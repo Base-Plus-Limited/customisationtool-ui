@@ -1,10 +1,16 @@
 import React from 'react';
+import { ThemeProvider } from 'styled-components';
+import theme from './theme';
+import { CustomiseProvider } from './CustomiseContext';
+import StyledCustomiseScreen from './Containers/CustomiseScreen';
   
 const App: React.FC = () => {
   return (
-    <div className="App">
-      <h1>Customisation tool</h1>
-    </div>
+    <ThemeProvider theme={theme}>
+      <CustomiseProvider>
+        <StyledCustomiseScreen></StyledCustomiseScreen>
+      </CustomiseProvider>
+    </ThemeProvider>
   );
 }
 

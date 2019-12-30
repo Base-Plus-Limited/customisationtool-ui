@@ -1,7 +1,7 @@
 import express, { Application } from 'express';
 import bodyParser from 'body-parser';
 import dotenv from 'dotenv';
-import { IIngredient, WordpressProduct } from './../react-ui/src/Interfaces/WordpressProduct';
+import WordpressProduct from './../react-ui/src/Interfaces/WordpressProduct';
 import * as request from 'superagent';
 import { resolve, join } from 'path';
 import fs from 'fs';
@@ -12,7 +12,7 @@ dotenv.config();
 
 class App {
   public express: Application;
-  private completedQuizModel = this.createCompletedQuizModel();
+  // private completedQuizModel = this.createCompletedQuizModel();
 
   constructor () {
     this.express = express();
@@ -20,8 +20,6 @@ class App {
     this.config(); 
     this.mountRoutes(); 
   }
-
-  private skinTypeCodes: string[] = ["#F1EAE1", "#F6E4E3", "#F0D4CA", "#E2AE8D", "#9E633C", "#5E3C2B"];
 
   private config () {
     this.express.use(express.static(resolve(__dirname, '../react-ui/build')));
@@ -73,38 +71,38 @@ class App {
     /*************************
      *  GET COMPLETED QUIZ ANSWERS
      *************************/
-    router.get('/completed-quiz', async (req, res) => {
-      this.completedQuizModel.find({ 'completedQuiz.quizData': { $size: 8 } })
-        .then(dbResponse => {
-          res.send(dbResponse);
-          this.writeDbDataTOCSV(dbResponse);
-        })
-        .catch(error => {
-          console.error(error);
-          res.send(error);
-        })
-    });
+    // router.get('/completed-quiz', async (req, res) => {
+    //   this.completedQuizModel.find({ 'completedQuiz.quizData': { $size: 8 } })
+    //     .then(dbResponse => {
+    //       res.send(dbResponse);
+    //       this.writeDbDataTOCSV(dbResponse);
+    //     })
+    //     .catch(error => {
+    //       console.error(error);
+    //       res.send(error);
+    //     })
+    // });
       
     /*************************
      *  SAVE QUIZ ANSWERS TO DB
      *************************/
-    router.post('/save-quiz', bodyParser.json(), async (req, res) => {
-      const quizData: IQuizData[] = req.body;
-      const completedQuiz = new this.completedQuizModel({
-        completedQuiz: {
-          quizData
-        }
-      });
-      completedQuiz.save()
-        .then(dbResponse => {
-          console.log(`Saved quiz data with id ${dbResponse.id}`);
-          res.json(dbResponse)
-        })
-        .catch(error => {
-          console.error(error);
-          res.send(error);
-        })
-    });
+    // router.post('/save-quiz', bodyParser.json(), async (req, res) => {
+    //   const quizData: IQuizData[] = req.body;
+    //   const completedQuiz = new this.completedQuizModel({
+    //     completedQuiz: {
+    //       quizData
+    //     }
+    //   });
+    //   completedQuiz.save()
+    //     .then(dbResponse => {
+    //       console.log(`Saved quiz data with id ${dbResponse.id}`);
+    //       res.json(dbResponse)
+    //     })
+    //     .catch(error => {
+    //       console.error(error);
+    //       res.send(error);
+    //     })
+    // });
 
     /*************************
      *  GET ALL INGREDIENTS
@@ -112,15 +110,13 @@ class App {
     router.get('/ingredients', async (req, res) => {
       await request.get(`${process.env.BASE_API_URL}/wc/v3/products?consumer_key=${process.env.WP_CONSUMER_KEY}&consumer_secret=${process.env.WP_CONSUMER_SECRET}&category=35&type=simple&per_page=30`)
         .then(res => res.body)
-        .then((ingredients: IIngredient[]) => ingredients.map(ingredient => {
-          ingredient.rank = 0;
+        .then((ingredients: WordpressProduct[]) => ingredients.map(ingredient => {
           ingredient.price_html = "";
           ingredient.description = ingredient.description.replace(/<[^>]*>?/gm, '');
           ingredient.short_description = ingredient.short_description.replace(/<[^>]*>?/gm, '');
-          ingredient.previouslyRanked = false;
           return ingredient;
         }))
-        .then((ingredients: IIngredient[]) => res.send(ingredients))
+        .then((ingredients: WordpressProduct[]) => res.send(ingredients))
         .catch((error) => {
           console.error(`Error ${this.handleError(error).code}, ${this.handleError(error).message}`);
           res.status(error.status).send(this.handleError(error));
@@ -135,26 +131,26 @@ class App {
     });
   }
 
-  private writeDbDataTOCSV = (dbData: (ICompletedQuizDBModel & mongoose.Document)[]) => {
-    if(dbData.length > 0) {
-      const filename = join(__dirname, '../react-ui/src/Assets/', 'completedQuizData.csv');
-      const output: string[] = [];
-      const dataHeadings = ["date", ...Object.keys(dbData[0].toObject().completedQuiz.quizData[0]).slice(1)];
-      output.push(dataHeadings.join());
-      dbData.forEach((field) => {
-        const quizObject: ICompletedQuiz = field.toObject();
-        quizObject.completedQuiz.quizData.forEach(x => {
-          const row = [];
-          row.push(new Date(quizObject.completedQuiz.date).toLocaleString().split(",")[0]);
-          row.push(x.questionId);
-          row.push(x.question.replace(",", "-"));
-          row.push(x.answer);
-          output.push(row.join());
-        })
-      });
-      fs.writeFileSync(filename, output.join(os.EOL));
-    }
-  }
+  // private writeDbDataTOCSV = (dbData: (ICompletedQuizDBModel & mongoose.Document)[]) => {
+  //   if(dbData.length > 0) {
+  //     const filename = join(__dirname, '../react-ui/src/Assets/', 'completedQuizData.csv');
+  //     const output: string[] = [];
+  //     const dataHeadings = ["date", ...Object.keys(dbData[0].toObject().completedQuiz.quizData[0]).slice(1)];
+  //     output.push(dataHeadings.join());
+  //     dbData.forEach((field) => {
+  //       const quizObject: ICompletedQuiz = field.toObject();
+  //       quizObject.completedQuiz.quizData.forEach(x => {
+  //         const row = [];
+  //         row.push(new Date(quizObject.completedQuiz.date).toLocaleString().split(",")[0]);
+  //         row.push(x.questionId);
+  //         row.push(x.question.replace(",", "-"));
+  //         row.push(x.answer);
+  //         output.push(row.join());
+  //       })
+  //     });
+  //     fs.writeFileSync(filename, output.join(os.EOL));
+  //   }
+  // }
 
   private connectToDb() {
     mongoose.connect(`${process.env.DB_CONNECTION_STRING}`, { useNewUrlParser: true, useUnifiedTopology: true },  (err: MongoError) => {
@@ -164,37 +160,37 @@ class App {
     });
   }
 
-  private createCompletedQuizModel() {
-    const CompletedQuizSchema = new Schema({
-      completedQuiz: {
-        id: {
-          type: String,
-          required: false,
-          default: mongoose.Types.ObjectId
-        },
-        date: {
-          type: Date,
-          required: false,
-          default: Date.now
-        },
-        quizData: [{
-          questionId: {
-            type: Number,
-            required: true
-          },
-          answer: {
-            type: String,
-            required: true
-          },
-          question: {
-            type: String,
-            required: true
-          }
-        }]
-      }
-    })
-    return model<ICompletedQuizDBModel & Document>('CompletedQuiz', CompletedQuizSchema);
-  }
+  // private createCompletedQuizModel() {
+  //   const CompletedQuizSchema = new Schema({
+  //     completedQuiz: {
+  //       id: {
+  //         type: String,
+  //         required: false,
+  //         default: mongoose.Types.ObjectId
+  //       },
+  //       date: {
+  //         type: Date,
+  //         required: false,
+  //         default: Date.now
+  //       },
+  //       quizData: [{
+  //         questionId: {
+  //           type: Number,
+  //           required: true
+  //         },
+  //         answer: {
+  //           type: String,
+  //           required: true
+  //         },
+  //         question: {
+  //           type: String,
+  //           required: true
+  //         }
+  //       }]
+  //     }
+  //   })
+  //   return model<ICompletedQuizDBModel & Document>('CompletedQuiz', CompletedQuizSchema);
+  // }
 
   private handleError(error: any) {
     const response = JSON.parse(error.response.text);
