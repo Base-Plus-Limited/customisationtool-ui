@@ -50,34 +50,11 @@ var body_parser_1 = __importDefault(require("body-parser"));
 var dotenv_1 = __importDefault(require("dotenv"));
 var request = __importStar(require("superagent"));
 var path_1 = require("path");
-var fs_1 = __importDefault(require("fs"));
-var os_1 = __importDefault(require("os"));
-var mongoose_1 = __importStar(require("mongoose"));
+var mongoose_1 = __importDefault(require("mongoose"));
 dotenv_1["default"].config();
 var App = /** @class */ (function () {
+    // private completedQuizModel = this.createCompletedQuizModel();
     function App() {
-        this.completedQuizModel = this.createCompletedQuizModel();
-        this.skinTypeCodes = ["#F1EAE1", "#F6E4E3", "#F0D4CA", "#E2AE8D", "#9E633C", "#5E3C2B"];
-        this.writeDbDataTOCSV = function (dbData) {
-            if (dbData.length > 0) {
-                var filename = path_1.join(__dirname, '../react-ui/src/Assets/', 'completedQuizData.csv');
-                var output_1 = [];
-                var dataHeadings = ["date"].concat(Object.keys(dbData[0].toObject().completedQuiz.quizData[0]).slice(1));
-                output_1.push(dataHeadings.join());
-                dbData.forEach(function (field) {
-                    var quizObject = field.toObject();
-                    quizObject.completedQuiz.quizData.forEach(function (x) {
-                        var row = [];
-                        row.push(new Date(quizObject.completedQuiz.date).toLocaleString().split(",")[0]);
-                        row.push(x.questionId);
-                        row.push(x.question.replace(",", "-"));
-                        row.push(x.answer);
-                        output_1.push(row.join());
-                    });
-                });
-                fs_1["default"].writeFileSync(filename, output_1.join(os_1["default"].EOL));
-            }
-        };
         this.express = express_1["default"]();
         this.connectToDb();
         this.config();
@@ -138,43 +115,37 @@ var App = /** @class */ (function () {
         /*************************
          *  GET COMPLETED QUIZ ANSWERS
          *************************/
-        router.get('/completed-quiz', function (req, res) { return __awaiter(_this, void 0, void 0, function () {
-            var _this = this;
-            return __generator(this, function (_a) {
-                this.completedQuizModel.find({ 'completedQuiz.quizData': { $size: 8 } })
-                    .then(function (dbResponse) {
-                    res.send(dbResponse);
-                    _this.writeDbDataTOCSV(dbResponse);
-                })["catch"](function (error) {
-                    console.error(error);
-                    res.send(error);
-                });
-                return [2 /*return*/];
-            });
-        }); });
+        // router.get('/completed-quiz', async (req, res) => {
+        //   this.completedQuizModel.find({ 'completedQuiz.quizData': { $size: 8 } })
+        //     .then(dbResponse => {
+        //       res.send(dbResponse);
+        //       this.writeDbDataTOCSV(dbResponse);
+        //     })
+        //     .catch(error => {
+        //       console.error(error);
+        //       res.send(error);
+        //     })
+        // });
         /*************************
          *  SAVE QUIZ ANSWERS TO DB
          *************************/
-        router.post('/save-quiz', body_parser_1["default"].json(), function (req, res) { return __awaiter(_this, void 0, void 0, function () {
-            var quizData, completedQuiz;
-            return __generator(this, function (_a) {
-                quizData = req.body;
-                completedQuiz = new this.completedQuizModel({
-                    completedQuiz: {
-                        quizData: quizData
-                    }
-                });
-                completedQuiz.save()
-                    .then(function (dbResponse) {
-                    console.log("Saved quiz data with id " + dbResponse.id);
-                    res.json(dbResponse);
-                })["catch"](function (error) {
-                    console.error(error);
-                    res.send(error);
-                });
-                return [2 /*return*/];
-            });
-        }); });
+        // router.post('/save-quiz', bodyParser.json(), async (req, res) => {
+        //   const quizData: IQuizData[] = req.body;
+        //   const completedQuiz = new this.completedQuizModel({
+        //     completedQuiz: {
+        //       quizData
+        //     }
+        //   });
+        //   completedQuiz.save()
+        //     .then(dbResponse => {
+        //       console.log(`Saved quiz data with id ${dbResponse.id}`);
+        //       res.json(dbResponse)
+        //     })
+        //     .catch(error => {
+        //       console.error(error);
+        //       res.send(error);
+        //     })
+        // });
         /*************************
          *  GET ALL INGREDIENTS
          *************************/
@@ -185,11 +156,9 @@ var App = /** @class */ (function () {
                     case 0: return [4 /*yield*/, request.get(process.env.BASE_API_URL + "/wc/v3/products?consumer_key=" + process.env.WP_CONSUMER_KEY + "&consumer_secret=" + process.env.WP_CONSUMER_SECRET + "&category=35&type=simple&per_page=30")
                             .then(function (res) { return res.body; })
                             .then(function (ingredients) { return ingredients.map(function (ingredient) {
-                            ingredient.rank = 0;
                             ingredient.price_html = "";
                             ingredient.description = ingredient.description.replace(/<[^>]*>?/gm, '');
                             ingredient.short_description = ingredient.short_description.replace(/<[^>]*>?/gm, '');
-                            ingredient.previouslyRanked = false;
                             return ingredient;
                         }); })
                             .then(function (ingredients) { return res.send(ingredients); })["catch"](function (error) {
@@ -209,6 +178,26 @@ var App = /** @class */ (function () {
             res.sendFile(path_1.join(__dirname, '../react-ui/build', 'index.html'));
         });
     };
+    // private writeDbDataTOCSV = (dbData: (ICompletedQuizDBModel & mongoose.Document)[]) => {
+    //   if(dbData.length > 0) {
+    //     const filename = join(__dirname, '../react-ui/src/Assets/', 'completedQuizData.csv');
+    //     const output: string[] = [];
+    //     const dataHeadings = ["date", ...Object.keys(dbData[0].toObject().completedQuiz.quizData[0]).slice(1)];
+    //     output.push(dataHeadings.join());
+    //     dbData.forEach((field) => {
+    //       const quizObject: ICompletedQuiz = field.toObject();
+    //       quizObject.completedQuiz.quizData.forEach(x => {
+    //         const row = [];
+    //         row.push(new Date(quizObject.completedQuiz.date).toLocaleString().split(",")[0]);
+    //         row.push(x.questionId);
+    //         row.push(x.question.replace(",", "-"));
+    //         row.push(x.answer);
+    //         output.push(row.join());
+    //       })
+    //     });
+    //     fs.writeFileSync(filename, output.join(os.EOL));
+    //   }
+    // }
     App.prototype.connectToDb = function () {
         mongoose_1["default"].connect("" + process.env.DB_CONNECTION_STRING, { useNewUrlParser: true, useUnifiedTopology: true }, function (err) {
             if (err)
@@ -216,37 +205,37 @@ var App = /** @class */ (function () {
             console.log("DB connection successful");
         });
     };
-    App.prototype.createCompletedQuizModel = function () {
-        var CompletedQuizSchema = new mongoose_1.Schema({
-            completedQuiz: {
-                id: {
-                    type: String,
-                    required: false,
-                    "default": mongoose_1["default"].Types.ObjectId
-                },
-                date: {
-                    type: Date,
-                    required: false,
-                    "default": Date.now
-                },
-                quizData: [{
-                        questionId: {
-                            type: Number,
-                            required: true
-                        },
-                        answer: {
-                            type: String,
-                            required: true
-                        },
-                        question: {
-                            type: String,
-                            required: true
-                        }
-                    }]
-            }
-        });
-        return mongoose_1.model('CompletedQuiz', CompletedQuizSchema);
-    };
+    // private createCompletedQuizModel() {
+    //   const CompletedQuizSchema = new Schema({
+    //     completedQuiz: {
+    //       id: {
+    //         type: String,
+    //         required: false,
+    //         default: mongoose.Types.ObjectId
+    //       },
+    //       date: {
+    //         type: Date,
+    //         required: false,
+    //         default: Date.now
+    //       },
+    //       quizData: [{
+    //         questionId: {
+    //           type: Number,
+    //           required: true
+    //         },
+    //         answer: {
+    //           type: String,
+    //           required: true
+    //         },
+    //         question: {
+    //           type: String,
+    //           required: true
+    //         }
+    //       }]
+    //     }
+    //   })
+    //   return model<ICompletedQuizDBModel & Document>('CompletedQuiz', CompletedQuizSchema);
+    // }
     App.prototype.handleError = function (error) {
         var response = JSON.parse(error.response.text);
         return {
