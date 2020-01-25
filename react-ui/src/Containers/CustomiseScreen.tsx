@@ -3,6 +3,7 @@ import styled from 'styled-components';
 import { CustomiseContext } from '../CustomiseContext';
 import WordpressProduct from './../Interfaces/WordpressProduct';
 import { ICategory } from '../Interfaces/Tag';
+import ICategorisedIngredient from '../Interfaces/CategorisedIngredient';
 
 export interface CustomiseScreenProps {
 
@@ -10,24 +11,20 @@ export interface CustomiseScreenProps {
 
 const StyledCustomiseScreen: React.SFC<CustomiseScreenProps> = () => {
 
-  const { saveIngredients, ingredients, setApplicationError } = useContext(CustomiseContext);
+  const { saveCategorisedIngredients, categorisedIngredients, setApplicationError } = useContext(CustomiseContext);
 
   useEffect(() => {
     fetch('/api/ingredients')
       .then(res => res.ok ? res.json() : res.json().then(errorResponse => setApplicationError(errorResponse)))
       .then((ingredients: WordpressProduct[]) => {
         const filteredIngredients = ingredients.filter(ingredient => ingredient.id !== 1474);
-        saveIngredients(filteredIngredients);
         const categories = returnUniqueCategories(filteredIngredients.flatMap(ingredient => ingredient.tags.map(tag => (
           {
             name: tag.name,
             id: tag.id
           }
-        ))));
-
-        const categorisedIngredients = returnCategoriesWithProducts(categories, ingredients);
-
-        console.log(categorisedIngredients);
+          ))));
+          saveCategorisedIngredients(returnCategorisedIngredients(categories, ingredients));
       })
       .catch((error) => {
         setApplicationError({
@@ -36,11 +33,11 @@ const StyledCustomiseScreen: React.SFC<CustomiseScreenProps> = () => {
           message: error.message
         })
       });
-  }, [saveIngredients, setApplicationError]);
+  }, [saveCategorisedIngredients, setApplicationError]);
 
-  const returnCategoriesWithProducts = (categories: ICategory[], ingredients: WordpressProduct[]) => {
+  const returnCategorisedIngredients = (categories: ICategory[], ingredients: WordpressProduct[]): ICategorisedIngredient[] => {
     return categories.map(category => {
-      const categorisedProducts = ingredients.flatMap(ingredient => {
+      const categorisedIngredients = ingredients.flatMap(ingredient => {
         return ingredient.tags.map(tag => {
           if(category.id === tag.id)
             return ingredient;
@@ -49,8 +46,8 @@ const StyledCustomiseScreen: React.SFC<CustomiseScreenProps> = () => {
       return {
         category: capitaliseFirstLetter(category.name),
         id: category.id,
-        products: categorisedProducts,
-        count: categorisedProducts.length
+        ingredients: categorisedIngredients,
+        count: categorisedIngredients.length
       }
     });
   }
@@ -66,7 +63,7 @@ const StyledCustomiseScreen: React.SFC<CustomiseScreenProps> = () => {
   return (
     <CustomiseScreen>
       {
-        `${ingredients.length} ingredients pulled from wordpress`
+        `${categorisedIngredients.length} ingredients pulled from wordpress`
       }
     </CustomiseScreen>
   );
