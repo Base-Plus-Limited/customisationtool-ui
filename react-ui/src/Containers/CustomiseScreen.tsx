@@ -25,7 +25,7 @@ const StyledCustomiseScreen: React.SFC<CustomiseScreenProps> = () => {
           }
         ))));
 
-        const categorisedIngredients = getCategorisedProducts(categories, ingredients);
+        const categorisedIngredients = returnCategoriesWithProducts(categories, ingredients);
 
         console.log(categorisedIngredients);
       })
@@ -38,17 +38,19 @@ const StyledCustomiseScreen: React.SFC<CustomiseScreenProps> = () => {
       });
   }, [saveIngredients, setApplicationError]);
 
-  const getCategorisedProducts = (categories: ICategory[], ingredients: WordpressProduct[]) => {
+  const returnCategoriesWithProducts = (categories: ICategory[], ingredients: WordpressProduct[]) => {
     return categories.map(category => {
+      const categorisedProducts = ingredients.flatMap(ingredient => {
+        return ingredient.tags.map(tag => {
+          if(category.id === tag.id)
+            return ingredient;
+        })
+      }).filter(product => product !== undefined) as WordpressProduct[];
       return {
         category: capitaliseFirstLetter(category.name),
         id: category.id,
-        products: ingredients.flatMap(ingredient => {
-          return ingredient.tags.map(tag => {
-            if(category.id === tag.id)
-              return ingredient;
-          })
-        }).filter(product => product !== undefined) as WordpressProduct[]
+        products: categorisedProducts,
+        count: categorisedProducts.length
       }
     });
   }
