@@ -76,27 +76,6 @@ class App {
     });
 
     /*************************
-     *  GET PRODUCT TAGS
-     *************************/
-    router.get('/tags', async (req, res) => {
-      await request.get(`${process.env.BASE_API_URL}/wc/v3/products/tags?consumer_key=${process.env.WP_CONSUMER_KEY}&consumer_secret=${process.env.WP_CONSUMER_SECRET}&category=35&type=simple&per_page=30`)
-        .then(res => res.body)
-        .then((tags: IWordpressTag[]) => tags.map(tag => (
-          {
-            name: tag.name,
-            id: tag.id,
-            count: tag.count 
-          }
-        )))
-        .then((tags: ITag[]) => res.send(tags))
-        .catch((error) => {
-          const { code, message } = this.handleError(error);
-          console.error(`Error ${code}, ${message}`);
-          res.status(error.status).send(this.handleError(error));
-        }) 
-    });
-
-    /*************************
      *  WILDCARD
      *************************/
     router.get('*', function (req, res) {
