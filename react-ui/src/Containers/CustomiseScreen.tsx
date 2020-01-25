@@ -2,6 +2,7 @@ import React, { useContext, useEffect } from 'react';
 import styled from 'styled-components';
 import { CustomiseContext } from '../CustomiseContext';
 import WordpressProduct from './../Interfaces/WordpressProduct';
+import { ICategory } from '../Interfaces/Tag';
 
 export interface CustomiseScreenProps {
 
@@ -17,7 +18,16 @@ const StyledCustomiseScreen: React.SFC<CustomiseScreenProps> = () => {
       .then((ingredients: WordpressProduct[]) => {
         const filteredIngredients = ingredients.filter(ingredient => ingredient.id !== 1474);
         saveIngredients(filteredIngredients);
-        console.log(filteredIngredients);
+        const categories = returnUniqueCategories(filteredIngredients.flatMap(ingredient => ingredient.tags.map(tag => (
+          {
+            name: tag.name,
+            id: tag.id
+          }
+        ))));
+
+        const categorisedIngredients = getCategorisedProducts(categories, ingredients);
+
+        console.log(categorisedIngredients);
       })
       .catch((error) => {
         setApplicationError({
@@ -27,6 +37,29 @@ const StyledCustomiseScreen: React.SFC<CustomiseScreenProps> = () => {
         })
       });
   }, [saveIngredients, setApplicationError]);
+
+  const getCategorisedProducts = (categories: ICategory[], ingredients: WordpressProduct[]) => {
+    return categories.map(category => {
+      return {
+        category: capitaliseFirstLetter(category.name),
+        id: category.id,
+        products: ingredients.flatMap(ingredient => {
+          return ingredient.tags.map(tag => {
+            if(category.id === tag.id)
+              return ingredient;
+          })
+        }).filter(product => product !== undefined) as WordpressProduct[]
+      }
+    });
+  }
+
+  const capitaliseFirstLetter = (category: string) => {
+    return category[0].toUpperCase() + category.substr(1);
+  }
+
+  const returnUniqueCategories = (categories: ICategory[]) => {
+    return categories.filter((value, index, categories) => categories.findIndex(cat => (cat.id === value.id)) === index);
+  }
 
   return (
     <CustomiseScreen>
