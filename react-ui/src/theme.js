@@ -6,7 +6,11 @@ const theme = {
     basePink: "#C06F78"
   },
   subHeadingFont: "'Montserrat', sans-serif",
-  bodyFont: "'Libre Baskerville', serif"
+  bodyFont: "'Libre Baskerville', serif",
+  mediaQueries: {
+    tablet: "@media screen and (min-width: 768px)",
+    desktop: "@media screen and (min-width: 1024px)"
+  }
 }
 
 export default theme;

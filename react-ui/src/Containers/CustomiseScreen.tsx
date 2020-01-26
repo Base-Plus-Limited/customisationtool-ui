@@ -2,6 +2,9 @@ import React, { useContext, useEffect } from 'react';
 import styled from 'styled-components';
 import { CustomiseContext } from '../CustomiseContext';
 import WordpressProduct from './../Interfaces/WordpressProduct';
+import { ICategory } from '../Interfaces/Tag';
+import ICategorisedIngredient from '../Interfaces/CategorisedIngredient';
+import SelectionTable from '../Components/SelectionTable';
 
 export interface CustomiseScreenProps {
 
@@ -9,15 +12,13 @@ export interface CustomiseScreenProps {
 
 const StyledCustomiseScreen: React.SFC<CustomiseScreenProps> = () => {
 
-  const { saveIngredients, ingredients, setApplicationError } = useContext(CustomiseContext);
+  const { saveCategorisedIngredients, categorisedIngredients, setApplicationError } = useContext(CustomiseContext);
 
   useEffect(() => {
     fetch('/api/ingredients')
       .then(res => res.ok ? res.json() : res.json().then(errorResponse => setApplicationError(errorResponse)))
-      .then((ingredients: WordpressProduct[]) => {
-        const filteredIngredients = ingredients.filter(ingredient => ingredient.id !== 1474);
-        saveIngredients(filteredIngredients);
-        console.log(filteredIngredients);
+      .then((categorisedIngredients: ICategorisedIngredient[]) => {
+          saveCategorisedIngredients(categorisedIngredients);
       })
       .catch((error) => {
         setApplicationError({
@@ -26,13 +27,34 @@ const StyledCustomiseScreen: React.SFC<CustomiseScreenProps> = () => {
           message: error.message
         })
       });
-  }, [saveIngredients, setApplicationError]);
+  }, [saveCategorisedIngredients, setApplicationError]);
+
+  const returnCategorisedIngredients = (categories: ICategory[], ingredients: WordpressProduct[]): ICategorisedIngredient[] => {
+    return categories.map(category => {
+      const categorisedIngredients = ingredients.flatMap(ingredient => {
+        return ingredient.tags.map(tag => {
+          if(category.id === tag.id)
+            return ingredient;
+        })
+      }).filter(product => product !== undefined) as WordpressProduct[];
+      return {
+        category: capitaliseFirstLetter(category.name),
+        id: category.id,
+        ingredients: categorisedIngredients,
+        count: categorisedIngredients.length
+      }
+    });
+  }
+
+  const capitaliseFirstLetter = (category: string) => {
+    return category[0].toUpperCase() + category.substr(1);
+  }
+
+  
 
   return (
     <CustomiseScreen>
-      {
-        `${ingredients.length} ingredients pulled from wordpress`
-      }
+      <SelectionTable categorisedIngredients={categorisedIngredients}></SelectionTable>
     </CustomiseScreen>
   );
 }
