@@ -4,6 +4,7 @@ import { CustomiseContext } from '../CustomiseContext';
 import WordpressProduct from './../Interfaces/WordpressProduct';
 import { ICategory } from '../Interfaces/Tag';
 import ICategorisedIngredient from '../Interfaces/CategorisedIngredient';
+import SelectionTable from '../Components/SelectionTable';
 
 export interface CustomiseScreenProps {
 
@@ -62,9 +63,7 @@ const StyledCustomiseScreen: React.SFC<CustomiseScreenProps> = () => {
 
   return (
     <CustomiseScreen>
-      {
-        `${categorisedIngredients.length} ingredients pulled from wordpress`
-      }
+      <SelectionTable categorisedIngredients={categorisedIngredients}></SelectionTable>
     </CustomiseScreen>
   );
 }

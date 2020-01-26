@@ -93,60 +93,6 @@ var App = /** @class */ (function () {
             });
         }); });
         /*************************
-         *  CREATE NEW PRODUCT
-         *************************/
-        router.post('/new-product', body_parser_1["default"].json(), function (req, res) { return __awaiter(_this, void 0, void 0, function () {
-            var _this = this;
-            return __generator(this, function (_a) {
-                switch (_a.label) {
-                    case 0: return [4 /*yield*/, request.post("https://baseplus.co.uk/wp-json/wc/v3/products?consumer_key=" + process.env.WP_CONSUMER_KEY + "&consumer_secret=" + process.env.WP_CONSUMER_SECRET)
-                            .send(req.body)
-                            .then(function (productResponse) { return productResponse.body; })
-                            .then(function (product) { return res.send(product); })["catch"](function (error) {
-                            console.error("Error " + _this.handleError(error).code + ", " + _this.handleError(error).message);
-                            res.status(error.status).send(_this.handleError(error));
-                        })];
-                    case 1:
-                        _a.sent();
-                        return [2 /*return*/];
-                }
-            });
-        }); });
-        /*************************
-         *  GET COMPLETED QUIZ ANSWERS
-         *************************/
-        // router.get('/completed-quiz', async (req, res) => {
-        //   this.completedQuizModel.find({ 'completedQuiz.quizData': { $size: 8 } })
-        //     .then(dbResponse => {
-        //       res.send(dbResponse);
-        //       this.writeDbDataTOCSV(dbResponse);
-        //     })
-        //     .catch(error => {
-        //       console.error(error);
-        //       res.send(error);
-        //     })
-        // });
-        /*************************
-         *  SAVE QUIZ ANSWERS TO DB
-         *************************/
-        // router.post('/save-quiz', bodyParser.json(), async (req, res) => {
-        //   const quizData: IQuizData[] = req.body;
-        //   const completedQuiz = new this.completedQuizModel({
-        //     completedQuiz: {
-        //       quizData
-        //     }
-        //   });
-        //   completedQuiz.save()
-        //     .then(dbResponse => {
-        //       console.log(`Saved quiz data with id ${dbResponse.id}`);
-        //       res.json(dbResponse)
-        //     })
-        //     .catch(error => {
-        //       console.error(error);
-        //       res.send(error);
-        //     })
-        // });
-        /*************************
          *  GET ALL INGREDIENTS
          *************************/
         router.get('/ingredients', function (req, res) { return __awaiter(_this, void 0, void 0, function () {
@@ -162,7 +108,8 @@ var App = /** @class */ (function () {
                             return ingredient;
                         }); })
                             .then(function (ingredients) { return res.send(ingredients); })["catch"](function (error) {
-                            console.error("Error " + _this.handleError(error).code + ", " + _this.handleError(error).message);
+                            var _a = _this.handleError(error), code = _a.code, message = _a.message;
+                            console.error("Error " + code + ", " + message);
                             res.status(error.status).send(_this.handleError(error));
                         })];
                     case 1:
@@ -178,26 +125,6 @@ var App = /** @class */ (function () {
             res.sendFile(path_1.join(__dirname, '../react-ui/build', 'index.html'));
         });
     };
-    // private writeDbDataTOCSV = (dbData: (ICompletedQuizDBModel & mongoose.Document)[]) => {
-    //   if(dbData.length > 0) {
-    //     const filename = join(__dirname, '../react-ui/src/Assets/', 'completedQuizData.csv');
-    //     const output: string[] = [];
-    //     const dataHeadings = ["date", ...Object.keys(dbData[0].toObject().completedQuiz.quizData[0]).slice(1)];
-    //     output.push(dataHeadings.join());
-    //     dbData.forEach((field) => {
-    //       const quizObject: ICompletedQuiz = field.toObject();
-    //       quizObject.completedQuiz.quizData.forEach(x => {
-    //         const row = [];
-    //         row.push(new Date(quizObject.completedQuiz.date).toLocaleString().split(",")[0]);
-    //         row.push(x.questionId);
-    //         row.push(x.question.replace(",", "-"));
-    //         row.push(x.answer);
-    //         output.push(row.join());
-    //       })
-    //     });
-    //     fs.writeFileSync(filename, output.join(os.EOL));
-    //   }
-    // }
     App.prototype.connectToDb = function () {
         mongoose_1["default"].connect("" + process.env.DB_CONNECTION_STRING, { useNewUrlParser: true, useUnifiedTopology: true }, function (err) {
             if (err)
@@ -205,37 +132,6 @@ var App = /** @class */ (function () {
             console.log("DB connection successful");
         });
     };
-    // private createCompletedQuizModel() {
-    //   const CompletedQuizSchema = new Schema({
-    //     completedQuiz: {
-    //       id: {
-    //         type: String,
-    //         required: false,
-    //         default: mongoose.Types.ObjectId
-    //       },
-    //       date: {
-    //         type: Date,
-    //         required: false,
-    //         default: Date.now
-    //       },
-    //       quizData: [{
-    //         questionId: {
-    //           type: Number,
-    //           required: true
-    //         },
-    //         answer: {
-    //           type: String,
-    //           required: true
-    //         },
-    //         question: {
-    //           type: String,
-    //           required: true
-    //         }
-    //       }]
-    //     }
-    //   })
-    //   return model<ICompletedQuizDBModel & Document>('CompletedQuiz', CompletedQuizSchema);
-    // }
     App.prototype.handleError = function (error) {
         var response = JSON.parse(error.response.text);
         return {

@@ -2,7 +2,7 @@ import express, { Application } from 'express';
 import bodyParser from 'body-parser';
 import dotenv from 'dotenv';
 import WordpressProduct from './../react-ui/src/Interfaces/WordpressProduct';
-import { IWordpressTag, ITag } from './../react-ui/src/Interfaces/Tag';
+import { IWordpressTag } from './../react-ui/src/Interfaces/Tag';
 import * as request from 'superagent';
 import { resolve, join } from 'path';
 import fs from 'fs';
