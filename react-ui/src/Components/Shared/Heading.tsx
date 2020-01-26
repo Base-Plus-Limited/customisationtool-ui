@@ -12,7 +12,7 @@ const StyledHeading: React.SFC<HeadingProps> = ({children}) => (
 const Heading = styled.h2`
   color: ${props => props.theme.brandColours.baseDarkGreen};
   font-family: ${props => props.theme.subHeadingFont};
-  font-size: 10pt;
+  font-size: 10.8pt;
   letter-spacing: 0.03em;
   text-align: center;
   text-transform: uppercase;
@@ -21,10 +21,6 @@ const Heading = styled.h2`
   span {
     padding-bottom: 2px;
     border-bottom: solid 3px ${props => props.theme.brandColours.baseLightGreen};
-    ${props => props.theme.mediaQueries.tablet} {
-      padding-bottom: 0;
-      border-bottom: none;
-    }
   }
 `
 

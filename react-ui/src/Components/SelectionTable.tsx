@@ -1,7 +1,8 @@
-import React, { useContext, useEffect } from 'react';
+import React from 'react';
 import styled from 'styled-components';
 import ICategorisedIngredient from '../Interfaces/CategorisedIngredient';
 import StyledHeading from './Shared/Heading';
+import StyledCategory from './Category';
 
 export interface SelectionTableProps {
   categorisedIngredients: ICategorisedIngredient[]
@@ -12,6 +13,9 @@ const SelectionTable: React.SFC<SelectionTableProps> = ({categorisedIngredients}
     <SelectionWrapper>
       <Categories>
         <StyledHeading>Categories</StyledHeading>
+        <CategoriesWrapper>
+          {categorisedIngredients.map(ingredient => <StyledCategory key={ingredient.id}>{ingredient.category}</StyledCategory>)}
+        </CategoriesWrapper>
       </Categories>
       <Selection>
         <StyledHeading>Ingredients</StyledHeading>
@@ -21,7 +25,6 @@ const SelectionTable: React.SFC<SelectionTableProps> = ({categorisedIngredients}
       </Summary>
     </SelectionWrapper>
   )
-  // return <p>{categorisedIngredients.map(ingredients => ingredients.category)}</p>
 }
  
 export default SelectionTable;
@@ -32,7 +35,16 @@ const SelectionWrapper = styled.div`
   grid-template-columns: 1fr 1fr;
   grid-template-rows: 1fr 1fr;
   ${props => props.theme.mediaQueries.tablet} {
+    grid-template-rows: auto 1fr;
     grid-template-columns: 200px 1fr 250px;
+  }
+`;
+
+const CategoriesWrapper = styled.div`
+  width:100%;
+  display: flex;
+  ${props => props.theme.mediaQueries.tablet} {
+    display: block;
   }
 `;
 
@@ -42,7 +54,16 @@ const Categories = styled.div`
   grid-row: 2;
   grid-column: 1/ span 2;
   width: 100%;
+  overflow-x: scroll;
+  h2{
+    display: none;
+  }
   ${props => props.theme.mediaQueries.tablet} {
+    h2{
+      display: block;
+      text-align:left;
+      padding: 20px;
+    }
     border: none;
     border-right: solid 1px ${props => props.theme.brandColours.baseDarkGreen};
     grid-column: 1;
