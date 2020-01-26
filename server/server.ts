@@ -1,8 +1,9 @@
 import express, { Application } from 'express';
 import bodyParser from 'body-parser';
 import dotenv from 'dotenv';
-import WordpressProduct from './../react-ui/src/Interfaces/WordpressProduct';
-import { IWordpressTag } from './../react-ui/src/Interfaces/Tag';
+import ICategorisedIngredient from './../react-ui/src/Interfaces/CategorisedIngredient';
+import IWordpressProduct from './../react-ui/src/Interfaces/WordpressProduct';
+import { IWordpressTag, ICategory } from './../react-ui/src/Interfaces/Tag';
 import * as request from 'superagent';
 import { resolve, join } from 'path';
 import fs from 'fs';
@@ -10,7 +11,7 @@ import os from 'os';
 import mongoose, { Document, Schema, model } from 'mongoose';
 import { MongoError } from 'mongodb';
 dotenv.config();
-
+import flatMap from 'array.prototype.flatmap';
 class App {
   public express: Application;
   // private completedQuizModel = this.createCompletedQuizModel();
@@ -61,13 +62,23 @@ class App {
     router.get('/ingredients', async (req, res) => {
       await request.get(`${process.env.BASE_API_URL}/wc/v3/products?consumer_key=${process.env.WP_CONSUMER_KEY}&consumer_secret=${process.env.WP_CONSUMER_SECRET}&category=35&type=simple&per_page=30`)
         .then(res => res.body)
-        .then((ingredients: WordpressProduct[]) => ingredients.map(ingredient => {
+        .then((ingredients: IWordpressProduct[]) => ingredients.map(ingredient => {
           ingredient.price_html = "";
           ingredient.description = ingredient.description.replace(/<[^>]*>?/gm, '');
           ingredient.short_description = ingredient.short_description.replace(/<[^>]*>?/gm, '');
           return ingredient;
         }))
-        .then((ingredients: WordpressProduct[]) => res.send(ingredients))
+        .then((ingredients: IWordpressProduct[]) => {
+          const filteredIngredients = ingredients.filter(ingredient => ingredient.id !== 1474);
+          const categories = this.returnUniqueCategories(flatMap(filteredIngredients, ingredient => ingredient.tags.map(tag => (
+            {
+              name: tag.name,
+              id: tag.id
+            }
+            ))));
+          return this.returnCategorisedIngredients(categories, ingredients);
+        })
+        .then((categorisedIngredients: ICategorisedIngredient[]) => res.send(categorisedIngredients))
         .catch((error) => {
           const { code, message } = this.handleError(error);
           console.error(`Error ${code}, ${message}`);
@@ -81,6 +92,31 @@ class App {
     router.get('*', function (req, res) {
       res.sendFile(join(__dirname, '../react-ui/build', 'index.html'));
     });
+  }
+
+  private returnUniqueCategories = (categories: ICategory[]) => {
+    return categories.filter((value, index, categories) => categories.findIndex(cat => (cat.id === value.id)) === index);
+  }
+
+  private returnCategorisedIngredients = (categories: ICategory[], ingredients: IWordpressProduct[]): ICategorisedIngredient[] => {
+    return categories.map(category => {
+      const categorisedIngredients = flatMap(ingredients, ingredient => {
+        return ingredient.tags.map(tag => {
+          if(category.id === tag.id)
+            return ingredient;
+        })
+      }).filter(product => product !== undefined) as IWordpressProduct[];
+      return {
+        category: this.capitaliseFirstLetter(category.name),
+        id: category.id,
+        ingredients: categorisedIngredients,
+        count: categorisedIngredients.length
+      }
+    });
+  }
+
+  private capitaliseFirstLetter = (category: string) => {
+    return category[0].toUpperCase() + category.substr(1);
   }
 
   private connectToDb() {

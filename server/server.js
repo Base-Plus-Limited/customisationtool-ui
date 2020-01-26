@@ -52,9 +52,33 @@ var request = __importStar(require("superagent"));
 var path_1 = require("path");
 var mongoose_1 = __importDefault(require("mongoose"));
 dotenv_1["default"].config();
+var array_prototype_flatmap_1 = __importDefault(require("array.prototype.flatmap"));
 var App = /** @class */ (function () {
     // private completedQuizModel = this.createCompletedQuizModel();
     function App() {
+        var _this = this;
+        this.returnUniqueCategories = function (categories) {
+            return categories.filter(function (value, index, categories) { return categories.findIndex(function (cat) { return (cat.id === value.id); }) === index; });
+        };
+        this.returnCategorisedIngredients = function (categories, ingredients) {
+            return categories.map(function (category) {
+                var categorisedIngredients = array_prototype_flatmap_1["default"](ingredients, function (ingredient) {
+                    return ingredient.tags.map(function (tag) {
+                        if (category.id === tag.id)
+                            return ingredient;
+                    });
+                }).filter(function (product) { return product !== undefined; });
+                return {
+                    category: _this.capitaliseFirstLetter(category.name),
+                    id: category.id,
+                    ingredients: categorisedIngredients,
+                    count: categorisedIngredients.length
+                };
+            });
+        };
+        this.capitaliseFirstLetter = function (category) {
+            return category[0].toUpperCase() + category.substr(1);
+        };
         this.express = express_1["default"]();
         this.connectToDb();
         this.config();
@@ -107,7 +131,15 @@ var App = /** @class */ (function () {
                             ingredient.short_description = ingredient.short_description.replace(/<[^>]*>?/gm, '');
                             return ingredient;
                         }); })
-                            .then(function (ingredients) { return res.send(ingredients); })["catch"](function (error) {
+                            .then(function (ingredients) {
+                            var filteredIngredients = ingredients.filter(function (ingredient) { return ingredient.id !== 1474; });
+                            var categories = _this.returnUniqueCategories(array_prototype_flatmap_1["default"](filteredIngredients, function (ingredient) { return ingredient.tags.map(function (tag) { return ({
+                                name: tag.name,
+                                id: tag.id
+                            }); }); }));
+                            return _this.returnCategorisedIngredients(categories, ingredients);
+                        })
+                            .then(function (categorisedIngredients) { return res.send(categorisedIngredients); })["catch"](function (error) {
                             var _a = _this.handleError(error), code = _a.code, message = _a.message;
                             console.error("Error " + code + ", " + message);
                             res.status(error.status).send(_this.handleError(error));

@@ -17,15 +17,8 @@ const StyledCustomiseScreen: React.SFC<CustomiseScreenProps> = () => {
   useEffect(() => {
     fetch('/api/ingredients')
       .then(res => res.ok ? res.json() : res.json().then(errorResponse => setApplicationError(errorResponse)))
-      .then((ingredients: WordpressProduct[]) => {
-        const filteredIngredients = ingredients.filter(ingredient => ingredient.id !== 1474);
-        const categories = returnUniqueCategories(filteredIngredients.flatMap(ingredient => ingredient.tags.map(tag => (
-          {
-            name: tag.name,
-            id: tag.id
-          }
-          ))));
-          saveCategorisedIngredients(returnCategorisedIngredients(categories, ingredients));
+      .then((categorisedIngredients: ICategorisedIngredient[]) => {
+          saveCategorisedIngredients(categorisedIngredients);
       })
       .catch((error) => {
         setApplicationError({
@@ -57,9 +50,7 @@ const StyledCustomiseScreen: React.SFC<CustomiseScreenProps> = () => {
     return category[0].toUpperCase() + category.substr(1);
   }
 
-  const returnUniqueCategories = (categories: ICategory[]) => {
-    return categories.filter((value, index, categories) => categories.findIndex(cat => (cat.id === value.id)) === index);
-  }
+  
 
   return (
     <CustomiseScreen>
