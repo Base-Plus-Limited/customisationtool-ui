@@ -4,6 +4,8 @@ import ICategorisedIngredient from '../Interfaces/CategorisedIngredient';
 import StyledHeading from './Shared/Heading';
 import StyledCategory from './Category';
 import { CustomiseContext } from '../CustomiseContext';
+import StyledIngredient from './Ingredient';
+import IWordpressProduct, { ISelectableProduct } from '../Interfaces/WordpressProduct';
 
 export interface SelectionTableProps {
   categorisedIngredients: ICategorisedIngredient[]
@@ -13,15 +15,32 @@ const SelectionTable: React.SFC<SelectionTableProps> = ({categorisedIngredients}
 
   const { updateCategorisedIngredients } = useContext(CustomiseContext);
 
-  const onCategorySelect = (selectedCategoryId: number) => {
+  const onCategorySelect = (categoryId: number) => {
     updateCategorisedIngredients(
       categorisedIngredients.map(category => {
         category.selected = false;
-        if(category.id === selectedCategoryId)
+        if(category.id === categoryId)
           category.selected = true;  
         return category;
       })
     )
+  }
+
+  const onIngredientSelect = (ingredientId: number) => {
+    updateCategorisedIngredients(
+      categorisedIngredients.map(category => {
+        category.ingredients.map(ingredient => {
+          ingredient.selected = false;
+          if(ingredient.id === ingredientId)
+            ingredient.selected = true;
+        })
+        return category;  
+      })
+    )
+  }
+
+  const getSelectedCategoryIngredients = () => {
+    return categorisedIngredients.filter(category => category.selected)[0].ingredients;
   }
 
   return (
@@ -32,9 +51,15 @@ const SelectionTable: React.SFC<SelectionTableProps> = ({categorisedIngredients}
           {categorisedIngredients.map(category => <StyledCategory selected={category.selected} selectCategory={() => onCategorySelect(category.id)} key={category.id}>{category.category}</StyledCategory>)}
         </CategoriesWrapper>
       </Categories>
-      <Selection>
+      <Ingredients>
         <StyledHeading>Ingredients</StyledHeading>
-      </Selection>
+      </Ingredients>
+      <IngredientsWrapper>
+      {
+        categorisedIngredients.some(category => category.selected) &&
+          getSelectedCategoryIngredients().map(ingredient => <StyledIngredient key={ingredient.id} ingredient={ingredient} selectIngredient={() => onIngredientSelect(ingredient.id)}></StyledIngredient>)
+      }
+      </IngredientsWrapper>
       <Summary>
         <StyledHeading>Summary</StyledHeading>
       </Summary>
@@ -98,8 +123,19 @@ const Summary = styled.div`
     }
   }
 `;
+
+const IngredientsWrapper = styled.div`
+  width:100%;
+  display: grid;
+  ${props => props.theme.mediaQueries.tablet} {
+    display: block;
+  }
+  .selected {
+    opacity: 1;
+  }
+`;
   
-const Selection = styled.div`
+const Ingredients = styled.div`
   grid-row: 1
   grid-column: 1;
   ${props => props.theme.mediaQueries.tablet} {
