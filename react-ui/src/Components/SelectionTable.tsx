@@ -5,10 +5,15 @@ import StyledHeading from './Shared/Heading';
 import StyledCategory from './Category';
 import { CustomiseContext } from '../CustomiseContext';
 import StyledIngredient from './Ingredient';
-import IWordpressProduct, { ISelectableProduct } from '../Interfaces/WordpressProduct';
+import { ISelectableProduct } from '../Interfaces/WordpressProduct';
+import {StyledText, Message} from './Shared/Text';
 
 export interface SelectionTableProps {
   categorisedIngredients: ICategorisedIngredient[]
+}
+
+export interface IngredientsInnerWrapperProps {
+  templateRows: number
 }
 
 const SelectionTable: React.SFC<SelectionTableProps> = ({categorisedIngredients}) => {
@@ -50,6 +55,26 @@ const SelectionTable: React.SFC<SelectionTableProps> = ({categorisedIngredients}
     return categorisedIngredients.filter(category => category.selected)[0].ingredients;
   }
 
+  const getIngredientTemplateRow = () => {
+    switch (categorisedIngredients.filter(category => category.selected)[0].ingredients.length) {
+      case 1:
+      case 2:
+      case 3:
+        return 1;
+      case 4:
+      case 5:
+      case 6:
+        return 2;
+      case 7:
+      case 8:
+      case 9:
+        return 3;
+      default:
+        return 1;
+    }
+    
+  }
+
   return (
     <SelectionWrapper>
       <Categories>
@@ -62,11 +87,17 @@ const SelectionTable: React.SFC<SelectionTableProps> = ({categorisedIngredients}
         <StyledHeading>Ingredients</StyledHeading>
       </Ingredients>
       <IngredientsWrapper>
-      {totalIngredientsSelected >= 2 ? "Please select only two products" : ""}
-      {
-        categorisedIngredients.some(category => category.selected) &&
-          getSelectedCategoryIngredients().map(ingredient => <StyledIngredient key={ingredient.id} ingredient={ingredient} selectIngredient={() => onIngredientSelect(ingredient.id)}></StyledIngredient>)
-      }
+        {
+          totalIngredientsSelected >= 2 ? <Message>{"Please select only two products"}</Message> : ""
+        }
+        {
+          categorisedIngredients.some(category => category.selected) &&
+            <IngredientsInnerWrapper templateRows={getIngredientTemplateRow()}>
+              {
+                getSelectedCategoryIngredients().map(ingredient => <StyledIngredient key={ingredient.id} ingredient={ingredient} selectIngredient={() => onIngredientSelect(ingredient.id)}></StyledIngredient>)
+              }
+            </IngredientsInnerWrapper>
+        }
       </IngredientsWrapper>
       <Summary>
         <StyledHeading>Summary</StyledHeading>
@@ -81,7 +112,7 @@ export default SelectionTable;
 const SelectionWrapper = styled.div`
   display: grid;
   grid-template-columns: 1fr 1fr;
-  grid-template-rows: 1fr 1fr;
+  grid-template-rows: auto 1fr;
   ${props => props.theme.mediaQueries.tablet} {
     grid-template-rows: auto 1fr;
     grid-template-columns: 200px 1fr 250px;
@@ -118,7 +149,6 @@ const Categories = styled.div`
   }
 `;
   
-  
 const Summary = styled.div`
   border-left: solid 1px ${props => props.theme.brandColours.baseDarkGreen};
   grid-row: 1;
@@ -135,11 +165,31 @@ const Summary = styled.div`
 const IngredientsWrapper = styled.div`
   width:100%;
   display: grid;
-  ${props => props.theme.mediaQueries.tablet} {
-    display: block;
-  }
+  grid-column: 1/ span 2;
+  grid-template-columns: 1fr 1fr;
+  padding-top: 20px;
   .selected {
     opacity: 1;
+  }
+  ${props => props.theme.mediaQueries.tablet} {
+    grid-column: 2;
+    grid-template-rows: auto 1fr;
+  }
+`;
+
+const IngredientsInnerWrapper = styled.div`
+  display: grid;
+  grid-column: 1/ span 2;
+  grid-template-columns: 1fr 1fr;
+  margin: 0 auto;
+  width: 90%;
+  grid-gap: 20px;
+  ${props => props.theme.mediaQueries.tablet} {
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: repeat(${(props: IngredientsInnerWrapperProps) => props.templateRows}, 160px);
+  }
+  ${props => props.theme.mediaQueries.desktop} {
+    grid-template-columns: 1fr 1fr 1fr;
   }
 `;
   
