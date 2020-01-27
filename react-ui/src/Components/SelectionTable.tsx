@@ -2,6 +2,7 @@ import React, { useContext } from 'react';
 import styled from 'styled-components';
 import ICategorisedIngredient from '../Interfaces/CategorisedIngredient';
 import StyledHeading from './Shared/Heading';
+import StyledAddToCart from './AddToCart';
 import StyledCategory from './Category';
 import { CustomiseContext } from '../CustomiseContext';
 import StyledIngredient from './Ingredient';
@@ -78,6 +79,19 @@ const SelectionTable: React.SFC<SelectionTableProps> = ({categorisedIngredients}
     }
   }
 
+  const getSelectedProductDescription = (): string => {
+    if(selectedIngredients.length)
+      return categorisedIngredients
+        .flatMap(categories => categories.ingredients)
+        .filter(x => x.recentlySelected)[0]
+        .short_description
+    return "";
+  }
+
+  const addToCart = () => {
+    
+  }
+
   return (
     <SelectionWrapper>
       <Categories>
@@ -107,16 +121,12 @@ const SelectionTable: React.SFC<SelectionTableProps> = ({categorisedIngredients}
       </Summary>
       <IngredientDescription>
         {
-          selectedIngredients.length ?
+          <React.Fragment>
             <StyledText>
-              {
-                categorisedIngredients
-                  .flatMap(categories => categories.ingredients)
-                  .filter(x => x.recentlySelected)[0]
-                  .short_description
-              }
+              {getSelectedProductDescription()}
             </StyledText>
-            : ""
+            {selectedIngredients.length <= 2 ? <StyledAddToCart selectAddToCart={addToCart}></StyledAddToCart> : ""}
+          </React.Fragment>
         }
       </IngredientDescription>
     </SelectionWrapper>
@@ -183,6 +193,10 @@ const IngredientDescription = styled.div`
   grid-row: 1;
   grid-column: 2;
   padding: 30px;
+  p{
+    font-size: 10pt;
+    line-height: 1.4em;
+  }
   ${props => props.theme.mediaQueries.tablet} {
     grid-column: 3;
     grid-row: 2;
