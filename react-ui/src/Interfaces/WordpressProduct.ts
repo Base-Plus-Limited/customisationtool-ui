@@ -1,5 +1,6 @@
 export interface ISelectableProduct extends IWordpressProduct{
   selected: boolean;
+  recentlySelected: boolean;
 }
 
 export default interface IWordpressProduct {

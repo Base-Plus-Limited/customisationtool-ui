@@ -18,7 +18,7 @@ export interface IngredientsInnerWrapperProps {
 
 const SelectionTable: React.SFC<SelectionTableProps> = ({categorisedIngredients}) => {
 
-  const { updateCategorisedIngredients, totalIngredientsSelected, updateTotalIngredientsSelected } = useContext(CustomiseContext);
+  const { updateCategorisedIngredients, selectedIngredients, updateSelectedIngredients } = useContext(CustomiseContext);
 
   const onCategorySelect = (categoryId: number) => {
     updateCategorisedIngredients(
@@ -35,16 +35,21 @@ const SelectionTable: React.SFC<SelectionTableProps> = ({categorisedIngredients}
     updateCategorisedIngredients(
       categorisedIngredients.map(category => {
         category.ingredients.map(ingredient => {
-          if(ingredient.id === ingredientId)
+          ingredient.recentlySelected = false;
+          if(ingredient.id === ingredientId) {
+            ingredient.recentlySelected = !ingredient.recentlySelected;
             ingredient.selected = !ingredient.selected;
-        })
+          }
+          return ingredient;
+        });
         return category;  
       })
     )
 
     const allIngredients = categorisedIngredients.flatMap(categories => categories.ingredients);
     const selectedIngredients = getUniqueIngredients(allIngredients.filter(ingredients => ingredients.selected));
-    updateTotalIngredientsSelected(selectedIngredients.length);
+    updateSelectedIngredients(selectedIngredients);
+    console.log(allIngredients.filter(x => x.recentlySelected)[0])
   }
 
   const getUniqueIngredients = (ingredients: ISelectableProduct[]) => {
@@ -72,7 +77,6 @@ const SelectionTable: React.SFC<SelectionTableProps> = ({categorisedIngredients}
       default:
         return 1;
     }
-    
   }
 
   return (
@@ -88,7 +92,7 @@ const SelectionTable: React.SFC<SelectionTableProps> = ({categorisedIngredients}
       </Ingredients>
       <IngredientsWrapper>
         {
-          totalIngredientsSelected > 2 ? <Message>{"Please select only two products"}</Message> : ""
+          selectedIngredients.length > 2 ? <Message>{"Please select only two products"}</Message> : ""
         }
         {
           categorisedIngredients.some(category => category.selected) &&
@@ -102,6 +106,20 @@ const SelectionTable: React.SFC<SelectionTableProps> = ({categorisedIngredients}
       <Summary>
         <StyledHeading>Summary</StyledHeading>
       </Summary>
+      <IngredientDescription>
+        {
+          selectedIngredients.length ?
+            <StyledText>
+              {
+                categorisedIngredients
+                  .flatMap(categories => categories.ingredients)
+                  .filter(x => x.recentlySelected)[0]
+                  .short_description
+              }
+            </StyledText>
+            : ""
+        }
+      </IngredientDescription>
     </SelectionWrapper>
   )
 }
@@ -115,7 +133,7 @@ const SelectionWrapper = styled.div`
   grid-template-rows: auto 1fr;
   ${props => props.theme.mediaQueries.tablet} {
     grid-template-rows: auto 1fr;
-    grid-template-columns: 200px 1fr 250px;
+    grid-template-columns: 200px 1fr 300px;
   }
 `;
 
@@ -159,6 +177,16 @@ const Summary = styled.div`
     h2{
       border-bottom: solid 1px ${props => props.theme.brandColours.baseDarkGreen};
     }
+  }
+`;
+  
+const IngredientDescription = styled.div`
+  grid-row: 1;
+  grid-column: 2;
+  padding: 30px;
+  ${props => props.theme.mediaQueries.tablet} {
+    grid-column: 3;
+    grid-row: 2;
   }
 `;
 
