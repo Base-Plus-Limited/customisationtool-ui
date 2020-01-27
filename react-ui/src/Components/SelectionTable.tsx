@@ -13,7 +13,7 @@ export interface SelectionTableProps {
 
 const SelectionTable: React.SFC<SelectionTableProps> = ({categorisedIngredients}) => {
 
-  const { updateCategorisedIngredients } = useContext(CustomiseContext);
+  const { updateCategorisedIngredients, totalIngredientsSelected, updateTotalIngredientsSelected } = useContext(CustomiseContext);
 
   const onCategorySelect = (categoryId: number) => {
     updateCategorisedIngredients(
@@ -30,13 +30,20 @@ const SelectionTable: React.SFC<SelectionTableProps> = ({categorisedIngredients}
     updateCategorisedIngredients(
       categorisedIngredients.map(category => {
         category.ingredients.map(ingredient => {
-          ingredient.selected = false;
           if(ingredient.id === ingredientId)
-            ingredient.selected = true;
+            ingredient.selected = !ingredient.selected;
         })
         return category;  
       })
     )
+
+    const allIngredients = categorisedIngredients.flatMap(categories => categories.ingredients);
+    const selectedIngredients = getUniqueIngredients(allIngredients.filter(ingredients => ingredients.selected));
+    updateTotalIngredientsSelected(selectedIngredients.length);
+  }
+
+  const getUniqueIngredients = (ingredients: ISelectableProduct[]) => {
+    return ingredients.filter((value, index, arr) => arr.findIndex(item => (item.id === value.id)) === index)
   }
 
   const getSelectedCategoryIngredients = () => {
@@ -55,6 +62,7 @@ const SelectionTable: React.SFC<SelectionTableProps> = ({categorisedIngredients}
         <StyledHeading>Ingredients</StyledHeading>
       </Ingredients>
       <IngredientsWrapper>
+      {totalIngredientsSelected >= 2 ? "Please select only two products" : ""}
       {
         categorisedIngredients.some(category => category.selected) &&
           getSelectedCategoryIngredients().map(ingredient => <StyledIngredient key={ingredient.id} ingredient={ingredient} selectIngredient={() => onIngredientSelect(ingredient.id)}></StyledIngredient>)
