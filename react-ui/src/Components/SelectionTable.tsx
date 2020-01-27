@@ -1,20 +1,35 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import styled from 'styled-components';
 import ICategorisedIngredient from '../Interfaces/CategorisedIngredient';
 import StyledHeading from './Shared/Heading';
 import StyledCategory from './Category';
+import { CustomiseContext } from '../CustomiseContext';
 
 export interface SelectionTableProps {
   categorisedIngredients: ICategorisedIngredient[]
 }
- 
+
 const SelectionTable: React.SFC<SelectionTableProps> = ({categorisedIngredients}) => {
+
+  const { updateCategorisedIngredients } = useContext(CustomiseContext);
+
+  const onCategorySelect = (selectedCategoryId: number) => {
+    updateCategorisedIngredients(
+      categorisedIngredients.map(category => {
+        category.selected = false;
+        if(category.id === selectedCategoryId)
+          category.selected = true;  
+        return category;
+      })
+    )
+  }
+
   return (
     <SelectionWrapper>
       <Categories>
         <StyledHeading>Categories</StyledHeading>
         <CategoriesWrapper>
-          {categorisedIngredients.map(ingredient => <StyledCategory key={ingredient.id}>{ingredient.category}</StyledCategory>)}
+          {categorisedIngredients.map(category => <StyledCategory selected={category.selected} selectCategory={() => onCategorySelect(category.id)} key={category.id}>{category.category}</StyledCategory>)}
         </CategoriesWrapper>
       </Categories>
       <Selection>

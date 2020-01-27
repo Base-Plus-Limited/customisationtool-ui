@@ -3,10 +3,14 @@ import styled from 'styled-components';
 
 export interface CategoryProps {
   children: any;
+  selected: boolean;
+  selectCategory: () => void;
 }
- 
-const StyledCategory: React.SFC<CategoryProps> = ({children}) => (
-  <Category><span>{children}</span></Category>
+
+const StyledCategory: React.SFC<CategoryProps> = ({children, selectCategory, selected}) => (
+  <Category onClick={selectCategory}>
+    <CategorySpan className={selected ? "selected" : ""}>{children}</CategorySpan> 
+  </Category>
 )
 
 const Category = styled.p`
@@ -19,18 +23,18 @@ const Category = styled.p`
   padding: 20px;
   margin: 0;
   display: inline-block;
-  span {
-    white-space: nowrap;
-    padding-bottom: 2px;
-    // border-bottom: solid 3px ${props => props.theme.brandColours.baseLightGreen};
-    ${props => props.theme.mediaQueries.tablet} {
-      padding-bottom: 0;
-      border-bottom: none;
-    }
-  }
+  cursor: pointer;
   ${props => props.theme.mediaQueries.tablet} {
     display: block;
     text-align:left;
   }
+  .selected{
+    border-bottom: solid 3px ${props => props.theme.brandColours.baseLightGreen};
+  }
+`
+
+const CategorySpan = styled.span`
+  white-space: nowrap;
+  padding-bottom: 2px;
 `
 export default StyledCategory;

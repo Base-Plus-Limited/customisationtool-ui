@@ -10,12 +10,12 @@ export interface CustomiseScreenProps {
 
 const StyledCustomiseScreen: React.SFC<CustomiseScreenProps> = () => {
 
-  const { saveCategorisedIngredients, categorisedIngredients, setApplicationError } = useContext(CustomiseContext);
+  const { updateCategorisedIngredients, categorisedIngredients, setApplicationError } = useContext(CustomiseContext);
 
   useEffect(() => {
     fetch('/api/ingredients')
       .then(res => res.ok ? res.json() : res.json().then(errorResponse => setApplicationError(errorResponse)))
-      .then((categorisedIngredients: ICategorisedIngredient[]) => saveCategorisedIngredients(categorisedIngredients))
+      .then((categorisedIngredients: ICategorisedIngredient[]) => updateCategorisedIngredients(categorisedIngredients))
       .catch((error) => {
         setApplicationError({
           error: true,
@@ -23,7 +23,7 @@ const StyledCustomiseScreen: React.SFC<CustomiseScreenProps> = () => {
           message: error.message
         })
       });
-  }, [saveCategorisedIngredients, setApplicationError]);
+  }, [updateCategorisedIngredients, setApplicationError]);
 
   return (
     <CustomiseScreen>

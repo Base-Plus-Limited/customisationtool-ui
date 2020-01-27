@@ -7,7 +7,7 @@ const state: ICustomiseContext = {
   applicationError: {} as IErrorResponse,
   setApplicationError: (previousApplicationError: SetStateAction<IErrorResponse>) => previousApplicationError,
   categorisedIngredients: [],
-  saveCategorisedIngredients: (previousIngredients: SetStateAction<ICategorisedIngredient[]>) => previousIngredients
+  updateCategorisedIngredients: (previousIngredients: SetStateAction<ICategorisedIngredient[]>) => previousIngredients
 }
 
 export const CustomiseContext = createContext(state);
@@ -18,14 +18,14 @@ interface CustomiseProviderProps {
 export const CustomiseProvider: React.SFC<CustomiseProviderProps> = ({ children }) => {
 
   const [applicationError, setApplicationError] = useState<IErrorResponse>({} as IErrorResponse);
-  const [categorisedIngredients, saveCategorisedIngredients] = useState<ICategorisedIngredient[]>([]);
+  const [categorisedIngredients, updateCategorisedIngredients] = useState<ICategorisedIngredient[]>([]);
 
   return (
     <CustomiseContext.Provider value={{
       applicationError,
       setApplicationError,
       categorisedIngredients,
-      saveCategorisedIngredients
+      updateCategorisedIngredients: updateCategorisedIngredients
     }}>
       {children}
     </CustomiseContext.Provider>
