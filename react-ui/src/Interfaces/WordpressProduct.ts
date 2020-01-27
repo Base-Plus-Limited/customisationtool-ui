@@ -1,3 +1,7 @@
+export interface ISelectableProduct extends IWordpressProduct{
+  selected: boolean;
+}
+
 export default interface IWordpressProduct {
   id: number;
   name: string;

@@ -6,5 +6,7 @@ export default interface ICustomiseContext {
   applicationError: IErrorResponse;
   setApplicationError: Dispatch<SetStateAction<IErrorResponse>>;
   categorisedIngredients: ICategorisedIngredient[];
-  saveCategorisedIngredients: Dispatch<SetStateAction<ICategorisedIngredient[]>>;
+  updateCategorisedIngredients: Dispatch<SetStateAction<ICategorisedIngredient[]>>;
+  totalIngredientsSelected: number;
+  updateTotalIngredientsSelected: Dispatch<SetStateAction<number>>;
 }

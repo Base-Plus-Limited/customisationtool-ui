@@ -15,5 +15,17 @@ const Text = styled.p`
   margin: 0;
 `
 
+const Message = styled(Text)`
+  background: ${props => props.theme.brandColours.basePink};
+  color: #fff;
+  margin: -20px 0 15px 0;
+  grid-column: 1/ span 2;
+  text-align: center;
+  padding: 10px 0;
+  font-size: 9pt;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+`
+
  
-export default StyledText;
+export {StyledText, Message};

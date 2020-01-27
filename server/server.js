@@ -61,18 +61,21 @@ var App = /** @class */ (function () {
             return categories.filter(function (value, index, categories) { return categories.findIndex(function (cat) { return (cat.id === value.id); }) === index; });
         };
         this.returnCategorisedIngredients = function (categories, ingredients) {
-            return categories.map(function (category) {
+            return categories.map(function (category, index) {
                 var categorisedIngredients = array_prototype_flatmap_1["default"](ingredients, function (ingredient) {
-                    return ingredient.tags.map(function (tag) {
+                    var x = ingredient;
+                    x.selected = false;
+                    return x.tags.map(function (tag) {
                         if (category.id === tag.id)
-                            return ingredient;
+                            return x;
                     });
                 }).filter(function (product) { return product !== undefined; });
                 return {
                     category: _this.capitaliseFirstLetter(category.name),
                     id: category.id,
                     ingredients: categorisedIngredients,
-                    count: categorisedIngredients.length
+                    count: categorisedIngredients.length,
+                    selected: index === 0 ? true : false
                 };
             });
         };

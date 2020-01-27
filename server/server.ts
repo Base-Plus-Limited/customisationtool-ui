@@ -2,7 +2,7 @@ import express, { Application } from 'express';
 import bodyParser from 'body-parser';
 import dotenv from 'dotenv';
 import ICategorisedIngredient from './../react-ui/src/Interfaces/CategorisedIngredient';
-import IWordpressProduct from './../react-ui/src/Interfaces/WordpressProduct';
+import IWordpressProduct, { ISelectableProduct } from './../react-ui/src/Interfaces/WordpressProduct';
 import { IWordpressTag, ICategory } from './../react-ui/src/Interfaces/Tag';
 import * as request from 'superagent';
 import { resolve, join } from 'path';
@@ -99,18 +99,21 @@ class App {
   }
 
   private returnCategorisedIngredients = (categories: ICategory[], ingredients: IWordpressProduct[]): ICategorisedIngredient[] => {
-    return categories.map(category => {
+    return categories.map((category, index) => {
       const categorisedIngredients = flatMap(ingredients, ingredient => {
-        return ingredient.tags.map(tag => {
+        const x = ingredient as ISelectableProduct;
+        x.selected = false;
+        return x.tags.map(tag => {
           if(category.id === tag.id)
-            return ingredient;
+            return x;
         })
-      }).filter(product => product !== undefined) as IWordpressProduct[];
+      }).filter(product => product !== undefined) as ISelectableProduct[];
       return {
         category: this.capitaliseFirstLetter(category.name),
         id: category.id,
         ingredients: categorisedIngredients,
-        count: categorisedIngredients.length
+        count: categorisedIngredients.length,
+        selected: index === 0 ? true : false
       }
     });
   }
