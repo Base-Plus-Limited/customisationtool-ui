@@ -88,7 +88,7 @@ const SelectionTable: React.SFC<SelectionTableProps> = ({categorisedIngredients}
       </Ingredients>
       <IngredientsWrapper>
         {
-          totalIngredientsSelected >= 2 ? <Message>{"Please select only two products"}</Message> : ""
+          totalIngredientsSelected > 2 ? <Message>{"Please select only two products"}</Message> : ""
         }
         {
           categorisedIngredients.some(category => category.selected) &&
