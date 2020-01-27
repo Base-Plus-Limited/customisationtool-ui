@@ -49,7 +49,6 @@ const SelectionTable: React.SFC<SelectionTableProps> = ({categorisedIngredients}
     const allIngredients = categorisedIngredients.flatMap(categories => categories.ingredients);
     const selectedIngredients = getUniqueIngredients(allIngredients.filter(ingredients => ingredients.selected));
     updateSelectedIngredients(selectedIngredients);
-    console.log(allIngredients.filter(x => x.recentlySelected)[0])
   }
 
   const getUniqueIngredients = (ingredients: ISelectableProduct[]) => {

@@ -65,6 +65,7 @@ var App = /** @class */ (function () {
                 var categorisedIngredients = array_prototype_flatmap_1["default"](ingredients, function (ingredient) {
                     var x = ingredient;
                     x.selected = false;
+                    x.recentlySelected = false;
                     return x.tags.map(function (tag) {
                         if (category.id === tag.id)
                             return x;
