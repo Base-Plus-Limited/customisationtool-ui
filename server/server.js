@@ -72,7 +72,8 @@ var App = /** @class */ (function () {
                     category: _this.capitaliseFirstLetter(category.name),
                     id: category.id,
                     ingredients: categorisedIngredients,
-                    count: categorisedIngredients.length
+                    count: categorisedIngredients.length,
+                    selected: false
                 };
             });
         };
