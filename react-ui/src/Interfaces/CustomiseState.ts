@@ -10,4 +10,6 @@ export default interface ICustomiseContext {
   updateCategorisedIngredients: Dispatch<SetStateAction<ICategorisedIngredient[]>>;
   selectedIngredients: ISelectableProduct[];
   updateSelectedIngredients: Dispatch<SetStateAction<ISelectableProduct[]>>;
+  isDescriptionVisible: boolean;
+  toggleDescriptionVisibility: Dispatch<SetStateAction<boolean>>;
 }

@@ -19,7 +19,7 @@ export interface IngredientsInnerWrapperProps {
 
 const SelectionTable: React.SFC<SelectionTableProps> = ({categorisedIngredients}) => {
 
-  const { updateCategorisedIngredients, selectedIngredients, updateSelectedIngredients } = useContext(CustomiseContext);
+  const { updateCategorisedIngredients, selectedIngredients, updateSelectedIngredients, toggleDescriptionVisibility, isDescriptionVisible } = useContext(CustomiseContext);
 
   const onCategorySelect = (categoryId: number) => {
     updateCategorisedIngredients(
@@ -79,17 +79,20 @@ const SelectionTable: React.SFC<SelectionTableProps> = ({categorisedIngredients}
     }
   }
 
-  const getSelectedProductDescription = (): string => {
+  const getSelectedProductDescription = () => {
     if(selectedIngredients.length)
       return categorisedIngredients
         .flatMap(categories => categories.ingredients)
-        .filter(x => x.recentlySelected)[0]
-        .short_description
-    return "";
+        .filter(x => x.recentlySelected)
   }
 
   const addToCart = () => {
     
+  }
+
+  const toggleDescription = () => {
+    let currentVisibility = isDescriptionVisible;
+    toggleDescriptionVisibility(currentVisibility = !isDescriptionVisible)
   }
 
   return (
@@ -119,11 +122,14 @@ const SelectionTable: React.SFC<SelectionTableProps> = ({categorisedIngredients}
       <Summary>
         <StyledHeading>Summary</StyledHeading>
       </Summary>
-      <IngredientDescription>
+      <IngredientDescriptionToggle onClick={toggleDescription}>
+        {Array.isArray(getSelectedProductDescription()) ? `View ${(getSelectedProductDescription() as ISelectableProduct[])[0].name} information` : "No description available"} 
+      </IngredientDescriptionToggle>
+      <IngredientDescription className={isDescriptionVisible ? "open" : "closed"}>
         {
           <React.Fragment>
             <StyledText>
-              {getSelectedProductDescription()}
+              {Array.isArray(getSelectedProductDescription()) ? (getSelectedProductDescription() as ISelectableProduct[])[0].short_description : ""}
             </StyledText>
             {selectedIngredients.length <= 2 ? <StyledAddToCart selectAddToCart={addToCart}></StyledAddToCart> : ""}
           </React.Fragment>
@@ -136,13 +142,39 @@ const SelectionTable: React.SFC<SelectionTableProps> = ({categorisedIngredients}
 export default SelectionTable;
 
 
+const IngredientDescriptionToggle = styled.div`
+  border-top: solid 1px ${props => props.theme.brandColours.baseDarkGreen};
+  color: ${props => props.theme.brandColours.baseDarkGreen};
+  position: absolute;
+  bottom: 0px;
+  width:100%;
+  font-size: 11pt;
+  padding: 3vh 0;
+  text-align: center;
+  z-index: 5;
+  background: #fff;
+  font-family: ${props => props.theme.bodyFont};
+  ${props => props.theme.mediaQueries.tablet} {
+    display: none;
+  }
+`;
+
 const SelectionWrapper = styled.div`
   display: grid;
   grid-template-columns: 1fr 1fr;
   grid-template-rows: auto 1fr;
+  .open{
+    transform: translateY(0vh);
+  }
+  .closed{
+    transform: translateY(100vh);
+  }
   ${props => props.theme.mediaQueries.tablet} {
     grid-template-rows: auto 1fr;
     grid-template-columns: 200px 1fr 300px;
+    .closed {
+      transform: translateY(0vh);
+    }
   }
 `;
 
@@ -192,14 +224,33 @@ const Summary = styled.div`
 const IngredientDescription = styled.div`
   grid-row: 1;
   grid-column: 2;
-  padding: 30px;
+  padding: 6% 8%;
+  position: absolute;
+  bottom: 0;
+  width: 84%;
+  transition: all 0.5s ease-in-out;
+  transform: translateY(100vh);
+  background: #fff;
   p{
     font-size: 10pt;
-    line-height: 1.4em;
+    font-family: ${props => props.theme.bodyFont};
+    line-height: 1.7em;
+    height: 320px;
+    padding-bottom: 8vh;
+    overflow-y: scroll;
   }
   ${props => props.theme.mediaQueries.tablet} {
+    position: static;
     grid-column: 3;
+    width: auto;
     grid-row: 2;
+    p{
+      height: auto;
+      padding: 0;
+      overflow-y: auto;
+      width: auto;
+
+    }
   }
 `;
 

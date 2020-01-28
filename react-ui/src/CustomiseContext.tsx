@@ -10,7 +10,9 @@ const state: ICustomiseContext = {
   categorisedIngredients: [],
   updateCategorisedIngredients: (previousIngredients: SetStateAction<ICategorisedIngredient[]>) => previousIngredients,
   selectedIngredients: [],
-  updateSelectedIngredients: (previousTotal: SetStateAction<ISelectableProduct[]>) => previousTotal
+  updateSelectedIngredients: (previousTotal: SetStateAction<ISelectableProduct[]>) => previousTotal,
+  isDescriptionVisible: false,
+  toggleDescriptionVisibility: (previousVisibility: SetStateAction<boolean>) => previousVisibility
 }
 
 export const CustomiseContext = createContext(state);
@@ -23,6 +25,7 @@ export const CustomiseProvider: React.SFC<CustomiseProviderProps> = ({ children 
   const [applicationError, setApplicationError] = useState<IErrorResponse>({} as IErrorResponse);
   const [categorisedIngredients, updateCategorisedIngredients] = useState<ICategorisedIngredient[]>([]);
   const [selectedIngredients, updateSelectedIngredients] = useState<ISelectableProduct[]>([]);
+  const [isDescriptionVisible, toggleDescriptionVisibility] = useState<boolean>(false);
 
   return (
     <CustomiseContext.Provider value={{
@@ -31,7 +34,9 @@ export const CustomiseProvider: React.SFC<CustomiseProviderProps> = ({ children 
       categorisedIngredients,
       updateCategorisedIngredients,
       selectedIngredients,
-      updateSelectedIngredients
+      updateSelectedIngredients,
+      isDescriptionVisible,
+      toggleDescriptionVisibility
     }}>
       {children}
     </CustomiseContext.Provider>
