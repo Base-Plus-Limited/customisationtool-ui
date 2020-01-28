@@ -103,6 +103,7 @@ class App {
       const categorisedIngredients = flatMap(ingredients, ingredient => {
         const x = ingredient as ISelectableProduct;
         x.selected = false;
+        x.recentlySelected = false;
         return x.tags.map(tag => {
           if(category.id === tag.id)
             return x;

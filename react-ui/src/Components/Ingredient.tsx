@@ -9,7 +9,7 @@ export interface IngredientProps {
 
 const StyledIngredient: React.SFC<IngredientProps> = ({selectIngredient, ingredient}) => (
   <IngredientWrap className={ingredient.selected ? "selected" : ""} onClick={selectIngredient}>
-    <img width={120} src={ingredient.images[0].src} alt={ingredient.name + " image"}/>
+    <img src={ingredient.images[0].src} alt={ingredient.name + " image"}/>
     <p>{ingredient.name}</p>
   </IngredientWrap>
 )
@@ -23,7 +23,12 @@ const IngredientWrap = styled.div`
   text-transform: uppercase;
   padding: 0;
   margin: 0;
+  justify-self: center;
   cursor: pointer;
   opacity: 0.7;
+  max-width: 120px;
+  img{
+    width: 100%;
+  }
 `
 export default StyledIngredient;
