@@ -47,8 +47,12 @@ const SelectionTable: React.SFC<SelectionTableProps> = ({categorisedIngredients}
       })
     )
 
-    const allIngredients = categorisedIngredients.flatMap(categories => categories.ingredients);
-    const selectedIngredients = getUniqueIngredients(allIngredients.filter(ingredients => ingredients.selected));
+
+    const selectedIngredients = getUniqueIngredients(
+      categorisedIngredients
+        .flatMap(categories => categories.ingredients)
+        .filter(ingredients => ingredients.selected)
+    );
     updateSelectedIngredients(selectedIngredients);
   }
 
@@ -79,11 +83,9 @@ const SelectionTable: React.SFC<SelectionTableProps> = ({categorisedIngredients}
     }
   }
 
-  const getSelectedProductDescription = () => {
-    if(selectedIngredients.length)
-      return categorisedIngredients
-        .flatMap(categories => categories.ingredients)
-        .filter(x => x.recentlySelected)
+  const areThereRecentlySelectedProducts = () => {
+    return selectedIngredients
+      .filter(x => x.recentlySelected).length > 0
   }
 
   const addToCart = () => {
@@ -93,6 +95,20 @@ const SelectionTable: React.SFC<SelectionTableProps> = ({categorisedIngredients}
   const toggleDescription = () => {
     let currentVisibility = isDescriptionVisible;
     toggleDescriptionVisibility(currentVisibility = !isDescriptionVisible)
+  }
+
+  const getSelectedProduct = () => {
+    return categorisedIngredients
+        .flatMap(categories => categories.ingredients)
+        .filter(x => x.recentlySelected)[0]
+  }
+
+  const getSelectionMessage = () => {
+    if(selectedIngredients.length === 1)
+      return `Selected: ${selectedIngredients.map(x => x.name)[0]}`;
+    if(selectedIngredients.length === 2)
+      return `Final mixture: ${selectedIngredients.map(x => x.name).join(' & ')}`;
+    return "Please select two ingredients";
   }
 
   return (
@@ -107,9 +123,7 @@ const SelectionTable: React.SFC<SelectionTableProps> = ({categorisedIngredients}
         <StyledHeading>Ingredients</StyledHeading>
       </Ingredients>
       <IngredientsWrapper>
-        {
-          selectedIngredients.length > 2 ? <Message>{"Please select only two products"}</Message> : ""
-        }
+      <Message>{getSelectionMessage()}</Message>
         {
           categorisedIngredients.some(category => category.selected) &&
             <IngredientsInnerWrapper templateRows={getIngredientTemplateRow()}>
@@ -123,13 +137,13 @@ const SelectionTable: React.SFC<SelectionTableProps> = ({categorisedIngredients}
         <StyledHeading>Summary</StyledHeading>
       </Summary>
       <IngredientDescriptionToggle onClick={toggleDescription}>
-        {Array.isArray(getSelectedProductDescription()) ? `View ${(getSelectedProductDescription() as ISelectableProduct[])[0].name} information` : "No description available"} 
+        {areThereRecentlySelectedProducts() ? `View ${getSelectedProduct().name} information` : "Please select a product"} 
       </IngredientDescriptionToggle>
       <IngredientDescription className={isDescriptionVisible ? "open" : "closed"}>
         {
           <React.Fragment>
             <StyledText>
-              {Array.isArray(getSelectedProductDescription()) ? (getSelectedProductDescription() as ISelectableProduct[])[0].short_description : ""}
+              {areThereRecentlySelectedProducts() ? getSelectedProduct().short_description : "No information available"}
             </StyledText>
             {selectedIngredients.length <= 2 ? <StyledAddToCart selectAddToCart={addToCart}></StyledAddToCart> : ""}
           </React.Fragment>
@@ -240,6 +254,7 @@ const IngredientDescription = styled.div`
     overflow-y: scroll;
   }
   ${props => props.theme.mediaQueries.tablet} {
+    background: transparent;
     position: static;
     grid-column: 3;
     width: auto;
