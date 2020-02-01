@@ -7,4 +7,5 @@ html {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   padding: 0;
+  overflow: hidden;
 }

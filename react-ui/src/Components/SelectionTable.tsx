@@ -19,7 +19,7 @@ export interface IngredientsInnerWrapperProps {
 
 const SelectionTable: React.SFC<SelectionTableProps> = ({categorisedIngredients}) => {
 
-  const { updateCategorisedIngredients, selectedIngredients, updateSelectedIngredients, toggleDescriptionVisibility, isDescriptionVisible } = useContext(CustomiseContext);
+  const { updateCategorisedIngredients, selectedIngredients, updateSelectedIngredients, toggleDescriptionVisibility, isDescriptionVisible, addToMixture, currentMixture } = useContext(CustomiseContext);
 
   const onCategorySelect = (categoryId: number) => {
     updateCategorisedIngredients(
@@ -37,23 +37,15 @@ const SelectionTable: React.SFC<SelectionTableProps> = ({categorisedIngredients}
       categorisedIngredients.map(category => {
         category.ingredients.map(ingredient => {
           ingredient.recentlySelected = false;
+          ingredient.selected = false;
           if(ingredient.id === ingredientId) {
             ingredient.recentlySelected = !ingredient.recentlySelected;
             ingredient.selected = !ingredient.selected;
           }
-          return ingredient;
         });
         return category;  
       })
     )
-
-
-    const selectedIngredients = getUniqueIngredients(
-      categorisedIngredients
-        .flatMap(categories => categories.ingredients)
-        .filter(ingredients => ingredients.selected)
-    );
-    updateSelectedIngredients(selectedIngredients);
   }
 
   const getUniqueIngredients = (ingredients: ISelectableProduct[]) => {
@@ -84,12 +76,24 @@ const SelectionTable: React.SFC<SelectionTableProps> = ({categorisedIngredients}
   }
 
   const areThereRecentlySelectedProducts = () => {
-    return selectedIngredients
-      .filter(x => x.recentlySelected).length > 0
+    console.log()
+    return categorisedIngredients
+      .flatMap(categories => categories.ingredients)
+      .filter(ingredients => ingredients.selected).length > 0
+    // return selectedIngredients
+    //   .filter(x => x.recentlySelected).length > 0
   }
 
   const addToCart = () => {
-    
+    if(currentMixture.some(x => x.id === getAlreadyAddedMixtureIngredients().id)) {
+      const a = currentMixture;
+      a.length = 0;
+      console.log(a)
+      return addToMixture(a);
+    }
+    addToMixture(
+      getUniqueIngredients(getSelectedProducts())
+    );
   }
 
   const toggleDescription = () => {
@@ -97,18 +101,24 @@ const SelectionTable: React.SFC<SelectionTableProps> = ({categorisedIngredients}
     toggleDescriptionVisibility(currentVisibility = !isDescriptionVisible)
   }
 
-  const getSelectedProduct = () => {
-    return categorisedIngredients
+  const getSelectedProducts = () => {
+    return getUniqueIngredients(categorisedIngredients
         .flatMap(categories => categories.ingredients)
-        .filter(x => x.recentlySelected)[0]
+        .filter(x => x.selected))
   }
 
   const getSelectionMessage = () => {
-    if(selectedIngredients.length === 1)
-      return `Selected: ${selectedIngredients.map(x => x.name)[0]}`;
-    if(selectedIngredients.length === 2)
-      return `Final mixture: ${selectedIngredients.map(x => x.name).join(' & ')}`;
+    if(currentMixture.length === 1)
+      return `Selected: ${currentMixture.map(x => x.name)[0]}`;
+    if(currentMixture.length === 2)
+      return `Final mixture: ${currentMixture.map(x => x.name).join(' & ')}`;
     return "Please select two ingredients";
+  }
+
+  const getAlreadyAddedMixtureIngredients = () => {
+    return getSelectedProducts().flatMap(x => {
+      return currentMixture.filter(y => x.id === y.id)
+    })[0];
   }
 
   return (
@@ -136,16 +146,19 @@ const SelectionTable: React.SFC<SelectionTableProps> = ({categorisedIngredients}
       <Summary>
         <StyledHeading>Summary</StyledHeading>
       </Summary>
-      <IngredientDescriptionToggle onClick={toggleDescription}>
-        {areThereRecentlySelectedProducts() ? `View ${getSelectedProduct().name} information` : "Please select a product"} 
-      </IngredientDescriptionToggle>
+      <FooterWrap>
+        <div onClick={toggleDescription} className="viewProductInfo">
+          {areThereRecentlySelectedProducts() ? `View ${getSelectedProducts()[0].name} information` : "Please select a product"} 
+        </div>
+        <StyledAddToCart isIngredientAlreadyAdded={getAlreadyAddedMixtureIngredients() !== undefined} selectAddToCart={addToCart}></StyledAddToCart>
+      </FooterWrap>
       <IngredientDescription className={isDescriptionVisible ? "open" : "closed"}>
         {
           <React.Fragment>
             <StyledText>
-              {areThereRecentlySelectedProducts() ? getSelectedProduct().short_description : "No information available"}
+              {areThereRecentlySelectedProducts() ? getSelectedProducts()[0].short_description : "No information available"}
             </StyledText>
-            {selectedIngredients.length <= 2 ? <StyledAddToCart selectAddToCart={addToCart}></StyledAddToCart> : ""}
+            {selectedIngredients.length <= 2 ? <StyledAddToCart isIngredientAlreadyAdded={getAlreadyAddedMixtureIngredients() !== undefined} selectAddToCart={addToCart}></StyledAddToCart> : ""}
           </React.Fragment>
         }
       </IngredientDescription>
@@ -156,18 +169,23 @@ const SelectionTable: React.SFC<SelectionTableProps> = ({categorisedIngredients}
 export default SelectionTable;
 
 
-const IngredientDescriptionToggle = styled.div`
+const FooterWrap = styled.div`
   border-top: solid 1px ${props => props.theme.brandColours.baseDarkGreen};
   color: ${props => props.theme.brandColours.baseDarkGreen};
   position: absolute;
   bottom: 0px;
   width:100%;
   font-size: 11pt;
-  padding: 3vh 0;
   text-align: center;
   z-index: 5;
   background: #fff;
   font-family: ${props => props.theme.bodyFont};
+  .viewProductInfo {
+    padding: 3vh 0;
+    float: left;
+    width: 69%;
+    font-size: 9pt;
+  }
   ${props => props.theme.mediaQueries.tablet} {
     display: none;
   }
@@ -212,7 +230,7 @@ const Categories = styled.div`
   }
   ${props => props.theme.mediaQueries.tablet} {
     h2{
-      display: block;
+      display: none;
       text-align:left;
       padding: 20px;
     }
@@ -253,6 +271,9 @@ const IngredientDescription = styled.div`
     padding-bottom: 8vh;
     overflow-y: scroll;
   }
+  .addToCart {
+    display: none;
+  }
   ${props => props.theme.mediaQueries.tablet} {
     background: transparent;
     position: static;
@@ -265,6 +286,9 @@ const IngredientDescription = styled.div`
       overflow-y: auto;
       width: auto;
 
+    }
+    .addToCart {
+      display: block;
     }
   }
 `;
