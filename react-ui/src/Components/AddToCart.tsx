@@ -4,24 +4,19 @@ import { CustomiseContext } from '../CustomiseContext';
 import { useContext } from 'react';
 
 export interface AddToCartProps {
-  selectAddToCart?: () => void;
+  onClick?: () => void;
   isIngredientAlreadyAdded?: boolean;
 }
 
-
-const StyledAddToCart: React.SFC<AddToCartProps> = ({selectAddToCart, isIngredientAlreadyAdded}) => {
+const StyledAddToCart: React.SFC<AddToCartProps> = ({onClick, isIngredientAlreadyAdded}) => {
 
   const { currentMixture } = useContext(CustomiseContext);
 
-  const toggleButtonText = () => {
-    return currentMixture.length !== 2 ? showRemoveOrAdd() : "view summary"
-  }
+  const toggleButtonText = () => currentMixture.length !== 2 ? showRemoveOrAdd() : "view summary";
 
-  const showRemoveOrAdd = () => {
-   return isIngredientAlreadyAdded ? "Remove -" : "Add +"
-  }
+  const showRemoveOrAdd = () => isIngredientAlreadyAdded ? "Remove -" : "Add +";
 
-  return <AddToCart className={isIngredientAlreadyAdded ? "isIngredientAlreadyAdded addToCart" : "addToCart"} onClick={selectAddToCart}>
+  return <AddToCart className={isIngredientAlreadyAdded ? "isIngredientAlreadyAdded addToCart" : "addToCart"} onClick={onClick}>
     {toggleButtonText()}
   </AddToCart>
 }

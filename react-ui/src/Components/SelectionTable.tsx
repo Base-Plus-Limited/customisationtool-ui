@@ -120,6 +120,10 @@ const SelectionTable: React.SFC<SelectionTableProps> = ({categorisedIngredients}
     })[0];
   }
 
+  const toggleSummaryScreen = () => {
+    console.log("Summary screen selected")
+  }
+
   return (
     <SelectionWrapper>
       <Categories>
@@ -152,7 +156,7 @@ const SelectionTable: React.SFC<SelectionTableProps> = ({categorisedIngredients}
         <div onClick={toggleDescription} className="viewProductInfo">
           {areThereRecentlySelectedProducts() ? `View ${getSelectedProducts()[0].name} information` : "Please select a product"} 
         </div>
-        <StyledAddToCart isIngredientAlreadyAdded={getAlreadyAddedMixtureIngredients() !== undefined} selectAddToCart={addToCart}></StyledAddToCart>
+        <StyledAddToCart isIngredientAlreadyAdded={getAlreadyAddedMixtureIngredients() !== undefined} onClick={currentMixture.length === 2 ? toggleSummaryScreen : addToCart}></StyledAddToCart>
       </FooterWrap>
       <IngredientDescription className={isDescriptionVisible ? "open" : "closed"}>
         {
@@ -160,7 +164,7 @@ const SelectionTable: React.SFC<SelectionTableProps> = ({categorisedIngredients}
             <StyledText>
               {areThereRecentlySelectedProducts() ? getSelectedProducts()[0].short_description : "No information available"}
             </StyledText>
-            <StyledAddToCart isIngredientAlreadyAdded={getAlreadyAddedMixtureIngredients() !== undefined} selectAddToCart={addToCart}></StyledAddToCart>
+            <StyledAddToCart isIngredientAlreadyAdded={getAlreadyAddedMixtureIngredients() !== undefined} onClick={currentMixture.length === 2 ? toggleSummaryScreen : addToCart}></StyledAddToCart>
           </React.Fragment>
         }
       </IngredientDescription>
