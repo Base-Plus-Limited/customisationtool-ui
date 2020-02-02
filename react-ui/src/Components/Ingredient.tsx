@@ -5,10 +5,11 @@ import { ISelectableProduct } from '../Interfaces/WordpressProduct';
 export interface IngredientProps {
   ingredient: ISelectableProduct;
   selectIngredient: () => void;
+  isSummaryScreen?: boolean;
 }
 
-const StyledIngredient: React.SFC<IngredientProps> = ({selectIngredient, ingredient}) => (
-  <IngredientWrap className={ingredient.selected ? "selected" : ""} onClick={selectIngredient}>
+const StyledIngredient: React.SFC<IngredientProps> = ({selectIngredient, ingredient, isSummaryScreen}) => (
+  <IngredientWrap className={ingredient.selected || isSummaryScreen ? "selected" : ""} onClick={selectIngredient}>
     <img src={ingredient.images[0].src} alt={ingredient.name + " image"}/>
     <p>{ingredient.name}</p>
   </IngredientWrap>

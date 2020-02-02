@@ -9,6 +9,7 @@ import StyledIngredient from './Ingredient';
 import StyledSelectedIngredient from './SelectedIngredient';
 import { ISelectableProduct } from '../Interfaces/WordpressProduct';
 import {StyledText, Message} from './Shared/Text';
+import { IHeading } from '../Interfaces/Heading';
 
 export interface SelectionTableProps {
   categorisedIngredients: ICategorisedIngredient[]
@@ -141,11 +142,14 @@ const SelectionTable: React.SFC<SelectionTableProps> = ({categorisedIngredients}
       })
     )
   }
+
+  const isSummaryHeadingSelected = () => {
+    return (headings.find(heading => heading.selected) as IHeading).id === 1;
+  }
   
   return (
     <SelectionWrapper>
       <Categories>
-        {/* <StyledHeading>Categories</StyledHeading> */}
         <CategoriesWrapper>
           {categorisedIngredients.map(category => <StyledCategory selected={category.selected} selectCategory={() => onCategorySelect(category.id)} key={category.id}>{category.category}</StyledCategory>)}
         </CategoriesWrapper>
@@ -154,38 +158,50 @@ const SelectionTable: React.SFC<SelectionTableProps> = ({categorisedIngredients}
         <StyledHeading onClick={() => toggleViews(headings[0].id)} selected={headings[0].selected}>{headings[0].headingText}</StyledHeading>
       </Ingredients>
       <IngredientsWrapper>
-      <Message>{getSelectionMessage()}</Message>
-        <SelectedIngredientsWrapper>
-          {currentMixture.map(ingredient => <StyledSelectedIngredient key={ingredient.id} removeFromCart={() => removeFromCart(ingredient)} ingredientName={ingredient.name}></StyledSelectedIngredient>)}
-        </SelectedIngredientsWrapper>
-        {
-          categorisedIngredients.some(category => category.selected) &&
-            <IngredientsInnerWrapper templateRows={getIngredientTemplateRow()}>
-              {
-                getSelectedCategoryIngredients().map(ingredient => <StyledIngredient key={ingredient.id} ingredient={ingredient} selectIngredient={() => onIngredientSelect(ingredient.id)}></StyledIngredient>)
-              }
-            </IngredientsInnerWrapper>
-        }
+        <React.Fragment>
+          { !isSummaryHeadingSelected() && <Message>{getSelectionMessage()}</Message>}
+          <SelectedIngredientsWrapper>
+            {currentMixture.map(ingredient => <StyledSelectedIngredient key={ingredient.id} removeFromCart={() => removeFromCart(ingredient)} ingredientName={ingredient.name}></StyledSelectedIngredient>)}
+          </SelectedIngredientsWrapper>
+          {
+            isSummaryHeadingSelected() ?
+            currentMixture.map(ingredient => <StyledIngredient isSummaryScreen={isSummaryHeadingSelected()} key={ingredient.id} ingredient={ingredient} selectIngredient={() => onIngredientSelect(ingredient.id)}></StyledIngredient>)
+            :
+            categorisedIngredients.some(category => category.selected) &&
+              <IngredientsInnerWrapper templateRows={getIngredientTemplateRow()}>
+                {
+                  getSelectedCategoryIngredients().map(ingredient => <StyledIngredient key={ingredient.id} ingredient={ingredient} selectIngredient={() => onIngredientSelect(ingredient.id)}></StyledIngredient>)
+                }
+              </IngredientsInnerWrapper>
+          }
+        </React.Fragment>
       </IngredientsWrapper>
       <Summary>
         <StyledHeading onClick={() => toggleViews(headings[1].id)} selected={headings[1].selected}>{headings[1].headingText}</StyledHeading>
       </Summary>
-      <FooterWrap>
-        <div onClick={toggleDescription} className="viewProductInfo">
-          {areThereRecentlySelectedProducts() ? `View ${getSelectedProducts()[0].name} information` : "Please select a product"} 
-        </div>
-        <StyledAddToCart isIngredientAlreadyAdded={getAlreadyAddedMixtureIngredients() !== undefined} onClick={currentMixture.length === 2 ? toggleSummaryScreen : addToCart}></StyledAddToCart>
-      </FooterWrap>
-      <IngredientDescription className={isDescriptionVisible ? "open" : "closed"}>
-        {
-          <React.Fragment>
-            <StyledText>
-              {areThereRecentlySelectedProducts() ? getSelectedProducts()[0].short_description : "No information available"}
-            </StyledText>
+      {
+        isSummaryHeadingSelected() ?
+        "summary screen"
+        :
+        <React.Fragment>
+            <FooterWrap>
+            <div onClick={toggleDescription} className="viewProductInfo">
+              {areThereRecentlySelectedProducts() ? `View ${getSelectedProducts()[0].name} information` : "Please select a product"} 
+            </div>
             <StyledAddToCart isIngredientAlreadyAdded={getAlreadyAddedMixtureIngredients() !== undefined} onClick={currentMixture.length === 2 ? toggleSummaryScreen : addToCart}></StyledAddToCart>
-          </React.Fragment>
-        }
-      </IngredientDescription>
+          </FooterWrap>
+          <IngredientDescription className={isDescriptionVisible ? "open" : "closed"}>
+            {
+              <React.Fragment>
+                <StyledText>
+                  {areThereRecentlySelectedProducts() ? getSelectedProducts()[0].short_description : "No information available"}
+                </StyledText>
+                <StyledAddToCart isIngredientAlreadyAdded={getAlreadyAddedMixtureIngredients() !== undefined} onClick={currentMixture.length === 2 ? toggleSummaryScreen : addToCart}></StyledAddToCart>
+              </React.Fragment>
+            }
+          </IngredientDescription>
+        </React.Fragment>
+      }
     </SelectionWrapper>
   )
 }
@@ -330,6 +346,7 @@ const IngredientsWrapper = styled.div`
   padding-top: 20px;
   .selected {
     opacity: 1;
+    pointer-events: none;
   }
   ${props => props.theme.mediaQueries.tablet} {
     grid-column: 2;
