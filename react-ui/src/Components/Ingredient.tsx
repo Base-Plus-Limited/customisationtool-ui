@@ -30,5 +30,8 @@ const IngredientWrap = styled.div`
   img{
     width: 100%;
   }
+  p{
+    margin: 0;
+  }
 `
 export default StyledIngredient;

@@ -6,6 +6,7 @@ import StyledAddToCart from './AddToCart';
 import StyledCategory from './Category';
 import { CustomiseContext } from '../CustomiseContext';
 import StyledIngredient from './Ingredient';
+import StyledSelectedIngredient from './SelectedIngredient';
 import { ISelectableProduct } from '../Interfaces/WordpressProduct';
 import {StyledText, Message} from './Shared/Text';
 
@@ -107,10 +108,10 @@ const SelectionTable: React.SFC<SelectionTableProps> = ({categorisedIngredients}
 
   const getSelectionMessage = () => {
     if(currentMixture.length === 1)
-      return `Selected: ${currentMixture.map(x => x.name)[0]}`;
+      return "Please add one more ingredient";
     if(currentMixture.length === 2)
-      return `Final mixture: ${currentMixture.map(x => x.name).join(' & ')}`;
-    return "Please select two ingredients";
+      return `View your mixture on the summary screen`;
+    return "Please add two ingredients";
   }
 
   const getAlreadyAddedMixtureIngredients = () => {
@@ -132,6 +133,9 @@ const SelectionTable: React.SFC<SelectionTableProps> = ({categorisedIngredients}
       </Ingredients>
       <IngredientsWrapper>
       <Message>{getSelectionMessage()}</Message>
+        <SelectedIngredientsWrapper>
+          {currentMixture.map(ingredient => <StyledSelectedIngredient key={ingredient.id} removeFromCart={() => removeFromCart(ingredient)} ingredientName={ingredient.name}></StyledSelectedIngredient>)}
+        </SelectedIngredientsWrapper>
         {
           categorisedIngredients.some(category => category.selected) &&
             <IngredientsInnerWrapper templateRows={getIngredientTemplateRow()}>
@@ -156,7 +160,7 @@ const SelectionTable: React.SFC<SelectionTableProps> = ({categorisedIngredients}
             <StyledText>
               {areThereRecentlySelectedProducts() ? getSelectedProducts()[0].short_description : "No information available"}
             </StyledText>
-            {selectedIngredients.length <= 2 ? <StyledAddToCart isIngredientAlreadyAdded={getAlreadyAddedMixtureIngredients() !== undefined} selectAddToCart={addToCart}></StyledAddToCart> : ""}
+            <StyledAddToCart isIngredientAlreadyAdded={getAlreadyAddedMixtureIngredients() !== undefined} selectAddToCart={addToCart}></StyledAddToCart>
           </React.Fragment>
         }
       </IngredientDescription>
@@ -166,6 +170,10 @@ const SelectionTable: React.SFC<SelectionTableProps> = ({categorisedIngredients}
  
 export default SelectionTable;
 
+const SelectedIngredientsWrapper = styled.div`
+  grid-column: 1/span 2;
+  text-align: center;
+`;
 
 const FooterWrap = styled.div`
   border-top: solid 1px ${props => props.theme.brandColours.baseDarkGreen};
@@ -303,7 +311,7 @@ const IngredientsWrapper = styled.div`
   }
   ${props => props.theme.mediaQueries.tablet} {
     grid-column: 2;
-    grid-template-rows: auto 1fr;
+    grid-template-rows: auto auto 1fr;
   }
 `;
 
@@ -313,7 +321,7 @@ const IngredientsInnerWrapper = styled.div`
   grid-template-columns: 1fr 1fr;
   margin: 0 auto;
   width: 90%;
-  grid-gap: 20px;
+  grid-gap: 40px;
   ${props => props.theme.mediaQueries.tablet} {
     grid-template-columns: 1fr 1fr;
     grid-template-rows: repeat(${(props: IngredientsInnerWrapperProps) => props.templateRows}, 160px);
