@@ -15,7 +15,13 @@ const StyledCustomiseScreen: React.SFC<CustomiseScreenProps> = () => {
   useEffect(() => {
     fetch('/api/ingredients')
       .then(res => res.ok ? res.json() : res.json().then(errorResponse => setApplicationError(errorResponse)))
-      .then((categorisedIngredients: ICategorisedIngredient[]) => updateCategorisedIngredients(categorisedIngredients))
+      .then((categorisedIngredients: ICategorisedIngredient[]) => {
+        updateCategorisedIngredients(categorisedIngredients.map(x => {
+          if(x.selected)
+            x.ingredients[0].selected = true;
+          return x;
+        }))
+      })
       .catch((error) => {
         setApplicationError({
           error: true,

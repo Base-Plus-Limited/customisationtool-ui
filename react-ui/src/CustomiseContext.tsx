@@ -12,7 +12,9 @@ const state: ICustomiseContext = {
   selectedIngredients: [],
   updateSelectedIngredients: (previousTotal: SetStateAction<ISelectableProduct[]>) => previousTotal,
   isDescriptionVisible: false,
-  toggleDescriptionVisibility: (previousVisibility: SetStateAction<boolean>) => previousVisibility
+  toggleDescriptionVisibility: (previousVisibility: SetStateAction<boolean>) => previousVisibility,
+  currentMixture: [],
+  addToMixture: (previousMixture: SetStateAction<ISelectableProduct[]>) => previousMixture
 }
 
 export const CustomiseContext = createContext(state);
@@ -26,6 +28,7 @@ export const CustomiseProvider: React.SFC<CustomiseProviderProps> = ({ children 
   const [categorisedIngredients, updateCategorisedIngredients] = useState<ICategorisedIngredient[]>([]);
   const [selectedIngredients, updateSelectedIngredients] = useState<ISelectableProduct[]>([]);
   const [isDescriptionVisible, toggleDescriptionVisibility] = useState<boolean>(false);
+  const [currentMixture, addToMixture] = useState<ISelectableProduct[]>([]);
 
   return (
     <CustomiseContext.Provider value={{
@@ -36,7 +39,9 @@ export const CustomiseProvider: React.SFC<CustomiseProviderProps> = ({ children 
       selectedIngredients,
       updateSelectedIngredients,
       isDescriptionVisible,
-      toggleDescriptionVisibility
+      toggleDescriptionVisibility,
+      currentMixture,
+      addToMixture
     }}>
       {children}
     </CustomiseContext.Provider>

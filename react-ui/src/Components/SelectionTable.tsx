@@ -6,6 +6,7 @@ import StyledAddToCart from './AddToCart';
 import StyledCategory from './Category';
 import { CustomiseContext } from '../CustomiseContext';
 import StyledIngredient from './Ingredient';
+import StyledSelectedIngredient from './SelectedIngredient';
 import { ISelectableProduct } from '../Interfaces/WordpressProduct';
 import {StyledText, Message} from './Shared/Text';
 
@@ -19,7 +20,7 @@ export interface IngredientsInnerWrapperProps {
 
 const SelectionTable: React.SFC<SelectionTableProps> = ({categorisedIngredients}) => {
 
-  const { updateCategorisedIngredients, selectedIngredients, updateSelectedIngredients, toggleDescriptionVisibility, isDescriptionVisible } = useContext(CustomiseContext);
+  const { updateCategorisedIngredients, selectedIngredients, toggleDescriptionVisibility, isDescriptionVisible, addToMixture, currentMixture } = useContext(CustomiseContext);
 
   const onCategorySelect = (categoryId: number) => {
     updateCategorisedIngredients(
@@ -37,23 +38,15 @@ const SelectionTable: React.SFC<SelectionTableProps> = ({categorisedIngredients}
       categorisedIngredients.map(category => {
         category.ingredients.map(ingredient => {
           ingredient.recentlySelected = false;
+          ingredient.selected = false;
           if(ingredient.id === ingredientId) {
             ingredient.recentlySelected = !ingredient.recentlySelected;
             ingredient.selected = !ingredient.selected;
           }
-          return ingredient;
         });
         return category;  
       })
     )
-
-
-    const selectedIngredients = getUniqueIngredients(
-      categorisedIngredients
-        .flatMap(categories => categories.ingredients)
-        .filter(ingredients => ingredients.selected)
-    );
-    updateSelectedIngredients(selectedIngredients);
   }
 
   const getUniqueIngredients = (ingredients: ISelectableProduct[]) => {
@@ -84,12 +77,22 @@ const SelectionTable: React.SFC<SelectionTableProps> = ({categorisedIngredients}
   }
 
   const areThereRecentlySelectedProducts = () => {
-    return selectedIngredients
-      .filter(x => x.recentlySelected).length > 0
+    return categorisedIngredients
+      .flatMap(categories => categories.ingredients)
+      .filter(ingredients => ingredients.selected).length > 0
   }
 
   const addToCart = () => {
-    
+    const currentlySelectedProduct = getSelectedProducts(); 
+    if(currentMixture.some(x => x.id === currentlySelectedProduct[0].id))
+      return removeFromCart(currentlySelectedProduct[0]);
+    if(currentMixture.length > 0)
+      return addToMixture(getUniqueIngredients([...currentMixture, ...currentlySelectedProduct]));
+    addToMixture(getUniqueIngredients(currentlySelectedProduct));
+  }
+
+  const removeFromCart = (selectedProduct: ISelectableProduct) => {
+    addToMixture(currentMixture.filter(ingredient => ingredient.id !== selectedProduct.id))
   }
 
   const toggleDescription = () => {
@@ -97,18 +100,28 @@ const SelectionTable: React.SFC<SelectionTableProps> = ({categorisedIngredients}
     toggleDescriptionVisibility(currentVisibility = !isDescriptionVisible)
   }
 
-  const getSelectedProduct = () => {
-    return categorisedIngredients
-        .flatMap(categories => categories.ingredients)
-        .filter(x => x.recentlySelected)[0]
+  const getSelectedProducts = () => {
+    return getUniqueIngredients(categorisedIngredients
+      .flatMap(categories => categories.ingredients)
+      .filter(x => x.selected))
   }
 
   const getSelectionMessage = () => {
-    if(selectedIngredients.length === 1)
-      return `Selected: ${selectedIngredients.map(x => x.name)[0]}`;
-    if(selectedIngredients.length === 2)
-      return `Final mixture: ${selectedIngredients.map(x => x.name).join(' & ')}`;
-    return "Please select two ingredients";
+    if(currentMixture.length === 1)
+      return "Please add one more ingredient";
+    if(currentMixture.length === 2)
+      return `View your mixture on the summary screen`;
+    return "Please add two ingredients";
+  }
+
+  const getAlreadyAddedMixtureIngredients = () => {
+    return getSelectedProducts().flatMap(x => {
+      return currentMixture.filter(y => x.id === y.id)
+    })[0];
+  }
+
+  const toggleSummaryScreen = () => {
+    console.log("Summary screen selected")
   }
 
   return (
@@ -124,6 +137,9 @@ const SelectionTable: React.SFC<SelectionTableProps> = ({categorisedIngredients}
       </Ingredients>
       <IngredientsWrapper>
       <Message>{getSelectionMessage()}</Message>
+        <SelectedIngredientsWrapper>
+          {currentMixture.map(ingredient => <StyledSelectedIngredient key={ingredient.id} removeFromCart={() => removeFromCart(ingredient)} ingredientName={ingredient.name}></StyledSelectedIngredient>)}
+        </SelectedIngredientsWrapper>
         {
           categorisedIngredients.some(category => category.selected) &&
             <IngredientsInnerWrapper templateRows={getIngredientTemplateRow()}>
@@ -136,16 +152,19 @@ const SelectionTable: React.SFC<SelectionTableProps> = ({categorisedIngredients}
       <Summary>
         <StyledHeading>Summary</StyledHeading>
       </Summary>
-      <IngredientDescriptionToggle onClick={toggleDescription}>
-        {areThereRecentlySelectedProducts() ? `View ${getSelectedProduct().name} information` : "Please select a product"} 
-      </IngredientDescriptionToggle>
+      <FooterWrap>
+        <div onClick={toggleDescription} className="viewProductInfo">
+          {areThereRecentlySelectedProducts() ? `View ${getSelectedProducts()[0].name} information` : "Please select a product"} 
+        </div>
+        <StyledAddToCart isIngredientAlreadyAdded={getAlreadyAddedMixtureIngredients() !== undefined} onClick={currentMixture.length === 2 ? toggleSummaryScreen : addToCart}></StyledAddToCart>
+      </FooterWrap>
       <IngredientDescription className={isDescriptionVisible ? "open" : "closed"}>
         {
           <React.Fragment>
             <StyledText>
-              {areThereRecentlySelectedProducts() ? getSelectedProduct().short_description : "No information available"}
+              {areThereRecentlySelectedProducts() ? getSelectedProducts()[0].short_description : "No information available"}
             </StyledText>
-            {selectedIngredients.length <= 2 ? <StyledAddToCart selectAddToCart={addToCart}></StyledAddToCart> : ""}
+            <StyledAddToCart isIngredientAlreadyAdded={getAlreadyAddedMixtureIngredients() !== undefined} onClick={currentMixture.length === 2 ? toggleSummaryScreen : addToCart}></StyledAddToCart>
           </React.Fragment>
         }
       </IngredientDescription>
@@ -155,19 +174,28 @@ const SelectionTable: React.SFC<SelectionTableProps> = ({categorisedIngredients}
  
 export default SelectionTable;
 
+const SelectedIngredientsWrapper = styled.div`
+  grid-column: 1/span 2;
+  text-align: center;
+`;
 
-const IngredientDescriptionToggle = styled.div`
+const FooterWrap = styled.div`
   border-top: solid 1px ${props => props.theme.brandColours.baseDarkGreen};
   color: ${props => props.theme.brandColours.baseDarkGreen};
   position: absolute;
   bottom: 0px;
   width:100%;
   font-size: 11pt;
-  padding: 3vh 0;
   text-align: center;
   z-index: 5;
   background: #fff;
   font-family: ${props => props.theme.bodyFont};
+  .viewProductInfo {
+    padding: 3vh 0;
+    float: left;
+    width: 69%;
+    font-size: 9pt;
+  }
   ${props => props.theme.mediaQueries.tablet} {
     display: none;
   }
@@ -212,7 +240,7 @@ const Categories = styled.div`
   }
   ${props => props.theme.mediaQueries.tablet} {
     h2{
-      display: block;
+      display: none;
       text-align:left;
       padding: 20px;
     }
@@ -253,6 +281,9 @@ const IngredientDescription = styled.div`
     padding-bottom: 8vh;
     overflow-y: scroll;
   }
+  .addToCart {
+    display: none;
+  }
   ${props => props.theme.mediaQueries.tablet} {
     background: transparent;
     position: static;
@@ -261,10 +292,14 @@ const IngredientDescription = styled.div`
     grid-row: 2;
     p{
       height: auto;
+      max-height: 386px;
       padding: 0;
       overflow-y: auto;
       width: auto;
-
+    }
+    .addToCart {
+      display: inline-block;
+      width: auto;
     }
   }
 `;
@@ -280,7 +315,7 @@ const IngredientsWrapper = styled.div`
   }
   ${props => props.theme.mediaQueries.tablet} {
     grid-column: 2;
-    grid-template-rows: auto 1fr;
+    grid-template-rows: auto auto 1fr;
   }
 `;
 
@@ -290,7 +325,7 @@ const IngredientsInnerWrapper = styled.div`
   grid-template-columns: 1fr 1fr;
   margin: 0 auto;
   width: 90%;
-  grid-gap: 20px;
+  grid-gap: 40px;
   ${props => props.theme.mediaQueries.tablet} {
     grid-template-columns: 1fr 1fr;
     grid-template-rows: repeat(${(props: IngredientsInnerWrapperProps) => props.templateRows}, 160px);

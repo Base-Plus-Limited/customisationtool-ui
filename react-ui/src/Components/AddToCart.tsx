@@ -1,24 +1,38 @@
 import * as React from 'react';
 import styled from 'styled-components';
+import { CustomiseContext } from '../CustomiseContext';
+import { useContext } from 'react';
 
 export interface AddToCartProps {
-  selectAddToCart: () => void;
+  onClick?: () => void;
+  isIngredientAlreadyAdded?: boolean;
 }
 
-const StyledAddToCart: React.SFC<AddToCartProps> = ({selectAddToCart}) => (
-  <AddToCart onClick={selectAddToCart}>Add +</AddToCart>
-)
+const StyledAddToCart: React.SFC<AddToCartProps> = ({onClick, isIngredientAlreadyAdded}) => {
 
+  const { currentMixture } = useContext(CustomiseContext);
+
+  const toggleButtonText = () => currentMixture.length !== 2 ? showRemoveOrAdd() : "view summary";
+
+  const showRemoveOrAdd = () => isIngredientAlreadyAdded ? "Remove -" : "Add +";
+
+  return <AddToCart className={isIngredientAlreadyAdded ? "isIngredientAlreadyAdded addToCart" : "addToCart"} onClick={onClick}>
+    {toggleButtonText()}
+  </AddToCart>
+}
 const AddToCart = styled.span`
-  border: solid 2px ${props => props.theme.brandColours.baseDarkGreen};
-  padding: 4px 8px;
-  font-size: 8pt;
+  border-left: solid 1px ${props => props.theme.brandColours.baseDarkGreen};
+  padding: 3vh 0;
+  width: 30%;
+  font-size: 9pt;
   font-family: ${props => props.theme.subHeadingFont};
   text-transform: uppercase;
-  margin: 15px 0 0 0;
-  display: none;
+  display: inline-block;
   ${props => props.theme.mediaQueries.tablet} {
-    display: inline-block;
+    font-size: 8pt;
+    margin: 15px 0 0 0;
+    padding: 4px 8px;
+    border: solid 2px ${props => props.theme.brandColours.baseDarkGreen};
     grid-template-rows: auto 1fr;
     grid-template-columns: 200px 1fr 300px;
   }

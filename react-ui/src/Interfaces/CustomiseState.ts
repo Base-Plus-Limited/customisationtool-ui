@@ -12,4 +12,6 @@ export default interface ICustomiseContext {
   updateSelectedIngredients: Dispatch<SetStateAction<ISelectableProduct[]>>;
   isDescriptionVisible: boolean;
   toggleDescriptionVisibility: Dispatch<SetStateAction<boolean>>;
+  currentMixture: ISelectableProduct[];
+  addToMixture: Dispatch<SetStateAction<ISelectableProduct[]>>;
 }
