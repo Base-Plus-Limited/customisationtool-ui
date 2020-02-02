@@ -76,21 +76,14 @@ const SelectionTable: React.SFC<SelectionTableProps> = ({categorisedIngredients}
   }
 
   const areThereRecentlySelectedProducts = () => {
-    console.log()
     return categorisedIngredients
       .flatMap(categories => categories.ingredients)
       .filter(ingredients => ingredients.selected).length > 0
-    // return selectedIngredients
-    //   .filter(x => x.recentlySelected).length > 0
   }
 
   const addToCart = () => {
-    if(currentMixture.some(x => x.id === getAlreadyAddedMixtureIngredients().id)) {
-      const a = currentMixture;
-      a.length = 0;
-      console.log(a)
-      return addToMixture(a);
-    }
+    if(currentMixture.length > 0)
+      return addToMixture(getUniqueIngredients([...currentMixture, ...getSelectedProducts()]));
     addToMixture(
       getUniqueIngredients(getSelectedProducts())
     );
