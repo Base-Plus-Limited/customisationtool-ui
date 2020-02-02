@@ -11,22 +11,26 @@ const StyledSelectedIngredient: React.SFC<SelectedIngredientProps> = ({ingredien
 )
 
 const SelectedIngredient = styled.span`
-  border: solid 1px ${props => props.theme.brandColours.baseDarkGreen};
   font-size: 9pt;
   font-family: ${props => props.theme.subHeadingFont};
   text-transform: uppercase;
   display: inline-block;
   padding-right: 7px;
   margin: 0 15px 30px 0;
+  cursor: pointer;
+  &:hover{
+    color: ${props => props.theme.brandColours.basePink};
+    text-decoration: line-through;
+  }
 `
   
   const Close = styled.span`
-  border-right: solid 1px ${props => props.theme.brandColours.baseDarkGreen};
+  color: ${props => props.theme.brandColours.basePink};
   font-size: 9pt;
   font-family: ${props => props.theme.subHeadingFont};
   text-transform: uppercase;
   display: inline-block;
-  padding: 5px 7px;
+  padding: 5px 3px 5px 0;
   margin: 0 6px 0 0;
 `
 
