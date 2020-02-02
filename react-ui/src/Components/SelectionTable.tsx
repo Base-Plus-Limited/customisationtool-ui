@@ -20,7 +20,7 @@ export interface IngredientsInnerWrapperProps {
 
 const SelectionTable: React.SFC<SelectionTableProps> = ({categorisedIngredients}) => {
 
-  const { updateCategorisedIngredients, selectedIngredients, toggleDescriptionVisibility, isDescriptionVisible, addToMixture, currentMixture } = useContext(CustomiseContext);
+  const { updateCategorisedIngredients, toggleDescriptionVisibility, isDescriptionVisible, addToMixture, currentMixture, headings, updateHeadings } = useContext(CustomiseContext);
 
   const onCategorySelect = (categoryId: number) => {
     updateCategorisedIngredients(
@@ -121,19 +121,37 @@ const SelectionTable: React.SFC<SelectionTableProps> = ({categorisedIngredients}
   }
 
   const toggleSummaryScreen = () => {
-    console.log("Summary screen selected")
+    updateHeadings(
+      headings.map(heading => {
+        heading.selected = false;
+        if (heading.id === 1) // summary heading id
+          heading.selected = !heading.selected;
+        return heading;
+      })
+    )
   }
 
+  const toggleViews = (headingId: number) => {
+    updateHeadings(
+      headings.map(heading => {
+        heading.selected = false;
+        if (heading.id === headingId)
+          heading.selected = !heading.selected;
+        return heading;
+      })
+    )
+  }
+  
   return (
     <SelectionWrapper>
       <Categories>
-        <StyledHeading>Categories</StyledHeading>
+        {/* <StyledHeading>Categories</StyledHeading> */}
         <CategoriesWrapper>
           {categorisedIngredients.map(category => <StyledCategory selected={category.selected} selectCategory={() => onCategorySelect(category.id)} key={category.id}>{category.category}</StyledCategory>)}
         </CategoriesWrapper>
       </Categories>
       <Ingredients>
-        <StyledHeading>Ingredients</StyledHeading>
+        <StyledHeading onClick={() => toggleViews(headings[0].id)} selected={headings[0].selected}>{headings[0].headingText}</StyledHeading>
       </Ingredients>
       <IngredientsWrapper>
       <Message>{getSelectionMessage()}</Message>
@@ -150,7 +168,7 @@ const SelectionTable: React.SFC<SelectionTableProps> = ({categorisedIngredients}
         }
       </IngredientsWrapper>
       <Summary>
-        <StyledHeading>Summary</StyledHeading>
+        <StyledHeading onClick={() => toggleViews(headings[1].id)} selected={headings[1].selected}>{headings[1].headingText}</StyledHeading>
       </Summary>
       <FooterWrap>
         <div onClick={toggleDescription} className="viewProductInfo">

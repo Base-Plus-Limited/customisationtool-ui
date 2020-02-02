@@ -3,10 +3,12 @@ import styled from 'styled-components';
 
 export interface HeadingProps {
   children: any;
+  selected: boolean;
+  onClick: () => void
 }
  
-const StyledHeading: React.SFC<HeadingProps> = ({children}) => (
-  <Heading><span>{children}</span></Heading>
+const StyledHeading: React.SFC<HeadingProps> = ({children, selected, onClick}) => (
+  <Heading onClick={onClick}><span className={selected ? "selected" : ""}>{children}</span></Heading>
 )
 
 const Heading = styled.h2`
@@ -19,7 +21,11 @@ const Heading = styled.h2`
   padding: 20px 0;
   margin: 0;
   span {
+    opacity: 0.4;
     padding-bottom: 2px;
+  }
+  .selected{
+    opacity: 1;
     border-bottom: solid 3px ${props => props.theme.brandColours.baseLightGreen};
   }
 `
