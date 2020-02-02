@@ -19,7 +19,7 @@ export interface IngredientsInnerWrapperProps {
 
 const SelectionTable: React.SFC<SelectionTableProps> = ({categorisedIngredients}) => {
 
-  const { updateCategorisedIngredients, selectedIngredients, updateSelectedIngredients, toggleDescriptionVisibility, isDescriptionVisible, addToMixture, currentMixture } = useContext(CustomiseContext);
+  const { updateCategorisedIngredients, selectedIngredients, toggleDescriptionVisibility, isDescriptionVisible, addToMixture, currentMixture } = useContext(CustomiseContext);
 
   const onCategorySelect = (categoryId: number) => {
     updateCategorisedIngredients(
@@ -82,11 +82,16 @@ const SelectionTable: React.SFC<SelectionTableProps> = ({categorisedIngredients}
   }
 
   const addToCart = () => {
+    const currentlySelectedProduct = getSelectedProducts(); 
+    if(currentMixture.some(x => x.id === currentlySelectedProduct[0].id))
+      return removeFromCart(currentlySelectedProduct[0]);
     if(currentMixture.length > 0)
-      return addToMixture(getUniqueIngredients([...currentMixture, ...getSelectedProducts()]));
-    addToMixture(
-      getUniqueIngredients(getSelectedProducts())
-    );
+      return addToMixture(getUniqueIngredients([...currentMixture, ...currentlySelectedProduct]));
+    addToMixture(getUniqueIngredients(currentlySelectedProduct));
+  }
+
+  const removeFromCart = (selectedProduct: ISelectableProduct) => {
+    addToMixture(currentMixture.filter(ingredient => ingredient.id !== selectedProduct.id))
   }
 
   const toggleDescription = () => {
@@ -96,8 +101,8 @@ const SelectionTable: React.SFC<SelectionTableProps> = ({categorisedIngredients}
 
   const getSelectedProducts = () => {
     return getUniqueIngredients(categorisedIngredients
-        .flatMap(categories => categories.ingredients)
-        .filter(x => x.selected))
+      .flatMap(categories => categories.ingredients)
+      .filter(x => x.selected))
   }
 
   const getSelectionMessage = () => {
@@ -275,13 +280,14 @@ const IngredientDescription = styled.div`
     grid-row: 2;
     p{
       height: auto;
+      max-height: 386px;
       padding: 0;
       overflow-y: auto;
       width: auto;
-
     }
     .addToCart {
-      display: block;
+      display: inline-block;
+      width: auto;
     }
   }
 `;
