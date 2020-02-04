@@ -8,18 +8,19 @@ import { CustomiseContext } from '../CustomiseContext';
 import StyledIngredient from './Ingredient';
 import StyledSelectedIngredient from './SelectedIngredient';
 import { ISelectableProduct } from '../Interfaces/WordpressProduct';
-import {StyledText, Message} from './Shared/Text';
+import {StyledText, Message, SummaryPriceRow} from './Shared/Text';
 import { IHeading } from '../Interfaces/Heading';
 
 export interface SelectionTableProps {
   categorisedIngredients: ICategorisedIngredient[]
+  baseProduct: ISelectableProduct
 }
 
 export interface IngredientsInnerWrapperProps {
   templateRows: number
 }
 
-const SelectionTable: React.SFC<SelectionTableProps> = ({categorisedIngredients}) => {
+const SelectionTable: React.SFC<SelectionTableProps> = ({categorisedIngredients, baseProduct}) => {
 
   const { updateCategorisedIngredients, toggleDescriptionVisibility, isDescriptionVisible, addToMixture, currentMixture, headings, updateHeadings } = useContext(CustomiseContext);
 
@@ -181,7 +182,11 @@ const SelectionTable: React.SFC<SelectionTableProps> = ({categorisedIngredients}
       </Summary>
       {
         isSummaryHeadingSelected() ?
-        "summary screen"
+        <SummaryPrices>
+          <h2>Your product</h2>
+          { currentMixture.map(ingredient => <SummaryPriceRow key={ingredient.id}>{ingredient.name} <span>£{ingredient.price}</span></SummaryPriceRow>) }
+          {<SummaryPriceRow>{baseProduct.name} <span>£{baseProduct.price}</span></SummaryPriceRow>}
+        </SummaryPrices>
         :
         <React.Fragment>
             <FooterWrap>
@@ -207,6 +212,16 @@ const SelectionTable: React.SFC<SelectionTableProps> = ({categorisedIngredients}
 }
  
 export default SelectionTable;
+
+const SummaryPrices = styled.div`
+  grid-column: 1/span2;
+  text-align: center;
+  padding: 20px 0 0 0;
+  border-top: solid 1px ${props => props.theme.brandColours.basePink};
+  max-width: 90%;
+  margin: 30px auto 0;
+  width: 100%;
+  `;
 
 const SelectedIngredientsWrapper = styled.div`
   grid-column: 1/span 2;
