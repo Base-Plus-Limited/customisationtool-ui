@@ -17,4 +17,6 @@ export default interface ICustomiseContext {
   addToMixture: Dispatch<SetStateAction<ISelectableProduct[]>>;
   headings: IHeading[];
   updateHeadings: Dispatch<SetStateAction<IHeading[]>>;
+  baseProduct: ISelectableProduct;
+  saveBaseProduct: Dispatch<SetStateAction<ISelectableProduct>>;
 }

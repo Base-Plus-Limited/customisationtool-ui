@@ -17,7 +17,9 @@ const state: ICustomiseContext = {
   currentMixture: [],
   addToMixture: (previousMixture: SetStateAction<ISelectableProduct[]>) => previousMixture,
   headings: [],
-  updateHeadings: (previousHeadings: SetStateAction<IHeading[]>) => previousHeadings
+  updateHeadings: (previousHeadings: SetStateAction<IHeading[]>) => previousHeadings,
+  baseProduct: {} as ISelectableProduct,
+  saveBaseProduct: (previousBase: SetStateAction<ISelectableProduct>) => previousBase
 }
 
 export const CustomiseContext = createContext(state);
@@ -44,6 +46,7 @@ export const CustomiseProvider: React.SFC<CustomiseProviderProps> = ({ children 
       id: 1
     }
   ]);
+  const [baseProduct, saveBaseProduct] = useState<ISelectableProduct>({} as ISelectableProduct);
 
   return (
     <CustomiseContext.Provider value={{
@@ -58,7 +61,9 @@ export const CustomiseProvider: React.SFC<CustomiseProviderProps> = ({ children 
       currentMixture,
       addToMixture,
       headings,
-      updateHeadings
+      updateHeadings,
+      baseProduct,
+      saveBaseProduct
     }}>
       {children}
     </CustomiseContext.Provider>

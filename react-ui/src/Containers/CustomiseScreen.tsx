@@ -3,6 +3,7 @@ import styled from 'styled-components';
 import { CustomiseContext } from '../CustomiseContext';
 import ICategorisedIngredient from '../Interfaces/CategorisedIngredient';
 import SelectionTable from '../Components/SelectionTable';
+import { ISelectableProduct } from '../Interfaces/WordpressProduct';
 
 export interface CustomiseScreenProps {
 
@@ -10,13 +11,15 @@ export interface CustomiseScreenProps {
 
 const StyledCustomiseScreen: React.SFC<CustomiseScreenProps> = () => {
 
-  const { updateCategorisedIngredients, categorisedIngredients, setApplicationError } = useContext(CustomiseContext);
+  const { updateCategorisedIngredients, categorisedIngredients, setApplicationError, saveBaseProduct, baseProduct } = useContext(CustomiseContext);
 
   useEffect(() => {
     fetch('/api/ingredients')
       .then(res => res.ok ? res.json() : res.json().then(errorResponse => setApplicationError(errorResponse)))
       .then((categorisedIngredients: ICategorisedIngredient[]) => {
-        updateCategorisedIngredients(categorisedIngredients.map(x => {
+        const ingredients = categorisedIngredients.filter(category => category.id !== 1474);
+        saveBaseProduct(categorisedIngredients.filter(category => category.id === 1474)[0].ingredients[0]);
+        updateCategorisedIngredients(ingredients.map(x => {
           if(x.selected)
             x.ingredients[0].selected = true;
           return x;
@@ -33,7 +36,7 @@ const StyledCustomiseScreen: React.SFC<CustomiseScreenProps> = () => {
 
   return (
     <CustomiseScreen>
-      <SelectionTable categorisedIngredients={categorisedIngredients}></SelectionTable>
+      <SelectionTable categorisedIngredients={categorisedIngredients} baseProduct={baseProduct}></SelectionTable>
     </CustomiseScreen>
   );
 }
