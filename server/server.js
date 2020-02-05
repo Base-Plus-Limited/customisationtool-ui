@@ -136,12 +136,20 @@ var App = /** @class */ (function () {
                             return ingredient;
                         }); })
                             .then(function (ingredients) {
-                            var filteredIngredients = ingredients.filter(function (ingredient) { return ingredient.id !== 1474; });
-                            var categories = _this.returnUniqueCategories(array_prototype_flatmap_1["default"](filteredIngredients, function (ingredient) { return ingredient.tags.map(function (tag) { return ({
+                            var categories = _this.returnUniqueCategories(array_prototype_flatmap_1["default"](ingredients, function (ingredient) { return ingredient.tags.map(function (tag) { return ({
                                 name: tag.name,
                                 id: tag.id
                             }); }); }));
-                            return _this.returnCategorisedIngredients(categories, ingredients);
+                            var baseProduct = ingredients.filter(function (ingredient) { return ingredient.id === 1474; });
+                            var products = _this.returnCategorisedIngredients(categories, ingredients);
+                            products.push({
+                                category: "Base Product",
+                                id: baseProduct[0].id,
+                                selected: false,
+                                count: baseProduct.length,
+                                ingredients: baseProduct
+                            });
+                            return products;
                         })
                             .then(function (categorisedIngredients) { return res.send(categorisedIngredients); })["catch"](function (error) {
                             var _a = _this.handleError(error), code = _a.code, message = _a.message;

@@ -69,14 +69,23 @@ class App {
           return ingredient;
         }))
         .then((ingredients: IWordpressProduct[]) => {
-          const filteredIngredients = ingredients.filter(ingredient => ingredient.id !== 1474);
-          const categories = this.returnUniqueCategories(flatMap(filteredIngredients, ingredient => ingredient.tags.map(tag => (
+          const categories = this.returnUniqueCategories(flatMap(ingredients, ingredient => ingredient.tags.map(tag => (
             {
               name: tag.name,
               id: tag.id
             }
             ))));
-          return this.returnCategorisedIngredients(categories, ingredients);
+
+          const baseProduct = ingredients.filter(ingredient => ingredient.id === 1474);
+          const products = this.returnCategorisedIngredients(categories, ingredients);
+          products.push({
+            category: "Base Product",
+            id: baseProduct[0].id,
+            selected: false,
+            count: baseProduct.length,
+            ingredients: (baseProduct as ISelectableProduct[])
+          });
+          return products;
         })
         .then((categorisedIngredients: ICategorisedIngredient[]) => res.send(categorisedIngredients))
         .catch((error) => {

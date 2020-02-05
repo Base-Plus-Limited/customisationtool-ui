@@ -2,6 +2,7 @@ import { Dispatch, SetStateAction } from 'react';
 import IErrorResponse from "./ErrorResponse";
 import ICategorisedIngredient from './CategorisedIngredient';
 import { ISelectableProduct } from './WordpressProduct';
+import { IHeading } from './Heading';
 
 export default interface ICustomiseContext {
   applicationError: IErrorResponse;
@@ -14,4 +15,8 @@ export default interface ICustomiseContext {
   toggleDescriptionVisibility: Dispatch<SetStateAction<boolean>>;
   currentMixture: ISelectableProduct[];
   addToMixture: Dispatch<SetStateAction<ISelectableProduct[]>>;
+  headings: IHeading[];
+  updateHeadings: Dispatch<SetStateAction<IHeading[]>>;
+  baseProduct: ISelectableProduct;
+  saveBaseProduct: Dispatch<SetStateAction<ISelectableProduct>>;
 }

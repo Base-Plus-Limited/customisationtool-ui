@@ -26,6 +26,27 @@ const Message = styled(Text)`
   letter-spacing: 0.04em;
   text-transform: uppercase;
 `
+const SummaryPriceRow = styled(Text)`
+  width: 100%;
+  max-width: 70%;
+  padding: 10px 0;
+  margin: 0 auto;
+  text-align: left;
+  font-size: 9pt;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  span{
+    float: right;
+  }
+`
+
+const TotalPriceRow = styled(SummaryPriceRow)`
+  border-top: solid 1px ${props => props.theme.brandColours.basePink};
+  color: ${props => props.theme.brandColours.basePink};
+  padding: 15px 0;
+  margin: 5px auto 30px;
+`
+
 
  
-export {StyledText, Message};
+export {StyledText, Message, SummaryPriceRow, TotalPriceRow};
