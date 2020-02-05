@@ -2,13 +2,13 @@ import React, { useContext } from 'react';
 import styled from 'styled-components';
 import ICategorisedIngredient from '../Interfaces/CategorisedIngredient';
 import StyledHeading from './Shared/Heading';
-import StyledAddToCart from './AddToCart';
+import {StyledButton, FooterButton} from './Button';
 import StyledCategory from './Category';
 import { CustomiseContext } from '../CustomiseContext';
 import StyledIngredient from './Ingredient';
 import StyledSelectedIngredient from './SelectedIngredient';
 import { ISelectableProduct } from '../Interfaces/WordpressProduct';
-import {StyledText, Message, SummaryPriceRow} from './Shared/Text';
+import {StyledText, Message, SummaryPriceRow, TotalPriceRow} from './Shared/Text';
 import { IHeading } from '../Interfaces/Heading';
 
 export interface SelectionTableProps {
@@ -147,6 +147,25 @@ const SelectionTable: React.SFC<SelectionTableProps> = ({categorisedIngredients,
   const isSummaryHeadingSelected = () => {
     return (headings.find(heading => heading.selected) as IHeading).id === 1;
   }
+
+  const goToCheckout = () => {
+
+  }
+
+  const toggleButtonText = () => currentMixture.length !== 2 ? showRemoveOrAdd() : "view summary";
+
+  const showRemoveOrAdd = () => getAlreadyAddedMixtureIngredients() ? "Remove -" : "Add +";
+
+  const getMixturePrice = () => {
+    if(currentMixture.length) {
+      const addedIngredientsPrice =
+        currentMixture
+          .map(x => Number(x.price))
+          .reduce((acc, val) => acc + val);
+      return addedIngredientsPrice + Number(baseProduct.price);
+    }
+    return Number(baseProduct.price);
+  }
   
   return (
     <SelectionWrapper>
@@ -166,7 +185,18 @@ const SelectionTable: React.SFC<SelectionTableProps> = ({categorisedIngredients,
           </SelectedIngredientsWrapper>
           {
             isSummaryHeadingSelected() ?
-            currentMixture.map(ingredient => <StyledIngredient isSummaryScreen={isSummaryHeadingSelected()} key={ingredient.id} ingredient={ingredient} selectIngredient={() => onIngredientSelect(ingredient.id)}></StyledIngredient>)
+            <React.Fragment>
+              {
+                currentMixture.map(ingredient => <StyledIngredient isSummaryScreen={isSummaryHeadingSelected()} key={ingredient.id} ingredient={ingredient} selectIngredient={() => onIngredientSelect(ingredient.id)}></StyledIngredient>)
+              }
+              <SummaryPrices>
+                <h2>Your product</h2>
+                { currentMixture.map(ingredient => <SummaryPriceRow key={ingredient.id}>{ingredient.name} <span>£{ingredient.price}</span></SummaryPriceRow>) }
+                {<SummaryPriceRow>{baseProduct.name} <span>£{baseProduct.price}</span></SummaryPriceRow>}
+                {<TotalPriceRow>Mixture <span>£{getMixturePrice()}</span></TotalPriceRow>}
+                {<StyledButton onClick={goToCheckout}>Checkout</StyledButton>}
+              </SummaryPrices>
+            </React.Fragment>
             :
             categorisedIngredients.some(category => category.selected) &&
               <IngredientsInnerWrapper templateRows={getIngredientTemplateRow()}>
@@ -181,31 +211,25 @@ const SelectionTable: React.SFC<SelectionTableProps> = ({categorisedIngredients,
         <StyledHeading onClick={() => toggleViews(headings[1].id)} selected={headings[1].selected}>{headings[1].headingText}</StyledHeading>
       </Summary>
       {
-        isSummaryHeadingSelected() ?
-        <SummaryPrices>
-          <h2>Your product</h2>
-          { currentMixture.map(ingredient => <SummaryPriceRow key={ingredient.id}>{ingredient.name} <span>£{ingredient.price}</span></SummaryPriceRow>) }
-          {<SummaryPriceRow>{baseProduct.name} <span>£{baseProduct.price}</span></SummaryPriceRow>}
-        </SummaryPrices>
-        :
-        <React.Fragment>
+        !isSummaryHeadingSelected() &&
+          <React.Fragment>
             <FooterWrap>
-            <div onClick={toggleDescription} className="viewProductInfo">
-              {areThereRecentlySelectedProducts() ? `View ${getSelectedProducts()[0].name} information` : "Please select a product"} 
-            </div>
-            <StyledAddToCart isIngredientAlreadyAdded={getAlreadyAddedMixtureIngredients() !== undefined} onClick={currentMixture.length === 2 ? toggleSummaryScreen : addToCart}></StyledAddToCart>
-          </FooterWrap>
-          <IngredientDescription className={isDescriptionVisible ? "open" : "closed"}>
-            {
-              <React.Fragment>
-                <StyledText>
-                  {areThereRecentlySelectedProducts() ? getSelectedProducts()[0].short_description : "No information available"}
-                </StyledText>
-                <StyledAddToCart isIngredientAlreadyAdded={getAlreadyAddedMixtureIngredients() !== undefined} onClick={currentMixture.length === 2 ? toggleSummaryScreen : addToCart}></StyledAddToCart>
-              </React.Fragment>
-            }
-          </IngredientDescription>
-        </React.Fragment>
+              <div onClick={toggleDescription} className="viewProductInfo">
+                {areThereRecentlySelectedProducts() ? `View ${getSelectedProducts()[0].name} information` : "Please select a product"} 
+              </div>
+              <FooterButton onClick={currentMixture.length === 2 ? toggleSummaryScreen : addToCart}>{toggleButtonText()}</FooterButton>
+            </FooterWrap>
+            <IngredientDescription className={isDescriptionVisible ? "open" : "closed"}>
+              {
+                <React.Fragment>
+                  <StyledText>
+                    {areThereRecentlySelectedProducts() ? getSelectedProducts()[0].short_description : "No information available"}
+                  </StyledText>
+                  <FooterButton onClick={currentMixture.length === 2 ? toggleSummaryScreen : addToCart}>{toggleButtonText()}</FooterButton>
+                </React.Fragment>
+              }
+            </IngredientDescription>
+          </React.Fragment>
       }
     </SelectionWrapper>
   )
@@ -217,14 +241,23 @@ const SummaryPrices = styled.div`
   grid-column: 1/span2;
   text-align: center;
   padding: 20px 0 0 0;
-  border-top: solid 1px ${props => props.theme.brandColours.basePink};
+  border-top: solid 1px ${props => props.theme.brandColours.baseDefaultGreen};
   max-width: 90%;
   margin: 30px auto 0;
   width: 100%;
-  `;
+  h2{
+    margin: 0 0 15px 0;
+    font-size: 15pt;
+    color: ${props => props.theme.brandColours.baseDarkGreen};
+    font-family: ${props => props.theme.bodyFont};
+  }
+  ${props => props.theme.mediaQueries.tablet} {
+    grid-row: 3;
+  }
+`;
 
 const SelectedIngredientsWrapper = styled.div`
-  grid-column: 1/span 2;
+  grid-column: 1/span 3;
   text-align: center;
 `;
 
@@ -330,9 +363,6 @@ const IngredientDescription = styled.div`
     padding-bottom: 8vh;
     overflow-y: scroll;
   }
-  .addToCart {
-    display: none;
-  }
   ${props => props.theme.mediaQueries.tablet} {
     background: transparent;
     position: static;
@@ -344,10 +374,6 @@ const IngredientDescription = styled.div`
       max-height: 386px;
       padding: 0;
       overflow-y: auto;
-      width: auto;
-    }
-    .addToCart {
-      display: inline-block;
       width: auto;
     }
   }

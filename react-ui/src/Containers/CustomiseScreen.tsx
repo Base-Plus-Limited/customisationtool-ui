@@ -3,7 +3,6 @@ import styled from 'styled-components';
 import { CustomiseContext } from '../CustomiseContext';
 import ICategorisedIngredient from '../Interfaces/CategorisedIngredient';
 import SelectionTable from '../Components/SelectionTable';
-import { ISelectableProduct } from '../Interfaces/WordpressProduct';
 
 export interface CustomiseScreenProps {
 
