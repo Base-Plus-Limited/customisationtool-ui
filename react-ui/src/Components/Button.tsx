@@ -24,6 +24,7 @@ const Button = styled.button`
   -webkit-tap-highlight-color: transparent;
   margin: 0;
   border-radius: 0px;
+  padding: 4px 8px;
   &:focus{
     outline: none;
   }
@@ -31,10 +32,10 @@ const Button = styled.button`
     font-size: 8pt;
     margin: 15px 0 0 0;
     width: auto;
-    padding: 4px 8px;
     border: solid 2px ${props => props.theme.brandColours.baseDarkGreen};
     grid-template-rows: auto 1fr;
     grid-template-columns: 200px 1fr 300px;
+    padding: 8px 14px;
   }
 `
 
@@ -43,11 +44,11 @@ const FooterButton = styled(Button)`
   border: none;
   border-left: solid 1px ${props => props.theme.brandColours.baseDarkGreen};
   padding: 3vh 0;
-  width: 30%;
+  width: 34%;
   ${props => props.theme.mediaQueries.tablet} {
     font-size: 8pt;
     margin: 15px 0 0 0;
-    padding: 4px 8px;
+    padding: 8px 14px;
     border: solid 2px ${props => props.theme.brandColours.baseDarkGreen};
     grid-template-rows: auto 1fr;
     grid-template-columns: 200px 1fr 300px;

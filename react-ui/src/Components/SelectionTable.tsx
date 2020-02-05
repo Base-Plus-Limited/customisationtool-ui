@@ -170,9 +170,12 @@ const SelectionTable: React.SFC<SelectionTableProps> = ({categorisedIngredients,
   return (
     <SelectionWrapper>
       <Categories>
-        <CategoriesWrapper>
-          {categorisedIngredients.map(category => <StyledCategory selected={category.selected} selectCategory={() => onCategorySelect(category.id)} key={category.id}>{category.category}</StyledCategory>)}
-        </CategoriesWrapper>
+        {
+          !isSummaryHeadingSelected() &&
+            <CategoriesWrapper>
+              {categorisedIngredients.map(category => <StyledCategory selected={category.selected} selectCategory={() => onCategorySelect(category.id)} key={category.id}>{category.category}</StyledCategory>)}
+          </CategoriesWrapper>
+        }
       </Categories>
       <Ingredients>
         <StyledHeading onClick={() => toggleViews(headings[0].id)} selected={headings[0].selected}>{headings[0].headingText}</StyledHeading>
@@ -187,14 +190,17 @@ const SelectionTable: React.SFC<SelectionTableProps> = ({categorisedIngredients,
             isSummaryHeadingSelected() ?
             <React.Fragment>
               {
-                currentMixture.map(ingredient => <StyledIngredient isSummaryScreen={isSummaryHeadingSelected()} key={ingredient.id} ingredient={ingredient} selectIngredient={() => onIngredientSelect(ingredient.id)}></StyledIngredient>)
+                isSummaryHeadingSelected() && currentMixture.length > 0 ?
+                  currentMixture.map(ingredient => <StyledIngredient isSummaryScreen={isSummaryHeadingSelected()} key={ingredient.id} ingredient={ingredient} selectIngredient={() => onIngredientSelect(ingredient.id)}></StyledIngredient>)
+                  :
+                  <h3>No ingredients selected</h3>
               }
               <SummaryPrices>
                 <h2>Your product</h2>
                 { currentMixture.map(ingredient => <SummaryPriceRow key={ingredient.id}>{ingredient.name} <span>£{ingredient.price}</span></SummaryPriceRow>) }
                 {<SummaryPriceRow>{baseProduct.name} <span>£{baseProduct.price}</span></SummaryPriceRow>}
                 {<TotalPriceRow>Mixture <span>£{getMixturePrice()}</span></TotalPriceRow>}
-                {<StyledButton onClick={goToCheckout}>Checkout</StyledButton>}
+                {currentMixture.length === 2 && <StyledButton onClick={goToCheckout}>Checkout</StyledButton>}
               </SummaryPrices>
             </React.Fragment>
             :
@@ -275,7 +281,7 @@ const FooterWrap = styled.div`
   .viewProductInfo {
     padding: 3vh 0;
     float: left;
-    width: 69%;
+    width: 65%;
     font-size: 9pt;
   }
   ${props => props.theme.mediaQueries.tablet} {
@@ -312,7 +318,6 @@ const CategoriesWrapper = styled.div`
 
 const Categories = styled.div`
   border-top: solid 1px ${props => props.theme.brandColours.baseDarkGreen};
-  border-bottom: solid 1px ${props => props.theme.brandColours.baseDarkGreen};
   grid-row: 2;
   grid-column: 1/ span 2;
   width: 100%;
@@ -392,6 +397,13 @@ const IngredientsWrapper = styled.div`
   ${props => props.theme.mediaQueries.tablet} {
     grid-column: 2;
     grid-template-rows: auto auto 1fr;
+  }
+  h3{
+    text-align: center;
+    grid-column: 1/span2;
+    font-size: 13pt;
+    color: ${props => props.theme.brandColours.baseDarkGreen};
+    font-family: ${props => props.theme.bodyFont};
   }
 `;
 

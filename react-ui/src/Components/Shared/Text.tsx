@@ -44,7 +44,7 @@ const TotalPriceRow = styled(SummaryPriceRow)`
   border-top: solid 1px ${props => props.theme.brandColours.basePink};
   color: ${props => props.theme.brandColours.basePink};
   padding: 15px 0;
-  margin: 5px auto;
+  margin: 5px auto 30px;
 `
 
 
