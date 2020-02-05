@@ -368,6 +368,9 @@ const IngredientDescription = styled.div`
     padding-bottom: 8vh;
     overflow-y: scroll;
   }
+  button {
+    display: none;
+  }
   ${props => props.theme.mediaQueries.tablet} {
     background: transparent;
     position: static;
@@ -380,6 +383,9 @@ const IngredientDescription = styled.div`
       padding: 0;
       overflow-y: auto;
       width: auto;
+    }
+    button {
+      display: inline-block;
     }
   }
 `;
