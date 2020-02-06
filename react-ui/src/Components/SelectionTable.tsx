@@ -7,9 +7,10 @@ import StyledCategory from './Category';
 import { CustomiseContext } from '../CustomiseContext';
 import StyledIngredient from './Ingredient';
 import StyledSelectedIngredient from './SelectedIngredient';
-import { ISelectableProduct } from '../Interfaces/WordpressProduct';
+import IWordpressProduct, { ISelectableProduct } from '../Interfaces/WordpressProduct';
 import {StyledText, Message, SummaryPriceRow, TotalPriceRow} from './Shared/Text';
 import { IHeading } from '../Interfaces/Heading';
+import IErrorResponse from '../Interfaces/ErrorResponse';
 
 export interface SelectionTableProps {
   categorisedIngredients: ICategorisedIngredient[]
@@ -22,7 +23,7 @@ export interface IngredientsInnerWrapperProps {
 
 const SelectionTable: React.SFC<SelectionTableProps> = ({categorisedIngredients, baseProduct}) => {
 
-  const { updateCategorisedIngredients, toggleDescriptionVisibility, isDescriptionVisible, addToMixture, currentMixture, headings, updateHeadings } = useContext(CustomiseContext);
+  const { updateCategorisedIngredients, toggleDescriptionVisibility, isDescriptionVisible, addToMixture, currentMixture, headings, updateHeadings, applicationError, setApplicationError } = useContext(CustomiseContext);
 
   const onCategorySelect = (categoryId: number) => {
     updateCategorisedIngredients(
@@ -148,8 +149,33 @@ const SelectionTable: React.SFC<SelectionTableProps> = ({categorisedIngredients,
     return (headings.find(heading => heading.selected) as IHeading).id === 1;
   }
 
-  const goToCheckout = () => {
-
+  const goToCheckout = async() => {
+    // completeQuiz();
+    // sendCompletedQuizQuestionsToApi();
+    return fetch('/api/new-product', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      cache: 'no-cache',
+      body: JSON.stringify(newProduct)
+    })
+    .then(res => res.ok ? res.json() : res.json().then((errorResponse: IErrorResponse) => {
+      errorResponse.uiMessage = `Sorry, we weren't able to create your product`;
+      setApplicationError(errorResponse);
+    }))
+    .then((product: IWordpressProduct) => {
+      if(product)
+        window.location.assign(`https://baseplus.co.uk/cart?add-to-cart=${product.id}`)
+    })
+    .catch((error: IErrorResponse) => {
+      setApplicationError({
+        error: true,
+        code: error.code,
+        message: error.message,
+        uiMessage: `Sorry, we weren't able to create your product`
+      })
+    });
   }
 
   const toggleButtonText = () => currentMixture.length !== 2 ? showRemoveOrAdd() : "view summary";
@@ -165,6 +191,30 @@ const SelectionTable: React.SFC<SelectionTableProps> = ({categorisedIngredients,
       return addedIngredientsPrice + Number(baseProduct.price);
     }
     return Number(baseProduct.price);
+  }
+  
+  // function getProductName(): string {
+  //   if(userName)
+  //     return `${userName}'s Bespoke Product`;
+  //   return `Your Bespoke Product`;
+  // }
+
+  const newProduct = {
+    name: "Your bespoke product",// getProductName(),
+    type: 'simple',
+    regular_price: `${getMixturePrice()}`,
+    description: '',
+    short_description: `Your custom mixture including ${currentMixture.flatMap(mix => mix.name).join(", ")} & the signature base+ ingredient`,
+    categories: [
+      {
+        id: 21
+      }
+    ],
+    images: [
+      {
+        src: 'http://baseplus.co.uk/wp-content/uploads/2018/12/productImageDefault.jpg'
+      }
+    ]
   }
   
   return (

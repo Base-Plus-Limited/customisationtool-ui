@@ -96,6 +96,20 @@ class App {
     });
 
     /*************************
+     *  CREATE NEW PRODUCT
+     *************************/
+    router.post('/new-product', bodyParser.json(), async (req, res) => {
+      await request.post(`https://baseplus.co.uk/wp-json/wc/v3/products?consumer_key=${process.env.WP_CONSUMER_KEY}&consumer_secret=${process.env.WP_CONSUMER_SECRET}`)
+        .send(req.body)
+        .then(productResponse => productResponse.body)
+        .then((product: IWordpressProduct) => res.send(product))
+        .catch((error) => {
+          console.error(`Error ${this.handleError(error).code}, ${this.handleError(error).message}`);
+          res.status(error.status).send(this.handleError(error));
+        }) 
+    });
+
+    /*************************
      *  WILDCARD
      *************************/
     router.get('*', function (req, res) {
