@@ -11,6 +11,7 @@ import IWordpressProduct, { ISelectableProduct } from '../Interfaces/WordpressPr
 import {StyledText, Message, SummaryPriceRow, TotalPriceRow} from './Shared/Text';
 import { IHeading } from '../Interfaces/Heading';
 import IErrorResponse from '../Interfaces/ErrorResponse';
+import { getUniqueIngredients } from '../Helpers/Helpers';
 
 export interface SelectionTableProps {
   categorisedIngredients: ICategorisedIngredient[]
@@ -23,7 +24,7 @@ export interface IngredientsInnerWrapperProps {
 
 const SelectionTable: React.SFC<SelectionTableProps> = ({categorisedIngredients, baseProduct}) => {
 
-  const { updateCategorisedIngredients, toggleDescriptionVisibility, isDescriptionVisible, addToMixture, currentMixture, headings, updateHeadings, applicationError, setApplicationError } = useContext(CustomiseContext);
+  const { updateCategorisedIngredients, toggleDescriptionVisibility, isDescriptionVisible, addToMixture, currentMixture, headings, updateHeadings, setApplicationError, userName, isProductBeingAmended, updateIsProductBeingAmended} = useContext(CustomiseContext);
 
   const onCategorySelect = (categoryId: number) => {
     updateCategorisedIngredients(
@@ -40,7 +41,6 @@ const SelectionTable: React.SFC<SelectionTableProps> = ({categorisedIngredients,
     updateCategorisedIngredients(
       categorisedIngredients.map(category => {
         category.ingredients.map(ingredient => {
-          ingredient.recentlySelected = false;
           ingredient.selected = false;
           if(ingredient.id === ingredientId) {
             ingredient.recentlySelected = !ingredient.recentlySelected;
@@ -50,10 +50,6 @@ const SelectionTable: React.SFC<SelectionTableProps> = ({categorisedIngredients,
         return category;  
       })
     )
-  }
-
-  const getUniqueIngredients = (ingredients: ISelectableProduct[]) => {
-    return ingredients.filter((value, index, arr) => arr.findIndex(item => (item.id === value.id)) === index)
   }
 
   const getSelectedCategoryIngredients = () => {
@@ -95,6 +91,8 @@ const SelectionTable: React.SFC<SelectionTableProps> = ({categorisedIngredients,
   }
 
   const removeFromCart = (selectedProduct: ISelectableProduct) => {
+    if(isProductBeingAmended)
+      updateIsProductBeingAmended(false)
     addToMixture(currentMixture.filter(ingredient => ingredient.id !== selectedProduct.id))
   }
 
@@ -110,10 +108,12 @@ const SelectionTable: React.SFC<SelectionTableProps> = ({categorisedIngredients,
   }
 
   const getSelectionMessage = () => {
+    if(currentMixture.length === 2 && isProductBeingAmended)
+      return "Remove the products below to amend";
     if(currentMixture.length === 1)
       return "Please add one more ingredient";
     if(currentMixture.length === 2)
-      return `View your mixture on the summary screen`;
+      return "View your mixture on the summary screen";
     return "Please add two ingredients";
   }
 
@@ -150,8 +150,6 @@ const SelectionTable: React.SFC<SelectionTableProps> = ({categorisedIngredients,
   }
 
   const goToCheckout = async() => {
-    // completeQuiz();
-    // sendCompletedQuizQuestionsToApi();
     return fetch('/api/new-product', {
       method: 'POST',
       headers: {
@@ -192,15 +190,9 @@ const SelectionTable: React.SFC<SelectionTableProps> = ({categorisedIngredients,
     }
     return Number(baseProduct.price);
   }
-  
-  // function getProductName(): string {
-  //   if(userName)
-  //     return `${userName}'s Bespoke Product`;
-  //   return `Your Bespoke Product`;
-  // }
 
   const newProduct = {
-    name: "Your bespoke product",// getProductName(),
+    name: userName ? `${userName}'s Product` : "Your bespoke product",
     type: 'simple',
     regular_price: `${getMixturePrice()}`,
     description: '',
@@ -243,7 +235,7 @@ const SelectionTable: React.SFC<SelectionTableProps> = ({categorisedIngredients,
                 isSummaryHeadingSelected() && currentMixture.length > 0 ?
                   currentMixture.map(ingredient => <StyledIngredient isSummaryScreen={isSummaryHeadingSelected()} key={ingredient.id} ingredient={ingredient} selectIngredient={() => onIngredientSelect(ingredient.id)}></StyledIngredient>)
                   :
-                  <h3>No ingredients selected</h3>
+                  <h3>{userName ? `Please select two ingredients ${userName}` : "No ingredients selected"}</h3>
               }
               <SummaryPrices>
                 <h2>Your product</h2>

@@ -19,4 +19,8 @@ export default interface ICustomiseContext {
   updateHeadings: Dispatch<SetStateAction<IHeading[]>>;
   baseProduct: ISelectableProduct;
   saveBaseProduct: Dispatch<SetStateAction<ISelectableProduct>>;
+  userName: string;
+  saveUserName: Dispatch<SetStateAction<string>>;
+  isProductBeingAmended: boolean;
+  updateIsProductBeingAmended: Dispatch<SetStateAction<boolean>>;
 }
