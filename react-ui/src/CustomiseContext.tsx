@@ -19,7 +19,11 @@ const state: ICustomiseContext = {
   headings: [],
   updateHeadings: (previousHeadings: SetStateAction<IHeading[]>) => previousHeadings,
   baseProduct: {} as ISelectableProduct,
-  saveBaseProduct: (previousBase: SetStateAction<ISelectableProduct>) => previousBase
+  saveBaseProduct: (previousBase: SetStateAction<ISelectableProduct>) => previousBase,
+  userName: "",
+  saveUserName: (previousUserName: SetStateAction<string>) => previousUserName,
+  isProductBeingAmended: false,
+  updateIsProductBeingAmended: (previousProductBeingAmended: SetStateAction<boolean>) => previousProductBeingAmended
 }
 
 export const CustomiseContext = createContext(state);
@@ -34,6 +38,7 @@ export const CustomiseProvider: React.SFC<CustomiseProviderProps> = ({ children 
   const [selectedIngredients, updateSelectedIngredients] = useState<ISelectableProduct[]>([]);
   const [isDescriptionVisible, toggleDescriptionVisibility] = useState<boolean>(false);
   const [currentMixture, addToMixture] = useState<ISelectableProduct[]>([]);
+  const [userName, saveUserName] = useState<string>("");
   const [headings, updateHeadings] = useState<IHeading[]>([
     {
       headingText: "Selection",
@@ -47,6 +52,7 @@ export const CustomiseProvider: React.SFC<CustomiseProviderProps> = ({ children 
     }
   ]);
   const [baseProduct, saveBaseProduct] = useState<ISelectableProduct>({} as ISelectableProduct);
+  const [isProductBeingAmended, updateIsProductBeingAmended] = useState<boolean>(false);
 
   return (
     <CustomiseContext.Provider value={{
@@ -63,7 +69,11 @@ export const CustomiseProvider: React.SFC<CustomiseProviderProps> = ({ children 
       headings,
       updateHeadings,
       baseProduct,
-      saveBaseProduct
+      saveBaseProduct,
+      userName,
+      saveUserName,
+      isProductBeingAmended,
+      updateIsProductBeingAmended
     }}>
       {children}
     </CustomiseContext.Provider>
