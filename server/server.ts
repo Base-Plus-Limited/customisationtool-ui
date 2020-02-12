@@ -4,6 +4,7 @@ import dotenv from 'dotenv';
 import ICategorisedIngredient from './../react-ui/src/Interfaces/CategorisedIngredient';
 import IWordpressProduct, { ISelectableProduct } from './../react-ui/src/Interfaces/WordpressProduct';
 import { IWordpressTag, ICategory } from './../react-ui/src/Interfaces/Tag';
+import ICustomProductDBModel from './../react-ui/src/Interfaces/CustomProduct';
 import * as request from 'superagent';
 import { resolve, join } from 'path';
 import fs from 'fs';
@@ -14,7 +15,7 @@ dotenv.config();
 import flatMap from 'array.prototype.flatmap';
 class App {
   public express: Application;
-  // private completedQuizModel = this.createCompletedQuizModel();
+  private customProductModel = this.createCustomProductModel();
 
   constructor () {
     this.express = express();
@@ -110,6 +111,27 @@ class App {
     });
 
     /*************************
+     *  SAVE PRODUCTS TO DB
+     *************************/
+    router.post('/save-product', bodyParser.json(), async (req, res) => {
+      const customProductRequest: ICustomProductDBModel = req.body;
+      const customProduct = new this.customProductModel({
+        date: customProductRequest.date,
+        products: customProductRequest.products,
+        amended: customProductRequest.amended
+      });
+      customProduct.save()
+        .then(dbResponse => {
+          console.log(`Saved custom product with id ${dbResponse.id}`);
+          res.json(dbResponse)
+        })
+        .catch(error => {
+          console.error(error);
+          res.send(error);
+        })
+    });
+
+    /*************************
      *  WILDCARD
      *************************/
     router.get('*', function (req, res) {
@@ -162,6 +184,37 @@ class App {
       message: response.message,
       error: true
     }
+  }
+
+  private createCustomProductModel() {
+    const CustomProductSchema = new Schema({
+      id: {
+        type: String,
+        required: false,
+        default: mongoose.Types.ObjectId
+      },
+      amended: {
+        type: Boolean,
+        required: true,
+        default: false
+      },
+      date: {
+        type: Date,
+        required: false,
+        default: Date.now
+      },
+      products: [{
+        id: {
+          type: Number,
+          required: true
+        },
+        name: {
+          type: String,
+          required: true
+        }
+      }]
+    })
+    return model<ICustomProductDBModel & Document>('CustomProduct', CustomProductSchema);
   }
   
 }
