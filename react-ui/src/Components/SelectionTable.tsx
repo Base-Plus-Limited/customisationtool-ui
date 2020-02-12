@@ -12,6 +12,7 @@ import {StyledText, Message, SummaryPriceRow, TotalPriceRow} from './Shared/Text
 import { IHeading } from '../Interfaces/Heading';
 import IErrorResponse from '../Interfaces/ErrorResponse';
 import { getUniqueIngredients } from '../Helpers/Helpers';
+import ICustomProductDBModel from '../Interfaces/CustomProduct';
 
 export interface SelectionTableProps {
   categorisedIngredients: ICategorisedIngredient[]
@@ -24,7 +25,7 @@ export interface IngredientsInnerWrapperProps {
 
 const SelectionTable: React.SFC<SelectionTableProps> = ({categorisedIngredients, baseProduct}) => {
 
-  const { updateCategorisedIngredients, toggleDescriptionVisibility, isDescriptionVisible, addToMixture, currentMixture, headings, updateHeadings, setApplicationError, userName, isProductBeingAmended, updateIsProductBeingAmended} = useContext(CustomiseContext);
+  const { updateCategorisedIngredients, toggleDescriptionVisibility, isDescriptionVisible, addToMixture, currentMixture, headings, updateHeadings, setApplicationError, userName, isProductBeingAmended} = useContext(CustomiseContext);
 
   const onCategorySelect = (categoryId: number) => {
     updateCategorisedIngredients(
@@ -91,8 +92,6 @@ const SelectionTable: React.SFC<SelectionTableProps> = ({categorisedIngredients,
   }
 
   const removeFromCart = (selectedProduct: ISelectableProduct) => {
-    if(isProductBeingAmended)
-      updateIsProductBeingAmended(false)
     addToMixture(currentMixture.filter(ingredient => ingredient.id !== selectedProduct.id))
   }
 
@@ -191,6 +190,31 @@ const SelectionTable: React.SFC<SelectionTableProps> = ({categorisedIngredients,
     return Number(baseProduct.price);
   }
 
+  const createFinalProductToSaveToDatabase = () => {
+    const databaseProduct: ICustomProductDBModel = {
+      products: currentMixture.map(ingredient => {
+        return {
+          name: ingredient.name,
+          id: ingredient.id
+        }
+      }),
+      amended: isProductBeingAmended
+    };
+    return databaseProduct;
+  }
+
+  const saveProductToDatabase = () => {
+    return fetch('/api/save-product', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      cache: 'no-cache',
+      body: JSON.stringify(createFinalProductToSaveToDatabase())
+    })
+    .finally(() => goToCheckout())
+  }
+
   const newProduct = {
     name: userName ? `${userName}'s Product` : "Your bespoke product",
     type: 'simple',
@@ -242,7 +266,7 @@ const SelectionTable: React.SFC<SelectionTableProps> = ({categorisedIngredients,
                 { currentMixture.map(ingredient => <SummaryPriceRow key={ingredient.id}>{ingredient.name} <span>£{ingredient.price}</span></SummaryPriceRow>) }
                 {<SummaryPriceRow>{baseProduct.name} <span>£{baseProduct.price}</span></SummaryPriceRow>}
                 {<TotalPriceRow>Mixture <span>£{getMixturePrice()}</span></TotalPriceRow>}
-                {currentMixture.length === 2 && <StyledButton onClick={goToCheckout}>Checkout</StyledButton>}
+                {currentMixture.length === 2 && <StyledButton onClick={saveProductToDatabase}>Checkout</StyledButton>}
               </SummaryPrices>
             </React.Fragment>
             :
