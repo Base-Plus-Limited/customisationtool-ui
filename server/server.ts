@@ -214,7 +214,7 @@ class App {
         }
       }]
     })
-    return model<ICustomProductDBModel & Document>('CustomProduct', CustomProductSchema);
+    return model<ICustomProductDBModel & Document>('products', CustomProductSchema);
   }
   
 }
