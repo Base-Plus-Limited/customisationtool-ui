@@ -116,18 +116,17 @@ class App {
     router.post('/save-product', bodyParser.json(), async (req, res) => {
       const customProductRequest: ICustomProductDBModel = req.body;
       const customProduct = new this.customProductModel({
-        date: customProductRequest.date,
         products: customProductRequest.products,
         amended: customProductRequest.amended
       });
       customProduct.save()
         .then(dbResponse => {
           console.log(`Saved custom product with id ${dbResponse.id}`);
-          res.json(dbResponse)
+          res.end();
         })
         .catch(error => {
           console.error(error);
-          res.send(error);
+          res.end();
         })
     });
 

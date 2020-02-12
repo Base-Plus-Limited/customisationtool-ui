@@ -190,17 +190,16 @@ var App = /** @class */ (function () {
             return __generator(this, function (_a) {
                 customProductRequest = req.body;
                 customProduct = new this.customProductModel({
-                    date: customProductRequest.date,
                     products: customProductRequest.products,
                     amended: customProductRequest.amended
                 });
                 customProduct.save()
                     .then(function (dbResponse) {
                     console.log("Saved custom product with id " + dbResponse.id);
-                    res.json(dbResponse);
+                    res.end();
                 })["catch"](function (error) {
                     console.error(error);
-                    res.send(error);
+                    res.end();
                 });
                 return [2 /*return*/];
             });
