@@ -50,13 +50,13 @@ var body_parser_1 = __importDefault(require("body-parser"));
 var dotenv_1 = __importDefault(require("dotenv"));
 var request = __importStar(require("superagent"));
 var path_1 = require("path");
-var mongoose_1 = __importDefault(require("mongoose"));
+var mongoose_1 = __importStar(require("mongoose"));
 dotenv_1["default"].config();
 var array_prototype_flatmap_1 = __importDefault(require("array.prototype.flatmap"));
 var App = /** @class */ (function () {
-    // private completedQuizModel = this.createCompletedQuizModel();
     function App() {
         var _this = this;
+        this.customProductModel = this.createCustomProductModel();
         this.returnUniqueCategories = function (categories) {
             return categories.filter(function (value, index, categories) { return categories.findIndex(function (cat) { return (cat.id === value.id); }) === index; });
         };
@@ -183,6 +183,28 @@ var App = /** @class */ (function () {
             });
         }); });
         /*************************
+         *  SAVE PRODUCTS TO DB
+         *************************/
+        router.post('/save-product', body_parser_1["default"].json(), function (req, res) { return __awaiter(_this, void 0, void 0, function () {
+            var customProductRequest, customProduct;
+            return __generator(this, function (_a) {
+                customProductRequest = req.body;
+                customProduct = new this.customProductModel({
+                    products: customProductRequest.products,
+                    amended: customProductRequest.amended
+                });
+                customProduct.save()
+                    .then(function (dbResponse) {
+                    console.log("Saved custom product with id " + dbResponse.id);
+                    res.end();
+                })["catch"](function (error) {
+                    console.error(error);
+                    res.end();
+                });
+                return [2 /*return*/];
+            });
+        }); });
+        /*************************
          *  WILDCARD
          *************************/
         router.get('*', function (req, res) {
@@ -204,6 +226,36 @@ var App = /** @class */ (function () {
             message: response.message,
             error: true
         };
+    };
+    App.prototype.createCustomProductModel = function () {
+        var CustomProductSchema = new mongoose_1.Schema({
+            id: {
+                type: String,
+                required: false,
+                "default": mongoose_1["default"].Types.ObjectId
+            },
+            amended: {
+                type: Boolean,
+                required: true,
+                "default": false
+            },
+            date: {
+                type: Date,
+                required: false,
+                "default": Date.now
+            },
+            products: [{
+                    id: {
+                        type: Number,
+                        required: true
+                    },
+                    name: {
+                        type: String,
+                        required: true
+                    }
+                }]
+        });
+        return mongoose_1.model('products', CustomProductSchema);
     };
     return App;
 }());
