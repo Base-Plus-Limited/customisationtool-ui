@@ -266,7 +266,8 @@ const SelectionTable: React.SFC<SelectionTableProps> = ({categorisedIngredients,
                 { currentMixture.map(ingredient => <SummaryPriceRow key={ingredient.id}>{ingredient.name} <span>£{ingredient.price}</span></SummaryPriceRow>) }
                 {<SummaryPriceRow>{baseProduct.name} <span>£{baseProduct.price}</span></SummaryPriceRow>}
                 {<TotalPriceRow>Mixture <span>£{getMixturePrice()}</span></TotalPriceRow>}
-                {currentMixture.length === 2 && <StyledButton onClick={saveProductToDatabase}>Checkout</StyledButton>}
+                {/* {currentMixture.length === 2 && <StyledButton onClick={saveProductToDatabase}>Checkout</StyledButton>} */}
+                <StyledButton onClick={() => currentMixture.length === 2 ? saveProductToDatabase : toggleViews(0)}>{currentMixture.length === 2 ? 'Checkout' : 'Back'}</StyledButton>
               </SummaryPrices>
             </React.Fragment>
             :
