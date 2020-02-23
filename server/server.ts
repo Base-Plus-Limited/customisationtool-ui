@@ -116,7 +116,7 @@ class App {
     router.post('/save-product', bodyParser.json(), async (req, res) => {
       const customProductRequest: ICustomProductDBModel = req.body;
       const customProduct = new this.customProductModel({
-        products: customProductRequest.products,
+        ingredients: customProductRequest.ingredients,
         amended: customProductRequest.amended
       });
       customProduct.save()
@@ -202,7 +202,7 @@ class App {
         required: false,
         default: Date.now
       },
-      products: [{
+      ingredients: [{
         id: {
           type: Number,
           required: true
@@ -213,7 +213,7 @@ class App {
         }
       }]
     })
-    return model<ICustomProductDBModel & Document>('products', CustomProductSchema);
+    return model<ICustomProductDBModel & Document>('custom-products', CustomProductSchema);
   }
   
 }

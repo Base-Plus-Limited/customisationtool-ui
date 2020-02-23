@@ -1,5 +1,5 @@
 export default interface ICustomProductDBModel {
-  products: IIngredient[];
+  ingredients: IIngredient[];
   amended: boolean;
 }
 

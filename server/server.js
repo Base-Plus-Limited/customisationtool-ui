@@ -190,7 +190,7 @@ var App = /** @class */ (function () {
             return __generator(this, function (_a) {
                 customProductRequest = req.body;
                 customProduct = new this.customProductModel({
-                    products: customProductRequest.products,
+                    ingredients: customProductRequest.ingredients,
                     amended: customProductRequest.amended
                 });
                 customProduct.save()
@@ -244,7 +244,7 @@ var App = /** @class */ (function () {
                 required: false,
                 "default": Date.now
             },
-            products: [{
+            ingredients: [{
                     id: {
                         type: Number,
                         required: true
@@ -255,7 +255,7 @@ var App = /** @class */ (function () {
                     }
                 }]
         });
-        return mongoose_1.model('products', CustomProductSchema);
+        return mongoose_1.model('custom-products', CustomProductSchema);
     };
     return App;
 }());

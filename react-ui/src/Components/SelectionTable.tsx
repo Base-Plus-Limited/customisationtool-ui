@@ -192,7 +192,7 @@ const SelectionTable: React.SFC<SelectionTableProps> = ({categorisedIngredients,
 
   const createFinalProductToSaveToDatabase = () => {
     const databaseProduct: ICustomProductDBModel = {
-      products: currentMixture.map(ingredient => {
+      ingredients: currentMixture.map(ingredient => {
         return {
           name: ingredient.name,
           id: ingredient.id
