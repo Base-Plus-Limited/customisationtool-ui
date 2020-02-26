@@ -6,6 +6,8 @@ import SelectionTable from '../Components/SelectionTable';
 
 import { getUniqueIngredients } from '../Helpers/Helpers';
 import { ISelectableProduct } from '../Interfaces/WordpressProduct';
+import StyledErrorScreen from '../Components/ErrorScreen';
+import IErrorResponse from '../Interfaces/ErrorResponse';
 
 export interface CustomiseScreenProps {
 
@@ -13,7 +15,7 @@ export interface CustomiseScreenProps {
 
 const StyledCustomiseScreen: React.SFC<CustomiseScreenProps> = () => {
 
-  const { updateCategorisedIngredients, categorisedIngredients, setApplicationError, saveBaseProduct, baseProduct, saveUserName, updateIsProductBeingAmended, addToMixture } = useContext(CustomiseContext);
+  const { updateCategorisedIngredients, categorisedIngredients, setApplicationError, saveBaseProduct, baseProduct, saveUserName, updateIsProductBeingAmended, addToMixture, hasApplicationErrored } = useContext(CustomiseContext);
 
   useEffect(() => {
     fetch('/api/ingredients')
@@ -56,7 +58,13 @@ const StyledCustomiseScreen: React.SFC<CustomiseScreenProps> = () => {
     }
   }
 
+  const getErrorMessage = (error: IErrorResponse) => {
+    return `${hasApplicationErrored.uiMessage && hasApplicationErrored.uiMessage.length > 0 ? `${hasApplicationErrored.uiMessage}` : "We're unable to load the customisation tool at the moment, please try again later"}`
+  }
+
   return (
+    hasApplicationErrored.error ? 
+      <StyledErrorScreen message={getErrorMessage(hasApplicationErrored)}></StyledErrorScreen> :
     <CustomiseScreen>
       <SelectionTable categorisedIngredients={categorisedIngredients} baseProduct={baseProduct}></SelectionTable>
     </CustomiseScreen>

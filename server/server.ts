@@ -134,7 +134,7 @@ class App {
      *  WILDCARD
      *************************/
     router.get('*', function (req, res) {
-      res.sendFile(join(__dirname, '../react-ui/build', 'index.html'));
+      res.status(400).sendFile(join(__dirname, '../react-ui/build', 'index.html'));
     });
   }
 

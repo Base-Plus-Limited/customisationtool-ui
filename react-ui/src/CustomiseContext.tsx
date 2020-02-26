@@ -6,7 +6,7 @@ import { ISelectableProduct } from './Interfaces/WordpressProduct';
 import { IHeading } from './Interfaces/Heading';
 
 const state: ICustomiseContext = {
-  applicationError: {} as IErrorResponse,
+  hasApplicationErrored: {} as IErrorResponse,
   setApplicationError: (previousApplicationError: SetStateAction<IErrorResponse>) => previousApplicationError,
   categorisedIngredients: [],
   updateCategorisedIngredients: (previousIngredients: SetStateAction<ICategorisedIngredient[]>) => previousIngredients,
@@ -33,7 +33,7 @@ interface CustomiseProviderProps {
  
 export const CustomiseProvider: React.SFC<CustomiseProviderProps> = ({ children }) => {
 
-  const [applicationError, setApplicationError] = useState<IErrorResponse>({} as IErrorResponse);
+  const [hasApplicationErrored, setApplicationError] = useState<IErrorResponse>({} as IErrorResponse);
   const [categorisedIngredients, updateCategorisedIngredients] = useState<ICategorisedIngredient[]>([]);
   const [selectedIngredients, updateSelectedIngredients] = useState<ISelectableProduct[]>([]);
   const [isDescriptionVisible, toggleDescriptionVisibility] = useState<boolean>(false);
@@ -56,7 +56,7 @@ export const CustomiseProvider: React.SFC<CustomiseProviderProps> = ({ children 
 
   return (
     <CustomiseContext.Provider value={{
-      applicationError,
+      hasApplicationErrored,
       setApplicationError,
       categorisedIngredients,
       updateCategorisedIngredients,
