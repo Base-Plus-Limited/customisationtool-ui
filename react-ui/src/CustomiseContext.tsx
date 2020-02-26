@@ -23,14 +23,16 @@ const state: ICustomiseContext = {
   userName: "",
   saveUserName: (previousUserName: SetStateAction<string>) => previousUserName,
   isProductBeingAmended: false,
-  updateIsProductBeingAmended: (previousProductBeingAmended: SetStateAction<boolean>) => previousProductBeingAmended
+  updateIsProductBeingAmended: (previousProductBeingAmended: SetStateAction<boolean>) => previousProductBeingAmended,
+  isCheckoutButtonSelected: false,
+  updateIsCheckoutButtonSelected: (previousIsCheckoutButtonSelected: SetStateAction<boolean>) => previousIsCheckoutButtonSelected
 }
 
 export const CustomiseContext = createContext(state);
 
 interface CustomiseProviderProps {
 }
- 
+
 export const CustomiseProvider: React.SFC<CustomiseProviderProps> = ({ children }) => {
 
   const [hasApplicationErrored, setApplicationError] = useState<IErrorResponse>({} as IErrorResponse);
@@ -53,6 +55,7 @@ export const CustomiseProvider: React.SFC<CustomiseProviderProps> = ({ children 
   ]);
   const [baseProduct, saveBaseProduct] = useState<ISelectableProduct>({} as ISelectableProduct);
   const [isProductBeingAmended, updateIsProductBeingAmended] = useState<boolean>(false);
+  const [isCheckoutButtonSelected, updateIsCheckoutButtonSelected] = useState<boolean>(false);
 
   return (
     <CustomiseContext.Provider value={{
@@ -73,10 +76,12 @@ export const CustomiseProvider: React.SFC<CustomiseProviderProps> = ({ children 
       userName,
       saveUserName,
       isProductBeingAmended,
-      updateIsProductBeingAmended
+      updateIsProductBeingAmended,
+      isCheckoutButtonSelected,
+      updateIsCheckoutButtonSelected
     }}>
       {children}
     </CustomiseContext.Provider>
   );
 }
- 
+

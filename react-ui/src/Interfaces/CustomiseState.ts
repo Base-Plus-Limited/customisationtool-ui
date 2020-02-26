@@ -23,4 +23,6 @@ export default interface ICustomiseContext {
   saveUserName: Dispatch<SetStateAction<string>>;
   isProductBeingAmended: boolean;
   updateIsProductBeingAmended: Dispatch<SetStateAction<boolean>>;
+  isCheckoutButtonSelected: boolean;
+  updateIsCheckoutButtonSelected: Dispatch<SetStateAction<boolean>>
 }

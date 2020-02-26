@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import { CustomiseContext } from '../CustomiseContext';
 import ICategorisedIngredient from '../Interfaces/CategorisedIngredient';
 import SelectionTable from '../Components/SelectionTable';
-
+import LoadingAnimation from './../Components/LoadingAnimation';
 import { getUniqueIngredients } from '../Helpers/Helpers';
 import { ISelectableProduct } from '../Interfaces/WordpressProduct';
 import StyledErrorScreen from '../Components/ErrorScreen';
@@ -65,9 +65,16 @@ const StyledCustomiseScreen: React.SFC<CustomiseScreenProps> = () => {
   return (
     hasApplicationErrored.error ? 
       <StyledErrorScreen message={getErrorMessage(hasApplicationErrored)}></StyledErrorScreen> :
-    <CustomiseScreen>
-      <SelectionTable categorisedIngredients={categorisedIngredients} baseProduct={baseProduct}></SelectionTable>
-    </CustomiseScreen>
+    <React.Fragment>
+      {
+        categorisedIngredients.length > 0 ?
+        <CustomiseScreen>
+          <SelectionTable categorisedIngredients={categorisedIngredients} baseProduct={baseProduct}></SelectionTable>
+        </CustomiseScreen> 
+        : <LoadingAnimation/>
+      }
+      
+    </React.Fragment>
   );
 }
 
