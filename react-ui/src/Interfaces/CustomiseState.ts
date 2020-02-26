@@ -5,7 +5,7 @@ import { ISelectableProduct } from './WordpressProduct';
 import { IHeading } from './Heading';
 
 export default interface ICustomiseContext {
-  applicationError: IErrorResponse;
+  hasApplicationErrored: IErrorResponse;
   setApplicationError: Dispatch<SetStateAction<IErrorResponse>>;
   categorisedIngredients: ICategorisedIngredient[];
   updateCategorisedIngredients: Dispatch<SetStateAction<ICategorisedIngredient[]>>;

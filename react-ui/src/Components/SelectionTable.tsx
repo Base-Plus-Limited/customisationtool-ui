@@ -158,7 +158,7 @@ const SelectionTable: React.SFC<SelectionTableProps> = ({categorisedIngredients,
       body: JSON.stringify(newProduct)
     })
     .then(res => res.ok ? res.json() : res.json().then((errorResponse: IErrorResponse) => {
-      errorResponse.uiMessage = `Sorry, we weren't able to create your product`;
+      errorResponse.uiMessage = "Sorry, we weren't able to create your product. Please try again later";
       setApplicationError(errorResponse);
     }))
     .then((product: IWordpressProduct) => {
@@ -170,7 +170,7 @@ const SelectionTable: React.SFC<SelectionTableProps> = ({categorisedIngredients,
         error: true,
         code: error.code,
         message: error.message,
-        uiMessage: `Sorry, we weren't able to create your product`
+        uiMessage: "Sorry, we weren't able to create your product. Please try again later"
       })
     });
   }

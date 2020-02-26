@@ -208,7 +208,7 @@ var App = /** @class */ (function () {
          *  WILDCARD
          *************************/
         router.get('*', function (req, res) {
-            res.sendFile(path_1.join(__dirname, '../react-ui/build', 'index.html'));
+            res.status(400).sendFile(path_1.join(__dirname, '../react-ui/build', 'index.html'));
         });
     };
     App.prototype.connectToDb = function () {
