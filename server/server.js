@@ -169,11 +169,12 @@ var App = /** @class */ (function () {
          *************************/
         router.post('/analytics', function (req, res) {
             var data = req.body;
-            var category_name = data.category_name, read_description_for = data.read_description_for, distinct_id = data.distinct_id, ingredients = data.ingredients, event_type = data.event_type;
+            var category_name = data.category_name, selected_ingredient = data.selected_ingredient, read_description_for = data.read_description_for, distinct_id = data.distinct_id, ingredients = data.ingredients, event_type = data.event_type;
             _this.mixPanelClient.track(event_type, {
                 distinct_id: distinct_id,
                 category_name: category_name,
                 read_description_for: read_description_for,
+                selected_ingredient: selected_ingredient,
                 ingredients: ingredients
             }, function (response) {
                 if (response) {
