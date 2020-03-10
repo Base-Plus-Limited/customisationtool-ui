@@ -49,6 +49,7 @@ var express_1 = __importDefault(require("express"));
 var body_parser_1 = __importDefault(require("body-parser"));
 var dotenv_1 = __importDefault(require("dotenv"));
 var request = __importStar(require("superagent"));
+var mixpanel = __importStar(require("mixpanel"));
 var path_1 = require("path");
 var mongoose_1 = __importStar(require("mongoose"));
 dotenv_1["default"].config();
@@ -57,6 +58,7 @@ var App = /** @class */ (function () {
     function App() {
         var _this = this;
         this.customProductModel = this.createCustomProductModel();
+        this.mixPanelClient = mixpanel.init("" + process.env.MIXPANEL_ID);
         this.returnUniqueCategories = function (categories) {
             return categories.filter(function (value, index, categories) { return categories.findIndex(function (cat) { return (cat.id === value.id); }) === index; });
         };
@@ -162,6 +164,27 @@ var App = /** @class */ (function () {
                 }
             });
         }); });
+        /*************************
+         *  LOG ANALYTICS
+         *************************/
+        router.post('/analytics', function (req, res) {
+            var data = req.body;
+            var category_name = data.category_name, read_description_for = data.read_description_for, distinct_id = data.distinct_id, ingredients = data.ingredients, event_type = data.event_type;
+            _this.mixPanelClient.track(event_type, {
+                distinct_id: distinct_id,
+                category_name: category_name,
+                read_description_for: read_description_for,
+                ingredients: ingredients
+            }, function (response) {
+                if (response) {
+                    res.send(response);
+                    console.error("Error logging analytics event " + response);
+                    return;
+                }
+                res.send(response);
+                console.log("Logged analytics event " + data.event_type);
+            });
+        });
         /*************************
          *  CREATE NEW PRODUCT
          *************************/
