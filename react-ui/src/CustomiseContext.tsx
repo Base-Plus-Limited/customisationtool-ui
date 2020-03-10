@@ -25,7 +25,9 @@ const state: ICustomiseContext = {
   isProductBeingAmended: false,
   updateIsProductBeingAmended: (previousProductBeingAmended: SetStateAction<boolean>) => previousProductBeingAmended,
   isCheckoutButtonSelected: false,
-  updateIsCheckoutButtonSelected: (previousIsCheckoutButtonSelected: SetStateAction<boolean>) => previousIsCheckoutButtonSelected
+  updateIsCheckoutButtonSelected: (previousIsCheckoutButtonSelected: SetStateAction<boolean>) => previousIsCheckoutButtonSelected,
+  uniqueId: "",
+  saveUniqueId: (previousUniqueId: SetStateAction<string>) => previousUniqueId,
 }
 
 export const CustomiseContext = createContext(state);
@@ -56,6 +58,7 @@ export const CustomiseProvider: React.SFC<CustomiseProviderProps> = ({ children 
   const [baseProduct, saveBaseProduct] = useState<ISelectableProduct>({} as ISelectableProduct);
   const [isProductBeingAmended, updateIsProductBeingAmended] = useState<boolean>(false);
   const [isCheckoutButtonSelected, updateIsCheckoutButtonSelected] = useState<boolean>(false);
+  const [uniqueId, saveUniqueId] = useState<string>("");
 
   return (
     <CustomiseContext.Provider value={{
@@ -78,7 +81,9 @@ export const CustomiseProvider: React.SFC<CustomiseProviderProps> = ({ children 
       isProductBeingAmended,
       updateIsProductBeingAmended,
       isCheckoutButtonSelected,
-      updateIsCheckoutButtonSelected
+      updateIsCheckoutButtonSelected,
+      uniqueId,
+      saveUniqueId
     }}>
       {children}
     </CustomiseContext.Provider>

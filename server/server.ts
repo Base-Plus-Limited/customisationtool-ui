@@ -2,13 +2,13 @@ import express, { Application } from 'express';
 import bodyParser from 'body-parser';
 import dotenv from 'dotenv';
 import ICategorisedIngredient from './../react-ui/src/Interfaces/CategorisedIngredient';
+import { IAnalyticsEvent } from './../react-ui/src/Interfaces/Analytics';
 import IWordpressProduct, { ISelectableProduct } from './../react-ui/src/Interfaces/WordpressProduct';
-import { IWordpressTag, ICategory } from './../react-ui/src/Interfaces/Tag';
+import { ICategory } from './../react-ui/src/Interfaces/Tag';
 import ICustomProductDBModel from './../react-ui/src/Interfaces/CustomProduct';
 import * as request from 'superagent';
+import * as mixpanel from 'mixpanel';
 import { resolve, join } from 'path';
-import fs from 'fs';
-import os from 'os';
 import mongoose, { Document, Schema, model } from 'mongoose';
 import { MongoError } from 'mongodb';
 dotenv.config();
@@ -16,6 +16,7 @@ import flatMap from 'array.prototype.flatmap';
 class App {
   public express: Application;
   private customProductModel = this.createCustomProductModel();
+  private mixPanelClient = mixpanel.init(`${process.env.MIXPANEL_ID}`);
 
   constructor () {
     this.express = express();
@@ -94,6 +95,29 @@ class App {
           console.error(`Error ${code}, ${message}`);
           res.status(error.status).send(this.handleError(error));
         }) 
+    });
+
+    /*************************
+     *  LOG ANALYTICS
+     *************************/
+    router.post('/analytics', (req, res) => {
+      const data: IAnalyticsEvent = req.body;
+      const { category_name, selected_ingredient, read_description_for, distinct_id, ingredients, event_type } = data;
+      this.mixPanelClient.track(event_type, {
+        distinct_id,
+        category_name,
+        read_description_for,
+        selected_ingredient,
+        ingredients
+      }, (response) => {
+        if(response) {
+          res.send(response);
+          console.error(`Error logging analytics event ${response}`);
+          return;
+        }
+        res.send(response);
+        console.log(`Logged analytics event ${data.event_type}`);
+      })
     });
 
     /*************************
