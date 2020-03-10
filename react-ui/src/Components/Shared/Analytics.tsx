@@ -12,7 +12,8 @@ export const track = async (event: IAnalyticsEvent) => {
       distinct_id: event.distinct_id,
       category_name: event.category_name,
       read_description_for: event.read_description_for,
-      ingredients: event.ingredients
+      ingredients: event.ingredients,
+      selected_ingredient: event.selected_ingredient
     })
   }).then()
   .catch((error) => console.error(error))

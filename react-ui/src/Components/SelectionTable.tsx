@@ -58,6 +58,20 @@ const SelectionTable: React.SFC<SelectionTableProps> = ({ categorisedIngredients
         return category;
       })
     )
+    logSelectedIngredient();
+  }
+
+  const logSelectedIngredient = () => {
+    categorisedIngredients.map(cat => {
+      if(cat.selected) {
+        const selectedIngredient = cat.ingredients.filter(ingredient => ingredient.selected);
+        track({
+          distinct_id: uniqueId,
+          event_type: "Ingredient selected",
+          selected_ingredient: selectedIngredient[0].name
+        });
+      }
+    });
   }
 
   const getSelectedCategoryIngredients = () => {
