@@ -8,6 +8,7 @@ import { getUniqueIngredients } from '../Helpers/Helpers';
 import { ISelectableProduct } from '../Interfaces/WordpressProduct';
 import StyledErrorScreen from '../Components/ErrorScreen';
 import IErrorResponse from '../Interfaces/ErrorResponse';
+import { generateUniqueId, track } from '../Components/Shared/Analytics';
 
 export interface CustomiseScreenProps {
 
@@ -15,7 +16,7 @@ export interface CustomiseScreenProps {
 
 const StyledCustomiseScreen: React.SFC<CustomiseScreenProps> = () => {
 
-  const { updateCategorisedIngredients, categorisedIngredients, setApplicationError, saveBaseProduct, baseProduct, saveUserName, updateIsProductBeingAmended, addToMixture, hasApplicationErrored } = useContext(CustomiseContext);
+  const { updateCategorisedIngredients, categorisedIngredients, setApplicationError, saveBaseProduct, baseProduct, saveUserName, updateIsProductBeingAmended, addToMixture, hasApplicationErrored, uniqueId, saveUniqueId } = useContext(CustomiseContext);
 
   useEffect(() => {
     fetch('/api/ingredients')
@@ -45,10 +46,11 @@ const StyledCustomiseScreen: React.SFC<CustomiseScreenProps> = () => {
     const params = new URLSearchParams(window.location.search.substring(1));
     const productIds: number[] = [Number(params.get('productone')), Number(params.get('producttwo'))];
     const userName = params.get('username');
+    const uniqueId = String(params.get('uniqueid') === null ? generateUniqueId() : params.get('uniqueid'));
+    saveUniqueId(uniqueId);
 
     if(userName !== null)
       saveUserName(userName);
-
     if (productIds.some(urlProductId => urlProductId !== 0)) {
       addToMixture(getUniqueIngredients(ingredients.filter(ingredient => productIds.includes(ingredient.id))));
       updateIsProductBeingAmended(true);
@@ -56,6 +58,10 @@ const StyledCustomiseScreen: React.SFC<CustomiseScreenProps> = () => {
       // window.location.replace('https://baseplus.co.uk/customise');
       // http://localhost:3000/?productone=696&producttwo=695&username=tess
     }
+    track({
+      distinct_id: uniqueId,
+      event_type: "Customisation started"
+    });
   }
 
   const getErrorMessage = (error: IErrorResponse) => {

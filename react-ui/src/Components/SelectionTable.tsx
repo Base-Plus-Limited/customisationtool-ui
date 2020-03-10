@@ -14,6 +14,7 @@ import IErrorResponse from '../Interfaces/ErrorResponse';
 import { getUniqueIngredients } from '../Helpers/Helpers';
 import ICustomProductDBModel from '../Interfaces/CustomProduct';
 import LoadingAnimation from './LoadingAnimation';
+import { track } from './Shared/Analytics';
 
 export interface SelectionTableProps {
   categorisedIngredients: ICategorisedIngredient[]
@@ -26,9 +27,14 @@ export interface IngredientsInnerWrapperProps {
 
 const SelectionTable: React.SFC<SelectionTableProps> = ({ categorisedIngredients, baseProduct }) => {
 
-  const { updateCategorisedIngredients, toggleDescriptionVisibility, isDescriptionVisible, addToMixture, currentMixture, headings, updateHeadings, setApplicationError, userName, isProductBeingAmended, updateIsCheckoutButtonSelected, isCheckoutButtonSelected } = useContext(CustomiseContext);
+  const { updateCategorisedIngredients, toggleDescriptionVisibility, isDescriptionVisible, addToMixture, currentMixture, headings, updateHeadings, setApplicationError, userName, isProductBeingAmended, updateIsCheckoutButtonSelected, isCheckoutButtonSelected, uniqueId } = useContext(CustomiseContext);
 
   const onCategorySelect = (categoryId: number) => {
+    track({
+      distinct_id: uniqueId,
+      event_type: "Category selected",
+      category_name: categorisedIngredients.filter(cat => cat.id === categoryId)[0].category
+    });
     updateCategorisedIngredients(
       categorisedIngredients.map(category => {
         category.selected = false;
@@ -97,6 +103,12 @@ const SelectionTable: React.SFC<SelectionTableProps> = ({ categorisedIngredients
   }
 
   const toggleDescription = () => {
+    if(!isDescriptionVisible)
+      track({
+        distinct_id: uniqueId,
+        event_type: "Open description",
+        read_description_for: categorisedIngredients.map(cat => cat.ingredients.filter(ingredient => ingredient.selected)[0])[0].name
+      });
     let currentVisibility = isDescriptionVisible;
     toggleDescriptionVisibility(currentVisibility = !isDescriptionVisible)
   }
@@ -163,8 +175,14 @@ const SelectionTable: React.SFC<SelectionTableProps> = ({ categorisedIngredients
         setApplicationError(errorResponse);
       }))
       .then((product: IWordpressProduct) => {
-        if (product)
-          window.location.assign(`https://baseplus.co.uk/cart?add-to-cart=${product.id}`)
+        track({
+          distinct_id: uniqueId,
+          event_type: "Buy now selected",
+          ingredients: currentMixture.map(x => x.name).join(' & ')
+        }).then(() => {
+          if (product)
+            window.location.assign(`https://baseplus.co.uk/cart?add-to-cart=${product.id}`)
+        });
       })
       .catch((error: IErrorResponse) => {
         setApplicationError({
