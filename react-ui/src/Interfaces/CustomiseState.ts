@@ -25,4 +25,6 @@ export default interface ICustomiseContext {
   updateIsProductBeingAmended: Dispatch<SetStateAction<boolean>>;
   isCheckoutButtonSelected: boolean;
   updateIsCheckoutButtonSelected: Dispatch<SetStateAction<boolean>>
+  uniqueId: string;
+  saveUniqueId: Dispatch<SetStateAction<string>>;
 }
