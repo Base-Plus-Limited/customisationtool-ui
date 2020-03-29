@@ -6,6 +6,7 @@ import { IAnalyticsEvent } from './../react-ui/src/Interfaces/Analytics';
 import IWordpressProduct, { ISelectableProduct } from './../react-ui/src/Interfaces/WordpressProduct';
 import { ICategory } from './../react-ui/src/Interfaces/Tag';
 import ICustomProductDBModel from './../react-ui/src/Interfaces/CustomProduct';
+import { IHoneyBadgerErrorTypes } from './../react-ui/src/Interfaces/ErrorTypes';
 import * as request from 'superagent';
 import * as mixpanel from 'mixpanel';
 import { resolve, join } from 'path';
@@ -13,6 +14,7 @@ import mongoose, { Document, Schema, model } from 'mongoose';
 import { MongoError } from 'mongodb';
 dotenv.config();
 import flatMap from 'array.prototype.flatmap';
+import honeybadger from 'honeybadger';
 class App {
   public express: Application;
   private customProductModel = this.createCustomProductModel();
@@ -20,9 +22,10 @@ class App {
 
   constructor () {
     this.express = express();
-    this.connectToDb();
+    this.configureHoneyBadger();
     this.config(); 
     this.mountRoutes(); 
+    this.connectToDb();
   }
 
   private config () {
@@ -31,6 +34,12 @@ class App {
       res.header("Access-Control-Allow-Origin", "*");
       res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
       next();
+    });
+  }
+
+  private configureHoneyBadger () {
+    honeybadger.configure({
+      apiKey: `${process.env.HONEYBADGER_API_KEY}`
     });
   }
 
@@ -49,6 +58,7 @@ class App {
     /*************************
      *  SERVE ROUTES
      *************************/
+    this.express.use(honeybadger.requestHandler);
     this.express.use('/api', bodyParser.json(), router);
 
     /*************************
@@ -91,8 +101,7 @@ class App {
         })
         .then((categorisedIngredients: ICategorisedIngredient[]) => res.send(categorisedIngredients))
         .catch((error) => {
-          const { code, message } = this.handleError(error);
-          console.error(`Error ${code}, ${message}`);
+          honeybadger.notify(`Error ${this.handleError(error).code}, ${this.handleError(error).message}`, IHoneyBadgerErrorTypes.APIREQUEST);
           res.status(error.status).send(this.handleError(error));
         }) 
     });
@@ -112,7 +121,7 @@ class App {
       }, (response) => {
         if(response) {
           res.send(response);
-          console.error(`Error logging analytics event ${response}`);
+          honeybadger.notify(`Error logging analytics: ${response}`, IHoneyBadgerErrorTypes.ANALYTICS);
           return;
         }
         res.send(response);
@@ -129,7 +138,7 @@ class App {
         .then(productResponse => productResponse.body)
         .then((product: IWordpressProduct) => res.send(product))
         .catch((error) => {
-          console.error(`Error ${this.handleError(error).code}, ${this.handleError(error).message}`);
+          honeybadger.notify(`Error ${this.handleError(error).code}, ${this.handleError(error).message}`, IHoneyBadgerErrorTypes.APIREQUEST);
           res.status(error.status).send(this.handleError(error));
         }) 
     });
@@ -149,7 +158,7 @@ class App {
           res.end();
         })
         .catch(error => {
-          console.error(error);
+          honeybadger.notify(`Error saving quiz: ${error.message}`, IHoneyBadgerErrorTypes.DATABASE);
           res.end();
         })
     });
@@ -197,12 +206,12 @@ class App {
       console.log("Db connection successful");
       this.listenForErrorsAfterConnection();
     })
-    .catch(error => console.error(`Database connection error: ${error.message}`));
+    .catch(error => honeybadger.notify(`Database connection error: ${error.message}`, IHoneyBadgerErrorTypes.DATABASE));
   }
 
   private listenForErrorsAfterConnection() {
     mongoose.connection.on('error', err => {
-      console.error(`Database error: ${err.message}`);
+      honeybadger.notify(err.message, IHoneyBadgerErrorTypes.DATABASE);
     });
   }
 
