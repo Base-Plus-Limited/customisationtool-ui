@@ -193,7 +193,7 @@ var App = /** @class */ (function () {
             var _this = this;
             return __generator(this, function (_a) {
                 switch (_a.label) {
-                    case 0: return [4 /*yield*/, request.post("https://baseplus.co.uk/wp-json/wc/v3/products?consumer_key=" + process.env.WP_CONSUMER_KEY + "&consumer_secret=" + process.env.WP_CONSUMER_SECRET)
+                    case 0: return [4 /*yield*/, request.post(process.env.BASE_API_URL + "/wc/v3/products?consumer_key=" + process.env.WP_CONSUMER_KEY + "&consumer_secret=" + process.env.WP_CONSUMER_SECRET)
                             .send(req.body)
                             .then(function (productResponse) { return productResponse.body; })
                             .then(function (product) { return res.send(product); })["catch"](function (error) {
@@ -236,10 +236,16 @@ var App = /** @class */ (function () {
         });
     };
     App.prototype.connectToDb = function () {
-        mongoose_1["default"].connect("" + process.env.DB_CONNECTION_STRING, { useNewUrlParser: true, useUnifiedTopology: true }, function (err) {
-            if (err)
-                return console.error(err.code + ", " + err.message);
-            console.log("DB connection successful");
+        var _this = this;
+        mongoose_1["default"].connect("" + process.env.DB_CONNECTION_STRdING, { useNewUrlParser: true, useUnifiedTopology: true })
+            .then(function (_) {
+            console.log("Db connection successful");
+            _this.listenForErrorsAfterConnection();
+        })["catch"](function (error) { return console.error("Database connection error: " + error.message); });
+    };
+    App.prototype.listenForErrorsAfterConnection = function () {
+        mongoose_1["default"].connection.on('error', function (err) {
+            console.error(err);
         });
     };
     App.prototype.handleError = function (error) {
