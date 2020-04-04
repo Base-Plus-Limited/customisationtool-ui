@@ -8,7 +8,7 @@ import { getUniqueIngredients } from '../Helpers/Helpers';
 import { ISelectableProduct } from '../Interfaces/WordpressProduct';
 import StyledErrorScreen from '../Components/ErrorScreen';
 import IErrorResponse from '../Interfaces/ErrorResponse';
-import { generateUniqueId, track } from '../Components/Shared/Analytics';
+import { generateUniqueId, track } from '../Components/Analytics';
 
 export interface CustomiseScreenProps {
 
@@ -19,7 +19,7 @@ const StyledCustomiseScreen: React.SFC<CustomiseScreenProps> = () => {
   const { updateCategorisedIngredients, categorisedIngredients, setApplicationError, saveBaseProduct, baseProduct, saveUserName, updateIsProductBeingAmended, addToMixture, hasApplicationErrored, uniqueId, saveUniqueId } = useContext(CustomiseContext);
 
   useEffect(() => {
-    fetch('/api/ingredients')
+    fetch(`${process.env.REACT_APP_URL}/ingredients`)
       .then(res => res.ok ? res.json() : res.json().then(errorResponse => setApplicationError(errorResponse)))
       .then((categorisedIngredients: ICategorisedIngredient[]) => {
         const filteredCategories = categorisedIngredients.filter(category => category.id !== 1474);
