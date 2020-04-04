@@ -14,7 +14,7 @@ import IErrorResponse from '../Interfaces/ErrorResponse';
 import { getUniqueIngredients } from '../Helpers/Helpers';
 import ICustomProductDBModel from '../Interfaces/CustomProduct';
 import LoadingAnimation from './LoadingAnimation';
-import { track } from './Shared/Analytics';
+import { track } from './Analytics';
 
 export interface SelectionTableProps {
   categorisedIngredients: ICategorisedIngredient[]

@@ -1,7 +1,6 @@
 import * as React from 'react';
 import { ReactComponent as baseplus_icon } from './../Assets/bplus_icon.svg';
 import styled, { keyframes } from 'styled-components';
-// const logo = require("././../Assets/bplus_icon.svg") as React.FunctionComponent<React.SVGProps<SVGSVGElement>>;
 
 
 export interface LoadingAnimationProps {

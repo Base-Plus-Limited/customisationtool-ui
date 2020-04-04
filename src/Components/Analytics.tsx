@@ -1,7 +1,7 @@
-import { IAnalyticsEvent } from "../../Interfaces/Analytics";
+import { IAnalyticsEvent } from "../Interfaces/Analytics";
 
 export const track = async (event: IAnalyticsEvent) => {
-  return fetch('/api/analytics', {
+  return fetch(`${process.env.REACT_APP_URL}/analytics`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
