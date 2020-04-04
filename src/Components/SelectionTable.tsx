@@ -176,7 +176,7 @@ const SelectionTable: React.SFC<SelectionTableProps> = ({ categorisedIngredients
   }
 
   const goToCheckout = async () => {
-    return fetch(`${process.env.REACT_APP_SERVER_URL}/api/new-product`, {
+    return fetch(`${process.env.REACT_APP_SERVER_URL}/new-product`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -238,7 +238,7 @@ const SelectionTable: React.SFC<SelectionTableProps> = ({ categorisedIngredients
 
   const saveProductToDatabase = () => {
     updateIsCheckoutButtonSelected(true);
-    return fetch('/api/save-product', {
+    return fetch(`${process.env.REACT_APP_SERVER_URL}/save-product`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
