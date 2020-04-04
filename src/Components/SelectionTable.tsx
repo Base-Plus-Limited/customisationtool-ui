@@ -176,7 +176,7 @@ const SelectionTable: React.SFC<SelectionTableProps> = ({ categorisedIngredients
   }
 
   const goToCheckout = async () => {
-    return fetch('/api/new-product', {
+    return fetch(`${process.env.REACT_APP_SERVER_URL}/api/new-product`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -195,7 +195,7 @@ const SelectionTable: React.SFC<SelectionTableProps> = ({ categorisedIngredients
           ingredients: currentMixture.map(x => x.name).join(' & ')
         }).then(() => {
           if (product)
-            window.location.assign(`https://baseplus.co.uk/cart?add-to-cart=${product.id}`)
+            window.location.assign(`${process.env.REACT_APP_WEBSITE_URL}/cart?add-to-cart=${product.id}`)
         });
       })
       .catch((error: IErrorResponse) => {
