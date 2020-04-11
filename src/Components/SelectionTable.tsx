@@ -37,16 +37,19 @@ const SelectionTable: React.SFC<SelectionTableProps> = ({ categorisedIngredients
     });
     updateCategorisedIngredients(
       categorisedIngredients.map(category => {
+        category.ingredients.map(ingredient => ingredient.selected = false);
         category.selected = false;
-        if (category.id === categoryId)
+        if (category.id === categoryId) {
           category.selected = true;
+          category.ingredients[0].selected = true;
+        }
         return category;
       })
     )
   }
 
   const onIngredientSelect = (ingredientId: number) => {
-    updateCategorisedIngredients(
+      updateCategorisedIngredients(
       categorisedIngredients.map(category => {
         category.ingredients.map(ingredient => {
           ingredient.selected = false;
@@ -117,12 +120,18 @@ const SelectionTable: React.SFC<SelectionTableProps> = ({ categorisedIngredients
   }
 
   const toggleDescription = () => {
-    if(!isDescriptionVisible)
-      track({
-        distinct_id: uniqueId,
-        event_type: "Open description",
-        read_description_for: categorisedIngredients.map(cat => cat.ingredients.filter(ingredient => ingredient.selected)[0])[0].name
-      });
+    categorisedIngredients.map(cat => {
+      if (cat.selected) {
+        const selectedIngredient = cat.ingredients.filter(ingredient => ingredient.selected);
+        if (!isDescriptionVisible) {
+          track({
+            distinct_id: uniqueId,
+            event_type: "Open description",
+            read_description_for: selectedIngredient[0].name
+          });
+        }
+      }
+    });
     let currentVisibility = isDescriptionVisible;
     toggleDescriptionVisibility(currentVisibility = !isDescriptionVisible)
   }
