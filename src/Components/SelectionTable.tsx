@@ -27,14 +27,14 @@ export interface IngredientsInnerWrapperProps {
 
 const SelectionTable: React.SFC<SelectionTableProps> = ({ categorisedIngredients, baseProduct }) => {
 
-  const { updateCategorisedIngredients, toggleDescriptionVisibility, isDescriptionVisible, addToMixture, currentMixture, headings, updateHeadings, setApplicationError, userName, isProductBeingAmended, updateIsCheckoutButtonSelected, isCheckoutButtonSelected, uniqueId } = useContext(CustomiseContext);
+  const { updateCategorisedIngredients, toggleDescriptionVisibility, isDescriptionVisible, addToMixture, currentMixture, headings, updateHeadings, setApplicationError, userName, isProductBeingAmended, updateIsCheckoutButtonSelected, isCheckoutButtonSelected, uniqueId, bearerToken } = useContext(CustomiseContext);
 
   const onCategorySelect = (categoryId: number) => {
     track({
       distinct_id: uniqueId,
       event_type: "Category selected",
       category_name: categorisedIngredients.filter(cat => cat.id === categoryId)[0].category
-    });
+    }, bearerToken);
     updateCategorisedIngredients(
       categorisedIngredients.map(category => {
         category.ingredients.map(ingredient => ingredient.selected = false);
@@ -72,7 +72,7 @@ const SelectionTable: React.SFC<SelectionTableProps> = ({ categorisedIngredients
           distinct_id: uniqueId,
           event_type: "Ingredient selected",
           selected_ingredient: selectedIngredient[0].name
-        });
+        }, bearerToken);
       }
     });
   }
@@ -128,7 +128,7 @@ const SelectionTable: React.SFC<SelectionTableProps> = ({ categorisedIngredients
             distinct_id: uniqueId,
             event_type: "Open description",
             read_description_for: selectedIngredient[0].name
-          });
+          }, bearerToken);
         }
       }
     });
@@ -189,6 +189,7 @@ const SelectionTable: React.SFC<SelectionTableProps> = ({ categorisedIngredients
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + bearerToken
       },
       cache: 'no-cache',
       body: JSON.stringify(newProduct)
@@ -202,7 +203,7 @@ const SelectionTable: React.SFC<SelectionTableProps> = ({ categorisedIngredients
           distinct_id: uniqueId,
           event_type: "Buy now selected",
           ingredients: currentMixture.map(x => x.name).join(' & ')
-        }).then(() => {
+        }, bearerToken).then(() => {
           if (product)
             window.location.assign(`${process.env.REACT_APP_WEBSITE_URL}/cart?add-to-cart=${product.id}`)
         });
@@ -251,6 +252,7 @@ const SelectionTable: React.SFC<SelectionTableProps> = ({ categorisedIngredients
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + bearerToken
       },
       cache: 'no-cache',
       body: JSON.stringify(createFinalProductToSaveToDatabase())
