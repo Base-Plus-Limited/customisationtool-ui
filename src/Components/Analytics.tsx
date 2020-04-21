@@ -1,12 +1,12 @@
 import { IAnalyticsEvent } from "../Interfaces/Analytics";
 
-export const track = async (event: IAnalyticsEvent) => {
+export const track = async (event: IAnalyticsEvent, bearerToken: string) => {
   return fetch(`${process.env.REACT_APP_SERVER_URL}/analytics`, {
     method: 'POST',
     headers: {
-      'Content-Type': 'application/json',
+      'Content-type': 'application/json',
+      'Authorization': 'Bearer ' + bearerToken
     },
-    cache: 'no-cache',
     body: JSON.stringify({
       event_type: event.event_type,
       distinct_id: event.distinct_id,

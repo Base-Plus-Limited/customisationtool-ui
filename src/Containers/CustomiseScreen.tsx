@@ -16,14 +16,27 @@ export interface CustomiseScreenProps {
 
 const StyledCustomiseScreen: React.SFC<CustomiseScreenProps> = () => {
 
-  const { updateCategorisedIngredients, categorisedIngredients, setApplicationError, saveBaseProduct, baseProduct, saveUserName, updateIsProductBeingAmended, addToMixture, hasApplicationErrored, uniqueId, saveUniqueId } = useContext(CustomiseContext);
+  const { updateCategorisedIngredients, categorisedIngredients, setApplicationError, saveBaseProduct, baseProduct, saveUserName, updateIsProductBeingAmended, addToMixture, hasApplicationErrored, saveUniqueId, saveBearerToken } = useContext(CustomiseContext);
 
   useEffect(() => {
-    fetch(`${process.env.REACT_APP_SERVER_URL}/ingredients`)
+    fetch(`${process.env.REACT_APP_SERVER_URL}/get-token`)
+    .then(res => res.ok ? res.json() : res.json().then(errorResponse => setApplicationError({
+      error: true,
+      code: errorResponse.status,
+      message: errorResponse.message
+    })))
+    .then(response => {
+      saveBearerToken(response.token);
+      fetch(`${process.env.REACT_APP_SERVER_URL}/ingredients`, {
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer ' + response.token
+        }
+      })
       .then(res => res.ok ? res.json() : res.json().then(errorResponse => setApplicationError(errorResponse)))
       .then((categorisedIngredients: ICategorisedIngredient[]) => {
         const filteredCategories = categorisedIngredients.filter(category => category.id !== 1474);
-        processUrlParams(filteredCategories.flatMap(category => category.ingredients));
+        processUrlParams(filteredCategories.flatMap(category => category.ingredients), response.token);
         updateCategorisedIngredients(
           filteredCategories.map(category => {
             if (category.selected)
@@ -40,9 +53,19 @@ const StyledCustomiseScreen: React.SFC<CustomiseScreenProps> = () => {
           message: error.message
         })
       });
-  }, [updateCategorisedIngredients, setApplicationError, saveBaseProduct]);
+    })
+    .catch((error) => {
+      setApplicationError({
+        error: true,
+        code: error.status,
+        message: error.message
+      })
+    });
 
-  const processUrlParams = (ingredients: ISelectableProduct[]) => {
+    
+  }, [updateCategorisedIngredients, setApplicationError, saveBaseProduct, saveBearerToken]);
+
+  const processUrlParams = (ingredients: ISelectableProduct[], bearer: string) => {
     const params = new URLSearchParams(window.location.search.substring(1));
     const productIds: number[] = [Number(params.get('productone')), Number(params.get('producttwo'))];
     const userName = params.get('username');
@@ -61,7 +84,7 @@ const StyledCustomiseScreen: React.SFC<CustomiseScreenProps> = () => {
     track({
       distinct_id: uniqueId,
       event_type: "Customisation started"
-    });
+    }, bearer);
   }
 
   const getErrorMessage = (error: IErrorResponse) => {
