@@ -77,9 +77,7 @@ const StyledCustomiseScreen: React.SFC<CustomiseScreenProps> = () => {
     if (productIds.some(urlProductId => urlProductId !== 0)) {
       addToMixture(getUniqueIngredients(ingredients.filter(ingredient => productIds.includes(ingredient.id))));
       updateIsProductBeingAmended(true);
-      // TODO: Replace url params
-      // window.location.replace('https://baseplus.co.uk/customise');
-      // http://localhost:3000/?productone=696&producttwo=695&username=tess
+      window.history.pushState({}, document.title, window.location.href.split("?")[0]);
     }
     track({
       distinct_id: uniqueId,
