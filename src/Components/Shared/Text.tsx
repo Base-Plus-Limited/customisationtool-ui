@@ -52,7 +52,8 @@ const LoadingMessage = styled(Text)`
 `
 
 const InfoMessageForAmendingUsers = styled(Text)`
-  margin:0 0 40px;
+  color: #C06F78;
+  margin: 0px 0 70px;
   text-align: center;
 `
 
