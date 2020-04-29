@@ -90,6 +90,10 @@ const StyledCustomiseScreen: React.SFC<CustomiseScreenProps> = () => {
     return `${hasApplicationErrored.uiMessage && hasApplicationErrored.uiMessage.length > 0 ? `${hasApplicationErrored.uiMessage}` : "We're unable to load the customisation tool at the moment, please try again later"}`
   }
 
+  const isUserAmending = () => {
+    return currentMixture.length > 0;
+  }
+
   return (
     hasApplicationErrored.error ? 
       <StyledErrorScreen message={getErrorMessage(hasApplicationErrored)}></StyledErrorScreen> :
@@ -98,8 +102,8 @@ const StyledCustomiseScreen: React.SFC<CustomiseScreenProps> = () => {
         categorisedIngredients.length > 0 ?
         <CustomiseScreen>
           {
-            userName !== "" &&
-              <InfoMessageForAmendingUsers>{`Hey, ${userName} we've preselected your ingredients (${currentMixture.map(ingredient => ingredient.name).join(' & ')}) as a starting point from the product builder. Using the customisation tool below, you can amend your final product.`}</InfoMessageForAmendingUsers>
+            isUserAmending() &&
+              <InfoMessageForAmendingUsers>{`Hey, ${userName !== "" ? userName : ""} we've preselected your ingredients (${currentMixture.map(ingredient => ingredient.name).join(' & ')}) as a starting point from the product builder. Using the customisation tool below, you can amend your final product.`}</InfoMessageForAmendingUsers>
           }
           <SelectionTable categorisedIngredients={categorisedIngredients} baseProduct={baseProduct}></SelectionTable>
         </CustomiseScreen> 
