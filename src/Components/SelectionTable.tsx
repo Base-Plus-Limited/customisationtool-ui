@@ -27,7 +27,7 @@ export interface IngredientsInnerWrapperProps {
 
 const SelectionTable: React.SFC<SelectionTableProps> = ({ categorisedIngredients, baseProduct }) => {
 
-  const { updateCategorisedIngredients, toggleDescriptionVisibility, isDescriptionVisible, addToMixture, currentMixture, headings, updateHeadings, setApplicationError, userName, isProductBeingAmended, updateIsCheckoutButtonSelected, isCheckoutButtonSelected, uniqueId, bearerToken } = useContext(CustomiseContext);
+  const { updateCategorisedIngredients, toggleDescriptionVisibility, isDescriptionVisible, addToMixture, currentMixture, headings, updateHeadings, setApplicationError, userName, isProductBeingAmended, updateIsCheckoutButtonSelected, isCheckoutButtonSelected, uniqueId, bearerToken, saveUserName } = useContext(CustomiseContext);
 
   const onCategorySelect = (categoryId: number) => {
     track({
@@ -49,17 +49,19 @@ const SelectionTable: React.SFC<SelectionTableProps> = ({ categorisedIngredients
   }
 
   const onIngredientSelect = (ingredientId: number) => {
-      updateCategorisedIngredients(
-      categorisedIngredients.map(category => {
-        category.ingredients.map(ingredient => {
-          ingredient.selected = false;
-          if (ingredient.id === ingredientId) {
-            ingredient.recentlySelected = !ingredient.recentlySelected;
-            ingredient.selected = !ingredient.selected;
-          }
-        });
-        return category;
-      })
+    if(userName !== "")
+      saveUserName("");
+    updateCategorisedIngredients(
+    categorisedIngredients.map(category => {
+      category.ingredients.map(ingredient => {
+        ingredient.selected = false;
+        if (ingredient.id === ingredientId) {
+          ingredient.recentlySelected = !ingredient.recentlySelected;
+          ingredient.selected = !ingredient.selected;
+        }
+      });
+      return category;
+    })
     )
     logSelectedIngredient();
   }

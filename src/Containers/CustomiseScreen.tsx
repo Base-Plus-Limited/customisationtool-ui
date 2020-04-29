@@ -9,6 +9,7 @@ import { ISelectableProduct } from '../Interfaces/WordpressProduct';
 import StyledErrorScreen from '../Components/ErrorScreen';
 import IErrorResponse from '../Interfaces/ErrorResponse';
 import { generateUniqueId, track } from '../Components/Analytics';
+import { LoadingMessage, InfoMessageForAmendingUsers } from '../Components/Shared/Text';
 
 export interface CustomiseScreenProps {
 
@@ -16,7 +17,7 @@ export interface CustomiseScreenProps {
 
 const StyledCustomiseScreen: React.SFC<CustomiseScreenProps> = () => {
 
-  const { updateCategorisedIngredients, categorisedIngredients, setApplicationError, saveBaseProduct, baseProduct, saveUserName, updateIsProductBeingAmended, addToMixture, hasApplicationErrored, saveUniqueId, saveBearerToken } = useContext(CustomiseContext);
+  const { updateCategorisedIngredients, categorisedIngredients, setApplicationError, saveBaseProduct, baseProduct, saveUserName, updateIsProductBeingAmended, addToMixture, hasApplicationErrored, saveUniqueId, saveBearerToken, userName, currentMixture } = useContext(CustomiseContext);
 
   useEffect(() => {
     fetch(`${process.env.REACT_APP_SERVER_URL}/get-token`)
@@ -96,9 +97,16 @@ const StyledCustomiseScreen: React.SFC<CustomiseScreenProps> = () => {
       {
         categorisedIngredients.length > 0 ?
         <CustomiseScreen>
+          {
+            userName !== "" &&
+              <InfoMessageForAmendingUsers>{`Hey, ${userName} we've preselected your ingredients (${currentMixture.map(ingredient => ingredient.name).join(' & ')}) as a starting point from the product builder. Using the customisation tool below, you can amend your final product.`}</InfoMessageForAmendingUsers>
+          }
           <SelectionTable categorisedIngredients={categorisedIngredients} baseProduct={baseProduct}></SelectionTable>
         </CustomiseScreen> 
-        : <LoadingAnimation/>
+        : <React.Fragment>          
+            <LoadingAnimation/>
+            <LoadingMessage> Loading the customistation tool...</LoadingMessage>
+          </React.Fragment>          
       }
       
     </React.Fragment>

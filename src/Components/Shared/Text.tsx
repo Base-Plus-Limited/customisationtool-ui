@@ -47,6 +47,15 @@ const TotalPriceRow = styled(SummaryPriceRow)`
   margin: 5px auto 30px;
 `
 
+const LoadingMessage = styled(Text)`
+  text-align: center;
+`
+
+const InfoMessageForAmendingUsers = styled(Text)`
+  margin:0 0 40px;
+  text-align: center;
+`
+
 
  
-export {StyledText, Message, SummaryPriceRow, TotalPriceRow};
+export {StyledText, Message, SummaryPriceRow, TotalPriceRow, LoadingMessage, InfoMessageForAmendingUsers};
