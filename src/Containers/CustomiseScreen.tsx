@@ -114,7 +114,7 @@ const StyledCustomiseScreen: React.SFC<CustomiseScreenProps> = () => {
 }
 
 const CustomiseScreen = styled.div`
-
+  height: 100%;
 `;
 
 export default StyledCustomiseScreen;

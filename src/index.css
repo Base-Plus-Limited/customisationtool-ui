@@ -8,4 +8,9 @@ html {
   -moz-osx-font-smoothing: grayscale;
   padding: 0;
   overflow: hidden;
+  height: 100%;
+}
+
+#customise-tool {
+  height: 100%;
 }
