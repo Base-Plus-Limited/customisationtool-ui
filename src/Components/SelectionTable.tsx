@@ -467,6 +467,7 @@ const Categories = styled.div`
   grid-column: 1/ span 2;
   width: 100%;
   overflow-x: scroll;
+  overflow-y: hidden;
   &::-webkit-scrollbar {
     height: 2px;
   } 
