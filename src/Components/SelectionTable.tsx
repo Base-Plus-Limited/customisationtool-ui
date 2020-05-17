@@ -466,6 +466,13 @@ const Categories = styled.div`
   grid-column: 1/ span 2;
   width: 100%;
   overflow-x: scroll;
+  &::-webkit-scrollbar {
+    height: 2px;
+  } 
+  &::-webkit-scrollbar-thumb {
+    background: ${props => props.theme.brandColours.baseDefaultGreen}; 
+    border-radius: 5px;
+  }
   h2{
     display: none;
   }

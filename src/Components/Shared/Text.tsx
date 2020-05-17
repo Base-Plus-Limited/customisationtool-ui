@@ -24,6 +24,9 @@ const Message = styled(Text)`
   font-size: 9pt;
   letter-spacing: 0.04em;
   text-transform: uppercase;
+  ${props => props.theme.mediaQueries.tablet} {
+    border-left: solid 1px ${props => props.theme.brandColours.baseDarkGreen};
+  }
 `
 const SummaryPriceRow = styled(Text)`
   width: 100%;
