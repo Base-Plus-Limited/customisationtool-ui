@@ -18,7 +18,6 @@ const Text = styled.p`
 const Message = styled(Text)`
   background: ${props => props.theme.brandColours.baseLightGreen};
   color: ${props => props.theme.brandColours.baseDarkGreen};
-  margin: -20px 0 15px 0;
   grid-column: 1/ span 2;
   text-align: center;
   padding: 10px 0;

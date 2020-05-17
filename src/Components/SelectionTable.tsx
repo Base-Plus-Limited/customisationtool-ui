@@ -52,16 +52,16 @@ const SelectionTable: React.SFC<SelectionTableProps> = ({ categorisedIngredients
     if(userName !== "")
       saveUserName("");
     updateCategorisedIngredients(
-    categorisedIngredients.map(category => {
-      category.ingredients.map(ingredient => {
-        ingredient.selected = false;
-        if (ingredient.id === ingredientId) {
-          ingredient.recentlySelected = !ingredient.recentlySelected;
-          ingredient.selected = !ingredient.selected;
-        }
-      });
-      return category;
-    })
+      categorisedIngredients.map(category => {
+        category.ingredients.map(ingredient => {
+          ingredient.selected = false;
+          if (ingredient.id === ingredientId) {
+            ingredient.recentlySelected = !ingredient.recentlySelected;
+            ingredient.selected = !ingredient.selected;
+          }
+        });
+        return category;
+      })
     )
     logSelectedIngredient();
   }
@@ -309,7 +309,7 @@ const SelectionTable: React.SFC<SelectionTableProps> = ({ categorisedIngredients
                 </SelectedIngredientsWrapper>
                 {
                   isSummaryHeadingSelected() ?
-                    <React.Fragment>
+                    <SummaryIngredientsWrap>
                       {
                         isSummaryHeadingSelected() && currentMixture.length > 0 ?
                           currentMixture.map(ingredient => <StyledIngredient isSummaryScreen={isSummaryHeadingSelected()} key={ingredient.id} ingredient={ingredient} selectIngredient={() => onIngredientSelect(ingredient.id)}></StyledIngredient>)
@@ -323,7 +323,7 @@ const SelectionTable: React.SFC<SelectionTableProps> = ({ categorisedIngredients
                         {<TotalPriceRow>Mixture <span>£{getMixturePrice()}</span></TotalPriceRow>}
                         <StyledButton onClick={() => currentMixture.length === 2 ? saveProductToDatabase() : toggleViews(0)}>{currentMixture.length === 2 ? 'Checkout' : 'Back'}</StyledButton>
                       </SummaryPrices>
-                    </React.Fragment>
+                    </SummaryIngredientsWrap>
                     :
                     categorisedIngredients.some(category => category.selected) &&
                     <IngredientsInnerWrapper templateRows={getIngredientTemplateRow()}>
@@ -367,6 +367,16 @@ const SelectionTable: React.SFC<SelectionTableProps> = ({ categorisedIngredients
 
 export default SelectionTable;
 
+const SummaryIngredientsWrap = styled.div`
+  margin: 50px 0 0;
+  grid-template-columns: 1fr 1fr;
+  display: grid;
+  grid-column: 1/span 2;
+  ${props => props.theme.mediaQueries.tablet} {
+    margin: 0;
+  }
+`
+
 const LoadingWrapper = styled.div`
   text-align: center;
 `
@@ -393,16 +403,21 @@ const SummaryPrices = styled.div`
 const SelectedIngredientsWrapper = styled.div`
   grid-column: 1/span 3;
   text-align: center;
+  justify-content: space-evenly;
+  display: flex;
+  margin: 20px auto 0;
+  max-width: 70%;
+  width: 100%;
 `;
 
 const FooterWrap = styled.div`
   border-top: solid 1px ${props => props.theme.brandColours.baseDarkGreen};
   color: ${props => props.theme.brandColours.baseDarkGreen};
-  position: absolute;
-  bottom: 0px;
   width:100%;
   font-size: 11pt;
   text-align: center;
+  grid-column: 1/ span 2;
+  margin: 50px 0 0 0;
   z-index: 5;
   background: #fff;
   font-family: ${props => props.theme.bodyFont};
@@ -420,7 +435,8 @@ const FooterWrap = styled.div`
 const SelectionWrapper = styled.div`
   display: grid;
   grid-template-columns: 1fr 1fr;
-  grid-template-rows: auto 1fr;
+  grid-template-rows: auto 59px 1fr;
+  height: 100%;
   .open{
     transform: translateY(0vh);
   }
@@ -522,14 +538,16 @@ const IngredientsWrapper = styled.div`
   width:100%;
   display: grid;
   grid-column: 1/ span 2;
+  grid-row: 3;
   grid-template-columns: 1fr 1fr;
-  padding-top: 20px;
+  grid-template-rows: 35px auto 1fr;
   .selected {
     opacity: 1;
     pointer-events: none;
   }
   ${props => props.theme.mediaQueries.tablet} {
     grid-column: 2;
+    grid-row: 2;
     grid-template-rows: auto auto 1fr;
   }
   h3{
@@ -545,9 +563,11 @@ const IngredientsInnerWrapper = styled.div`
   display: grid;
   grid-column: 1/ span 2;
   grid-template-columns: 1fr 1fr;
+  grid-template-rows: 1fr 1fr;
   margin: 0 auto;
   width: 90%;
   grid-gap: 40px;
+  max-height: 376px;
   ${props => props.theme.mediaQueries.tablet} {
     grid-template-columns: 1fr 1fr;
     grid-template-rows: repeat(${(props: IngredientsInnerWrapperProps) => props.templateRows}, 160px);

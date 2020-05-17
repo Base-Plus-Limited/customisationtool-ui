@@ -16,7 +16,7 @@ const SelectedIngredient = styled.span`
   text-transform: uppercase;
   display: inline-block;
   padding-right: 7px;
-  margin: 0 15px 30px 0;
+  margin: 0 0 30px 0;
   cursor: pointer;
   &:hover{
     color: ${props => props.theme.brandColours.basePink};

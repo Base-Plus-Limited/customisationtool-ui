@@ -17,7 +17,7 @@ export interface CustomiseScreenProps {
 
 const StyledCustomiseScreen: React.SFC<CustomiseScreenProps> = () => {
 
-  const { updateCategorisedIngredients, categorisedIngredients, setApplicationError, saveBaseProduct, baseProduct, saveUserName, updateIsProductBeingAmended, addToMixture, hasApplicationErrored, saveUniqueId, saveBearerToken, userName, currentMixture } = useContext(CustomiseContext);
+  const { updateCategorisedIngredients, categorisedIngredients, setApplicationError, saveBaseProduct, baseProduct, saveUserName, updateIsProductBeingAmended, addToMixture, hasApplicationErrored, saveUniqueId, saveBearerToken, userName, currentMixture, isProductBeingAmended } = useContext(CustomiseContext);
 
   useEffect(() => {
     fetch(`${process.env.REACT_APP_SERVER_URL}/get-token`)
@@ -90,10 +90,6 @@ const StyledCustomiseScreen: React.SFC<CustomiseScreenProps> = () => {
     return `${hasApplicationErrored.uiMessage && hasApplicationErrored.uiMessage.length > 0 ? `${hasApplicationErrored.uiMessage}` : "We're unable to load the customisation tool at the moment, please try again later"}`
   }
 
-  const isUserAmending = () => {
-    return currentMixture.length > 0;
-  }
-
   return (
     hasApplicationErrored.error ? 
       <StyledErrorScreen message={getErrorMessage(hasApplicationErrored)}></StyledErrorScreen> :
@@ -102,7 +98,7 @@ const StyledCustomiseScreen: React.SFC<CustomiseScreenProps> = () => {
         categorisedIngredients.length > 0 ?
         <CustomiseScreen>
           {
-            isUserAmending() &&
+            isProductBeingAmended &&
               <InfoMessageForAmendingUsers>{`Hey, ${userName !== "" ? userName : ""} we've preselected your ingredients (${currentMixture.map(ingredient => ingredient.name).join(' & ')}) as a starting point from the product builder. Using the customisation tool below, you can amend your final product.`}</InfoMessageForAmendingUsers>
           }
           <SelectionTable categorisedIngredients={categorisedIngredients} baseProduct={baseProduct}></SelectionTable>
@@ -118,7 +114,7 @@ const StyledCustomiseScreen: React.SFC<CustomiseScreenProps> = () => {
 }
 
 const CustomiseScreen = styled.div`
-
+  height: 100%;
 `;
 
 export default StyledCustomiseScreen;

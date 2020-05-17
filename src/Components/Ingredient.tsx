@@ -27,7 +27,7 @@ const IngredientWrap = styled.div`
   justify-self: center;
   cursor: pointer;
   opacity: 0.7;
-  max-width: 120px;
+  max-width: 130px;
   img{
     width: 100%;
   }
