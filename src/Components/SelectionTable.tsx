@@ -27,7 +27,7 @@ export interface IngredientsInnerWrapperProps {
 
 const SelectionTable: React.SFC<SelectionTableProps> = ({ categorisedIngredients, baseProduct }) => {
 
-  const { updateCategorisedIngredients, toggleDescriptionVisibility, isDescriptionVisible, addToMixture, currentMixture, headings, updateHeadings, setApplicationError, userName, isProductBeingAmended, updateIsCheckoutButtonSelected, isCheckoutButtonSelected, uniqueId, bearerToken, saveUserName } = useContext(CustomiseContext);
+  const { updateCategorisedIngredients, toggleDescriptionVisibility, isDescriptionVisible, addToMixture, currentMixture, headings, updateHeadings, setApplicationError, userName, isProductBeingAmended, updateIsCheckoutButtonSelected, isCheckoutButtonSelected, uniqueId, bearerToken, saveUserName, toggleCustomiseMessageVisibility } = useContext(CustomiseContext);
 
   const onCategorySelect = (categoryId: number) => {
     track({
@@ -118,6 +118,7 @@ const SelectionTable: React.SFC<SelectionTableProps> = ({ categorisedIngredients
   }
 
   const removeFromCart = (selectedProduct: ISelectableProduct) => {
+    toggleCustomiseMessageVisibility(false);
     addToMixture(currentMixture.filter(ingredient => ingredient.id !== selectedProduct.id))
   }
 

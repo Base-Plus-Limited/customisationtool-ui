@@ -17,7 +17,7 @@ export interface CustomiseScreenProps {
 
 const StyledCustomiseScreen: React.SFC<CustomiseScreenProps> = () => {
 
-  const { updateCategorisedIngredients, categorisedIngredients, setApplicationError, saveBaseProduct, baseProduct, saveUserName, updateIsProductBeingAmended, addToMixture, hasApplicationErrored, saveUniqueId, saveBearerToken, userName, currentMixture, isProductBeingAmended } = useContext(CustomiseContext);
+  const { updateCategorisedIngredients, categorisedIngredients, setApplicationError, saveBaseProduct, baseProduct, saveUserName, updateIsProductBeingAmended, addToMixture, hasApplicationErrored, saveUniqueId, saveBearerToken, userName, currentMixture, isProductBeingAmended, isCustomiseMessageVisible, toggleCustomiseMessageVisibility } = useContext(CustomiseContext);
 
   useEffect(() => {
     fetch(`${process.env.REACT_APP_SERVER_URL}/get-token`)
@@ -78,6 +78,7 @@ const StyledCustomiseScreen: React.SFC<CustomiseScreenProps> = () => {
     if (productIds.some(urlProductId => urlProductId !== 0)) {
       addToMixture(getUniqueIngredients(ingredients.filter(ingredient => productIds.includes(ingredient.id))));
       updateIsProductBeingAmended(true);
+      toggleCustomiseMessageVisibility(true);
       window.history.pushState({}, document.title, window.location.href.split("?")[0]);
     }
     track({
@@ -93,23 +94,22 @@ const StyledCustomiseScreen: React.SFC<CustomiseScreenProps> = () => {
   return (
     hasApplicationErrored.error ? 
       <StyledErrorScreen message={getErrorMessage(hasApplicationErrored)}></StyledErrorScreen> :
-    <React.Fragment>
-      {
-        categorisedIngredients.length > 0 ?
-        <CustomiseScreen>
-          {
-            isProductBeingAmended &&
-              <InfoMessageForAmendingUsers>{`Hey, ${userName !== "" ? userName : ""} we've preselected your ingredients (${currentMixture.map(ingredient => ingredient.name).join(' & ')}) as a starting point from the product builder. Using the customisation tool below, you can amend your final product.`}</InfoMessageForAmendingUsers>
-          }
-          <SelectionTable categorisedIngredients={categorisedIngredients} baseProduct={baseProduct}></SelectionTable>
-        </CustomiseScreen> 
-        : <React.Fragment>          
-            <LoadingAnimation/>
-            <LoadingMessage> Loading the customistation tool...</LoadingMessage>
-          </React.Fragment>          
-      }
-      
-    </React.Fragment>
+      <React.Fragment>
+        {
+          categorisedIngredients.length > 0 ?
+          <CustomiseScreen>
+            {
+              isProductBeingAmended && isCustomiseMessageVisible &&
+                <InfoMessageForAmendingUsers>{`Hey, ${userName !== "" ? userName : ""} we've preselected your ingredients (${currentMixture.map(ingredient => ingredient.name).join(' & ')}) as a starting point from the product builder. Using the customisation tool below, you can amend your final product.`}</InfoMessageForAmendingUsers>
+            }
+            <SelectionTable categorisedIngredients={categorisedIngredients} baseProduct={baseProduct}></SelectionTable>
+          </CustomiseScreen> 
+          : <React.Fragment>          
+              <LoadingAnimation/>
+              <LoadingMessage> Loading the customistation tool...</LoadingMessage>
+            </React.Fragment>          
+        }
+      </React.Fragment>
   );
 }
 

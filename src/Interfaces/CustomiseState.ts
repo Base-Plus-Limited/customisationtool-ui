@@ -29,4 +29,6 @@ export default interface ICustomiseContext {
   saveUniqueId: Dispatch<SetStateAction<string>>;
   bearerToken: string;
   saveBearerToken: Dispatch<SetStateAction<string>>;
+  isCustomiseMessageVisible: boolean;
+  toggleCustomiseMessageVisibility: Dispatch<SetStateAction<boolean>>;
 }
