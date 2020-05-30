@@ -100,7 +100,7 @@ const StyledCustomiseScreen: React.SFC<CustomiseScreenProps> = () => {
           <CustomiseScreen>
             {
               isProductBeingAmended && isCustomiseMessageVisible &&
-                <InfoMessageForAmendingUsers>{`Hey, ${userName !== "" ? userName : ""} we've preselected your ingredients (${currentMixture.map(ingredient => ingredient.name).join(' & ')}) as a starting point from the product builder. Using the customisation tool below, you can amend your final product.`}</InfoMessageForAmendingUsers>
+                <InfoMessageForAmendingUsers>{`Hey, ${userName !== "" ? userName : ""} we've preselected your ingredients (${currentMixture.map(ingredient => ingredient.name).join(' & ')}) as a starting point from the product builder. \n Using the customisation tool below, you can amend your final product.`}</InfoMessageForAmendingUsers>
             }
             <SelectionTable categorisedIngredients={categorisedIngredients} baseProduct={baseProduct}></SelectionTable>
           </CustomiseScreen> 
