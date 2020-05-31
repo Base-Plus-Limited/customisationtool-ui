@@ -351,7 +351,7 @@ const SelectionTable: React.SFC<SelectionTableProps> = ({ categorisedIngredients
                   {
                     <React.Fragment>
                       <StyledText>
-                        {areThereRecentlySelectedProducts() ? getSelectedProducts()[0].short_description : "No information available"}
+                        {areThereRecentlySelectedProducts() ? getSelectedProducts()[0].description : "No information available"}
                       </StyledText>
                       <FooterButton onClick={currentMixture.length === 2 ? toggleSummaryScreen : addToCart}>{toggleButtonText()}</FooterButton>
                     </React.Fragment>
