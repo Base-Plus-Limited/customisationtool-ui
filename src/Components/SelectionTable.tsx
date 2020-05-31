@@ -251,6 +251,12 @@ const SelectionTable: React.SFC<SelectionTableProps> = ({ categorisedIngredients
     return databaseProduct;
   }
 
+  const changeHeadingTextIfDesktop = () => {
+    if(window.innerWidth >= 768 && headings[0].selected)
+      return headings[0].desktopText;
+    return headings[1].selected ? `back` : headings[0].headingText;
+  }
+
   const saveProductToDatabase = () => {
     updateIsCheckoutButtonSelected(true);
     return fetch(`${process.env.REACT_APP_SERVER_URL}/save-product`, {
@@ -302,7 +308,9 @@ const SelectionTable: React.SFC<SelectionTableProps> = ({ categorisedIngredients
               }
             </Categories>
             <Ingredients>
-              <StyledHeading onClick={() => toggleViews(headings[0].id)} selected={headings[0].selected}>{headings[1].selected ? `back` : headings[0].headingText}</StyledHeading>
+              <StyledHeading onClick={() => toggleViews(headings[0].id)} selected={headings[0].selected}>
+                {changeHeadingTextIfDesktop()}
+              </StyledHeading>
             </Ingredients>
             <IngredientsWrapper>
               <React.Fragment>
@@ -338,7 +346,9 @@ const SelectionTable: React.SFC<SelectionTableProps> = ({ categorisedIngredients
               </React.Fragment>
             </IngredientsWrapper>
             <Summary>
-              <StyledHeading onClick={() => toggleViews(headings[1].id)} selected={headings[1].selected}>{headings[1].headingText}</StyledHeading>
+              <StyledHeading onClick={() => toggleViews(headings[1].id)} selected={headings[1].selected}>
+                {headings[1].headingText}
+              </StyledHeading>
             </Summary>
             {
               !isSummaryHeadingSelected() &&

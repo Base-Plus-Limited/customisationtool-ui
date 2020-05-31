@@ -28,6 +28,10 @@ const Heading = styled.h2`
     opacity: 1;
     border-bottom: solid 3px ${props => props.theme.brandColours.baseLightGreen};
   }
+  ${props => props.theme.mediaQueries.tablet} {
+    text-align: left;
+    padding-left: 20px;
+  }
 `
 
  
