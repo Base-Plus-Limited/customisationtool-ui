@@ -50,6 +50,7 @@ export const CustomiseProvider: React.SFC<CustomiseProviderProps> = ({ children 
   const [headings, updateHeadings] = useState<IHeading[]>([
     {
       headingText: "Selection",
+      desktopText: "Skin Concerns",
       selected: true,
       id: 0
     },

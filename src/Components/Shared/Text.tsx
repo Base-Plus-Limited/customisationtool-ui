@@ -3,6 +3,7 @@ import styled from 'styled-components';
 
 export interface TextProps {
   children: any;
+  onClick?: () => void;
 }
  
 const StyledText: React.SFC<TextProps> = ({children}) => (

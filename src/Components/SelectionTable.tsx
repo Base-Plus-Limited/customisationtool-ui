@@ -151,7 +151,7 @@ const SelectionTable: React.SFC<SelectionTableProps> = ({ categorisedIngredients
     if (currentMixture.length === 1)
       return "Please add one more ingredient";
     if (currentMixture.length === 2)
-      return "View your mixture on the summary screen";
+      return "View summary";
     return "Please add two ingredients";
   }
 
@@ -172,7 +172,9 @@ const SelectionTable: React.SFC<SelectionTableProps> = ({ categorisedIngredients
     )
   }
 
-  const toggleViews = (headingId: number) => {
+  const toggleViews = (headingId: number, fromMessage: boolean = false) => {
+    if((fromMessage === true) && (currentMixture.length !== 2))
+      return;
     updateHeadings(
       headings.map(heading => {
         heading.selected = false;
@@ -249,6 +251,12 @@ const SelectionTable: React.SFC<SelectionTableProps> = ({ categorisedIngredients
     return databaseProduct;
   }
 
+  const changeHeadingTextIfDesktop = () => {
+    if(window.innerWidth >= 768 && headings[0].selected)
+      return headings[0].desktopText;
+    return headings[1].selected ? `back` : headings[0].headingText;
+  }
+
   const saveProductToDatabase = () => {
     updateIsCheckoutButtonSelected(true);
     return fetch(`${process.env.REACT_APP_SERVER_URL}/save-product`, {
@@ -291,6 +299,15 @@ const SelectionTable: React.SFC<SelectionTableProps> = ({ categorisedIngredients
           </LoadingWrapper>
           :
           <SelectionWrapper>
+            <React.Fragment>
+              {
+                !isSummaryHeadingSelected() &&
+                  <React.Fragment>
+                    <Shadow className="leftShadow"></Shadow>
+                    <Shadow className="rightShadow"></Shadow>
+                  </React.Fragment>
+              }
+            </React.Fragment>
             <Categories>
               {
                 !isSummaryHeadingSelected() &&
@@ -300,11 +317,13 @@ const SelectionTable: React.SFC<SelectionTableProps> = ({ categorisedIngredients
               }
             </Categories>
             <Ingredients>
-              <StyledHeading onClick={() => toggleViews(headings[0].id)} selected={headings[0].selected}>{headings[1].selected ? `back` : headings[0].headingText}</StyledHeading>
+              <StyledHeading onClick={() => toggleViews(headings[0].id)} selected={headings[0].selected}>
+                {changeHeadingTextIfDesktop()}
+              </StyledHeading>
             </Ingredients>
             <IngredientsWrapper>
               <React.Fragment>
-                {!isSummaryHeadingSelected() && <Message>{getSelectionMessage()}</Message>}
+                {!isSummaryHeadingSelected() && <Message onClick={() => toggleViews(headings[1].id, true)}>{getSelectionMessage()}</Message>}
                 <SelectedIngredientsWrapper>
                   {currentMixture.map(ingredient => <StyledSelectedIngredient key={ingredient.id} removeFromCart={() => removeFromCart(ingredient)} ingredientName={ingredient.name}></StyledSelectedIngredient>)}
                 </SelectedIngredientsWrapper>
@@ -336,7 +355,9 @@ const SelectionTable: React.SFC<SelectionTableProps> = ({ categorisedIngredients
               </React.Fragment>
             </IngredientsWrapper>
             <Summary>
-              <StyledHeading onClick={() => toggleViews(headings[1].id)} selected={headings[1].selected}>{headings[1].headingText}</StyledHeading>
+              <StyledHeading onClick={() => toggleViews(headings[1].id)} selected={headings[1].selected}>
+                {headings[1].headingText}
+              </StyledHeading>
             </Summary>
             {
               !isSummaryHeadingSelected() &&
@@ -345,13 +366,13 @@ const SelectionTable: React.SFC<SelectionTableProps> = ({ categorisedIngredients
                   <div onClick={toggleDescription} className="viewProductInfo">
                     {areThereRecentlySelectedProducts() ? `${ isDescriptionVisible ? 'Hide' : 'View'} ${getSelectedProducts()[0].name} information` : "Please select a product"}
                   </div>
-                  <FooterButton onClick={currentMixture.length === 2 ? toggleSummaryScreen : addToCart}>{toggleButtonText()}</FooterButton>
+                  <FooterButton className={getAlreadyAddedMixtureIngredients() ? '' : 'green'} onClick={currentMixture.length === 2 ? toggleSummaryScreen : addToCart}>{toggleButtonText()}</FooterButton>
                 </FooterWrap>
                 <IngredientDescription className={isDescriptionVisible ? "open" : "closed"}>
                   {
                     <React.Fragment>
                       <StyledText>
-                        {areThereRecentlySelectedProducts() ? getSelectedProducts()[0].short_description : "No information available"}
+                        {areThereRecentlySelectedProducts() ? getSelectedProducts()[0].description : "No information available"}
                       </StyledText>
                       <FooterButton onClick={currentMixture.length === 2 ? toggleSummaryScreen : addToCart}>{toggleButtonText()}</FooterButton>
                     </React.Fragment>
@@ -367,6 +388,19 @@ const SelectionTable: React.SFC<SelectionTableProps> = ({ categorisedIngredients
 }
 
 export default SelectionTable;
+
+
+const Shadow = styled.div`
+  height: 58px;
+  position: absolute;
+  top: 1px;
+  width: 15px;
+  grid-row: 2;
+  grid-column: 1/ span 2;
+  ${props => props.theme.mediaQueries.tablet} {
+    display: none;
+  }
+`
 
 const SummaryIngredientsWrap = styled.div`
   margin: 50px 0 0;
@@ -428,16 +462,28 @@ const FooterWrap = styled.div`
     width: 65%;
     font-size: 9pt;
   }
+  .green{
+    background: ${props => props.theme.brandColours.baseLightGreen};
+  }
   ${props => props.theme.mediaQueries.tablet} {
     display: none;
   }
 `;
 
 const SelectionWrapper = styled.div`
+  position: relative;
   display: grid;
   grid-template-columns: 1fr 1fr;
   grid-template-rows: auto 59px 1fr;
   height: 100%;
+  .rightShadow{
+    right: 0;
+    background: linear-gradient(-90deg, rgba(177, 177, 177, 0.65) 0%, rgba(255,255,255,0.65) 100% );
+  }
+  .leftShadow{
+    left: 0;
+    background: linear-gradient(90deg, rgba(177, 177, 177, 0.65) 0%, rgba(255,255,255,0.65) 100% );
+  }
   .open{
     transform: translateY(0vh);
   }
@@ -473,6 +519,7 @@ const Categories = styled.div`
   } 
   &::-webkit-scrollbar-thumb {
     background: ${props => props.theme.brandColours.baseDefaultGreen}; 
+    display: none;
     border-radius: 5px;
   }
   h2{
