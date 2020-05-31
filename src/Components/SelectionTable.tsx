@@ -151,7 +151,7 @@ const SelectionTable: React.SFC<SelectionTableProps> = ({ categorisedIngredients
     if (currentMixture.length === 1)
       return "Please add one more ingredient";
     if (currentMixture.length === 2)
-      return "View your mixture on the summary screen";
+      return "View summary";
     return "Please add two ingredients";
   }
 
@@ -172,7 +172,9 @@ const SelectionTable: React.SFC<SelectionTableProps> = ({ categorisedIngredients
     )
   }
 
-  const toggleViews = (headingId: number) => {
+  const toggleViews = (headingId: number, fromMessage: boolean = false) => {
+    if((fromMessage === true) && (currentMixture.length !== 2))
+      return;
     updateHeadings(
       headings.map(heading => {
         heading.selected = false;
@@ -304,7 +306,7 @@ const SelectionTable: React.SFC<SelectionTableProps> = ({ categorisedIngredients
             </Ingredients>
             <IngredientsWrapper>
               <React.Fragment>
-                {!isSummaryHeadingSelected() && <Message>{getSelectionMessage()}</Message>}
+                {!isSummaryHeadingSelected() && <Message onClick={() => toggleViews(headings[1].id, true)}>{getSelectionMessage()}</Message>}
                 <SelectedIngredientsWrapper>
                   {currentMixture.map(ingredient => <StyledSelectedIngredient key={ingredient.id} removeFromCart={() => removeFromCart(ingredient)} ingredientName={ingredient.name}></StyledSelectedIngredient>)}
                 </SelectedIngredientsWrapper>
