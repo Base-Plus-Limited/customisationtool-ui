@@ -44,7 +44,7 @@ const FooterButton = styled(Button)`
   border: none;
   border-left: solid 1px ${props => props.theme.brandColours.baseDarkGreen};
   padding: 3vh 0;
-  width: 34%;
+  width: 35%;
   ${props => props.theme.mediaQueries.tablet} {
     font-size: 8pt;
     margin: 15px 0 0 0;

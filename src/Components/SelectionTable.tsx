@@ -366,7 +366,7 @@ const SelectionTable: React.SFC<SelectionTableProps> = ({ categorisedIngredients
                   <div onClick={toggleDescription} className="viewProductInfo">
                     {areThereRecentlySelectedProducts() ? `${ isDescriptionVisible ? 'Hide' : 'View'} ${getSelectedProducts()[0].name} information` : "Please select a product"}
                   </div>
-                  <FooterButton onClick={currentMixture.length === 2 ? toggleSummaryScreen : addToCart}>{toggleButtonText()}</FooterButton>
+                  <FooterButton className={getAlreadyAddedMixtureIngredients() ? '' : 'green'} onClick={currentMixture.length === 2 ? toggleSummaryScreen : addToCart}>{toggleButtonText()}</FooterButton>
                 </FooterWrap>
                 <IngredientDescription className={isDescriptionVisible ? "open" : "closed"}>
                   {
@@ -461,6 +461,9 @@ const FooterWrap = styled.div`
     float: left;
     width: 65%;
     font-size: 9pt;
+  }
+  .green{
+    background: ${props => props.theme.brandColours.baseLightGreen};
   }
   ${props => props.theme.mediaQueries.tablet} {
     display: none;
