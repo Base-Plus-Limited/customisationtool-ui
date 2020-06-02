@@ -20,7 +20,7 @@ const Category = styled.p`
   letter-spacing: 0.03em;
   text-align: center;
   text-transform: uppercase;
-  padding: 20px;
+  padding: 20px 16px;
   margin: 0;
   display: inline-block;
   cursor: pointer;
