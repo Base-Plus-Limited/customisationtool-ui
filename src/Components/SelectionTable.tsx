@@ -430,9 +430,11 @@ const FooterWrap = styled.div`
   font-size: 11pt;
   text-align: center;
   grid-column: 1/ span 2;
-  margin: 50px 0 0 0;
+  margin: 0;
   z-index: 5;
   background: #fff;
+  position: absolute;
+  bottom: 0;
   font-family: ${props => props.theme.bodyFont};
   .viewProductInfo {
     padding: 3vh 0;
@@ -587,11 +589,12 @@ const IngredientsInnerWrapper = styled.div`
   display: grid;
   grid-column: 1/ span 2;
   grid-template-columns: 1fr 1fr;
-  grid-template-rows: 1fr 1fr;
+  grid-template-rows: repeat(3, 150px);
   margin: 0 auto;
   width: 90%;
-  grid-gap: 40px;
+  grid-gap: 20px;
   max-height: 376px;
+  overflow: scroll;
   ${props => props.theme.mediaQueries.tablet} {
     grid-template-columns: 1fr 1fr;
     grid-template-rows: repeat(${(props: IngredientsInnerWrapperProps) => props.templateRows}, 160px);
