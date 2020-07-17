@@ -17,7 +17,7 @@ export interface CustomiseScreenProps {
 
 const StyledCustomiseScreen: React.SFC<CustomiseScreenProps> = () => {
 
-  const { updateCategorisedIngredients, categorisedIngredients, setApplicationError, saveBaseProduct, baseProduct, saveUserName, updateIsProductBeingAmended, addToMixture, hasApplicationErrored, saveUniqueId, saveBearerToken, userName, currentMixture, isProductBeingAmended, isCustomiseMessageVisible, toggleCustomiseMessageVisibility } = useContext(CustomiseContext);
+  const { updateCategorisedIngredients, categorisedIngredients, setApplicationError, saveBaseProduct, baseProduct, saveUserName, updateIsProductBeingAmended, addToMixture, hasApplicationErrored, saveUniqueId, saveBearerToken, userName, currentMixture, isProductBeingAmended, isCustomiseMessageVisible, toggleCustomiseMessageVisibility, saveTempProductId } = useContext(CustomiseContext);
 
   useEffect(() => {
     fetch(`${process.env.REACT_APP_SERVER_URL}/get-token`)
@@ -70,9 +70,12 @@ const StyledCustomiseScreen: React.SFC<CustomiseScreenProps> = () => {
     const params = new URLSearchParams(window.location.search.substring(1));
     const productIds: number[] = [Number(params.get('productone')), Number(params.get('producttwo'))];
     const userName = params.get('username');
+    const tempProductId = params.get('tempproductid');
     const uniqueId = String(params.get('uniqueid') === null ? generateUniqueId() : params.get('uniqueid'));
     saveUniqueId(uniqueId);
 
+    if(tempProductId !== null)
+      saveTempProductId(Number(tempProductId));
     if(userName !== null)
       saveUserName(userName);
     if (productIds.some(urlProductId => urlProductId !== 0)) {
