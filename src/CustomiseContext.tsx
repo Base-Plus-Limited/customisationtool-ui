@@ -31,7 +31,9 @@ const state: ICustomiseContext = {
   bearerToken: "",
   saveBearerToken: (previousBearerToken: SetStateAction<string>) => previousBearerToken,
   isCustomiseMessageVisible: false,
-  toggleCustomiseMessageVisibility: (previousMessageVisibility: SetStateAction<boolean>) => previousMessageVisibility
+  toggleCustomiseMessageVisibility: (previousMessageVisibility: SetStateAction<boolean>) => previousMessageVisibility,
+  tempProductId: 0,
+  saveTempProductId: (previousId: SetStateAction<number>) => previousId
 }
 
 export const CustomiseContext = createContext(state);
@@ -66,6 +68,7 @@ export const CustomiseProvider: React.SFC<CustomiseProviderProps> = ({ children 
   const [uniqueId, saveUniqueId] = useState<string>("");
   const [bearerToken, saveBearerToken] = useState<string>("");
   const [isCustomiseMessageVisible, toggleCustomiseMessageVisibility] = useState<boolean>(false);
+  const [tempProductId, saveTempProductId] = useState<number>(0);
 
   return (
     <CustomiseContext.Provider value={{
@@ -94,7 +97,9 @@ export const CustomiseProvider: React.SFC<CustomiseProviderProps> = ({ children 
       bearerToken,
       saveBearerToken,
       isCustomiseMessageVisible,
-      toggleCustomiseMessageVisibility
+      toggleCustomiseMessageVisibility,
+      tempProductId,
+      saveTempProductId
     }}>
       {children}
     </CustomiseContext.Provider>
