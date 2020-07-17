@@ -74,8 +74,11 @@ const StyledCustomiseScreen: React.SFC<CustomiseScreenProps> = () => {
     const uniqueId = String(params.get('uniqueid') === null ? generateUniqueId() : params.get('uniqueid'));
     saveUniqueId(uniqueId);
 
-    if(tempProductId !== null)
+    if(tempProductId !== null) {
       saveTempProductId(Number(tempProductId));
+    } else {
+      saveTempProductId(generateTempProductId());
+    }
     if(userName !== null)
       saveUserName(userName);
     if (productIds.some(urlProductId => urlProductId !== 0)) {
@@ -88,6 +91,10 @@ const StyledCustomiseScreen: React.SFC<CustomiseScreenProps> = () => {
       distinct_id: uniqueId,
       event_type: "Customisation started"
     }, bearer);
+  }
+
+  const generateTempProductId = () => {
+    return Number(Math.random().toString().split('.')[1].slice(0,5));
   }
 
   const getErrorMessage = (error: IErrorResponse) => {
