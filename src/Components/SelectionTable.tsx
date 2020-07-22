@@ -228,8 +228,13 @@ const SelectionTable: React.SFC<SelectionTableProps> = ({ categorisedIngredients
   }
 
   const updateTempIds = (productId: number) => {
-    return fetch(`${process.env.REACT_APP_SERVER_URL}/update?productId=${productId}&tempId=${tempProductId}`, {
+    return fetch(`${process.env.REACT_APP_SERVER_URL}/update`, {
       method: 'POST',
+      body: JSON.stringify({
+        tempProductId,
+        productId,
+        hasQuizBeenTaken: isProductBeingAmended
+      }),
       headers: {
         'Content-Type': 'application/json',
         'Authorization': 'Bearer ' + bearerToken
