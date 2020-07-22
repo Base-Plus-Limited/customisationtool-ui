@@ -31,4 +31,6 @@ export default interface ICustomiseContext {
   saveBearerToken: Dispatch<SetStateAction<string>>;
   isCustomiseMessageVisible: boolean;
   toggleCustomiseMessageVisibility: Dispatch<SetStateAction<boolean>>;
+  tempProductId: number;
+  saveTempProductId: Dispatch<SetStateAction<number>>;
 }

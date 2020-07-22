@@ -27,7 +27,7 @@ export interface IngredientsInnerWrapperProps {
 
 const SelectionTable: React.SFC<SelectionTableProps> = ({ categorisedIngredients, baseProduct }) => {
 
-  const { updateCategorisedIngredients, toggleDescriptionVisibility, isDescriptionVisible, addToMixture, currentMixture, headings, updateHeadings, setApplicationError, userName, isProductBeingAmended, updateIsCheckoutButtonSelected, isCheckoutButtonSelected, uniqueId, bearerToken, saveUserName, toggleCustomiseMessageVisibility } = useContext(CustomiseContext);
+  const { updateCategorisedIngredients, toggleDescriptionVisibility, isDescriptionVisible, addToMixture, currentMixture, headings, updateHeadings, setApplicationError, userName, isProductBeingAmended, updateIsCheckoutButtonSelected, isCheckoutButtonSelected, uniqueId, bearerToken, saveUserName, toggleCustomiseMessageVisibility, tempProductId } = useContext(CustomiseContext);
 
   const onCategorySelect = (categoryId: number) => {
     track({
@@ -189,7 +189,7 @@ const SelectionTable: React.SFC<SelectionTableProps> = ({ categorisedIngredients
     return (headings.find(heading => heading.selected) as IHeading).id === 1;
   }
 
-  const goToCheckout = async () => {
+  const createWordpressProduct = async () => {
     return fetch(`${process.env.REACT_APP_SERVER_URL}/new-product`, {
       method: 'POST',
       headers: {
@@ -209,8 +209,12 @@ const SelectionTable: React.SFC<SelectionTableProps> = ({ categorisedIngredients
           event_type: "Buy now selected",
           ingredients: currentMixture.map(x => x.name).join(' & ')
         }, bearerToken).then(() => {
-          if (product)
-            window.location.assign(`${process.env.REACT_APP_WEBSITE_URL}/cart?add-to-cart=${product.id}`)
+          if (product) {
+            updateTempIds(product.id)
+              .then(x => {
+                window.location.assign(`${process.env.REACT_APP_WEBSITE_URL}/cart?add-to-cart=${product.id}`)
+              })
+          }
         });
       })
       .catch((error: IErrorResponse) => {
@@ -221,6 +225,22 @@ const SelectionTable: React.SFC<SelectionTableProps> = ({ categorisedIngredients
           uiMessage: "Sorry, we weren't able to create your product. Please try again later"
         })
       });
+  }
+
+  const updateTempIds = (productId: number) => {
+    return fetch(`${process.env.REACT_APP_SERVER_URL}/update`, {
+      method: 'POST',
+      body: JSON.stringify({
+        tempProductId,
+        productId,
+        hasQuizBeenTaken: isProductBeingAmended
+      }),
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + bearerToken
+      },
+      cache: 'no-cache'
+    })
   }
 
   const toggleButtonText = () => currentMixture.length !== 2 ? showRemoveOrAdd() : "view summary";
@@ -240,6 +260,7 @@ const SelectionTable: React.SFC<SelectionTableProps> = ({ categorisedIngredients
 
   const createFinalProductToSaveToDatabase = () => {
     const databaseProduct: ICustomProductDBModel = {
+      productId: tempProductId,
       ingredients: currentMixture.map(ingredient => {
         return {
           name: ingredient.name,
@@ -268,7 +289,15 @@ const SelectionTable: React.SFC<SelectionTableProps> = ({ categorisedIngredients
       cache: 'no-cache',
       body: JSON.stringify(createFinalProductToSaveToDatabase())
     })
-      .finally(() => goToCheckout())
+    .then(x => createWordpressProduct())
+    .catch((error: IErrorResponse) => {
+      setApplicationError({
+        error: true,
+        code: error.code,
+        message: error.message,
+        uiMessage: "Sorry, we weren't able to create your product. Please try again later"
+      })
+    })
   }
 
   const newProduct = {
