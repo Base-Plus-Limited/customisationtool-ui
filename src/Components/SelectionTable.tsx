@@ -214,6 +214,14 @@ const SelectionTable: React.SFC<SelectionTableProps> = ({ categorisedIngredients
               .then(x => {
                 window.location.assign(`${process.env.REACT_APP_WEBSITE_URL}/cart?add-to-cart=${product.id}`)
               })
+              .catch(error => {
+                setApplicationError({
+                  error: true,
+                  code: error.code,
+                  message: error.message,
+                  uiMessage: "Sorry, we weren't able to create your product. Please try again later"
+                })
+              })
           }
         });
       })
@@ -231,8 +239,8 @@ const SelectionTable: React.SFC<SelectionTableProps> = ({ categorisedIngredients
     return fetch(`${process.env.REACT_APP_SERVER_URL}/update`, {
       method: 'POST',
       body: JSON.stringify({
-        tempProductId,
-        productId,
+        tempId: tempProductId,
+        productId: productId,
         hasQuizBeenTaken: isProductBeingAmended
       }),
       headers: {
