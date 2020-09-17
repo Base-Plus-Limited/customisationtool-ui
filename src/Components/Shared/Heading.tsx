@@ -4,11 +4,14 @@ import styled from 'styled-components';
 export interface HeadingProps {
   children: any;
   selected: boolean;
+  fullWidth: boolean;
   onClick: () => void
 }
  
-const StyledHeading: React.SFC<HeadingProps> = ({children, selected, onClick}) => (
-  <Heading onClick={onClick}><span className={selected ? "selected" : ""}>{children}</span></Heading>
+const StyledHeading: React.SFC<HeadingProps> = ({children, selected, fullWidth, onClick}) => (
+  <Heading onClick={onClick}><span className={
+    `${selected ? "selected" : ""} ${fullWidth ? "fullWidth" : ""}`
+  }>{children}</span></Heading>
 )
 
 const Heading = styled.h2`
