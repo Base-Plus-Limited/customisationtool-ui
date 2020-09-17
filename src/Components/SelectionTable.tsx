@@ -29,6 +29,8 @@ const SelectionTable: React.SFC<SelectionTableProps> = ({ categorisedIngredients
 
   const { updateCategorisedIngredients, toggleDescriptionVisibility, isDescriptionVisible, addToMixture, currentMixture, headings, updateHeadings, setApplicationError, userName, isProductBeingAmended, updateIsCheckoutButtonSelected, isCheckoutButtonSelected, uniqueId, bearerToken, saveUserName, toggleCustomiseMessageVisibility, tempProductId } = useContext(CustomiseContext);
 
+  const returnCurrentMixtureTotal = () => currentMixture.length;
+
   const onCategorySelect = (categoryId: number) => {
     track({
       distinct_id: uniqueId,
@@ -120,8 +122,15 @@ const SelectionTable: React.SFC<SelectionTableProps> = ({ categorisedIngredients
   const removeFromCart = (selectedProduct: ISelectableProduct) => {
     toggleCustomiseMessageVisibility(false);
     addToMixture(currentMixture.filter(ingredient => ingredient.id !== selectedProduct.id))
+    if (headings[1].selected)
+      navigateToSelectionScreen();
   }
 
+  const navigateToSelectionScreen = () => {
+    headings[1].selected = !headings[1].selected;
+    headings[0].selected = true;
+  }
+  
   const toggleDescription = () => {
     categorisedIngredients.map(cat => {
       if (cat.selected) {
@@ -344,8 +353,8 @@ const SelectionTable: React.SFC<SelectionTableProps> = ({ categorisedIngredients
                 </CategoriesWrapper>
               }
             </Categories>
-            <Ingredients>
-              <StyledHeading onClick={() => toggleViews(headings[0].id)} selected={headings[0].selected}>
+            <Ingredients className={returnCurrentMixtureTotal() === 2 ? "ingredientsWrapper" : "ingredientsWrapper fullWidth"}>
+              <StyledHeading onClick={() => toggleViews(headings[0].id)} fullWidth={returnCurrentMixtureTotal() === 2} selected={headings[0].selected}>
                 {changeHeadingTextIfDesktop()}
               </StyledHeading>
             </Ingredients>
@@ -382,11 +391,13 @@ const SelectionTable: React.SFC<SelectionTableProps> = ({ categorisedIngredients
                 }
               </React.Fragment>
             </IngredientsWrapper>
+              {returnCurrentMixtureTotal() === 2 &&
             <Summary>
-              <StyledHeading onClick={() => toggleViews(headings[1].id)} selected={headings[1].selected}>
-                {headings[1].headingText}
-              </StyledHeading>
+                <StyledHeading fullWidth={returnCurrentMixtureTotal() === 2} onClick={() => toggleViews(headings[1].id)} selected={headings[1].selected}>
+                  {headings[1].headingText}
+                </StyledHeading>
             </Summary>
+              }
             {
               !isSummaryHeadingSelected() &&
               <React.Fragment>
@@ -396,7 +407,10 @@ const SelectionTable: React.SFC<SelectionTableProps> = ({ categorisedIngredients
                   </div>
                   <FooterButton className={getAlreadyAddedMixtureIngredients() ? '' : 'green'} onClick={currentMixture.length === 2 ? toggleSummaryScreen : addToCart}>{toggleButtonText()}</FooterButton>
                 </FooterWrap>
-                <IngredientDescription className={isDescriptionVisible ? "open" : "closed"}>
+                <IngredientDescription className={`
+                  ${isDescriptionVisible ? "open" : "closed"}
+                  ${returnCurrentMixtureTotal() === 2 ? "" : "addBorders"}
+                `}>
                   {
                     <React.Fragment>
                       <StyledText>
@@ -492,6 +506,9 @@ const SelectionWrapper = styled.div`
   grid-template-columns: 1fr 1fr;
   grid-template-rows: auto 59px 1fr;
   height: 100%;
+  .ingredientsWrapper.fullWidth {
+    grid-column: 1/ span 2;
+  }
   .open{
     transform: translateY(0vh);
   }
@@ -503,6 +520,10 @@ const SelectionWrapper = styled.div`
     grid-template-columns: 200px 1fr 300px;
     .closed {
       transform: translateY(0vh);
+    }
+    .addBorders {
+      border-top: solid 1px ${props => props.theme.brandColours.baseDarkGreen};
+      border-left: solid 1px ${props => props.theme.brandColours.baseDarkGreen};
     }
   }
 `;
@@ -547,7 +568,9 @@ const Categories = styled.div`
 const Summary = styled.div`
   border-left: solid 1px ${props => props.theme.brandColours.baseDarkGreen};
   grid-row: 1;
-  grid-column: 2;
+  .fullWidth{
+    grid-column: 1 / span 2;
+  }
   ${props => props.theme.mediaQueries.tablet} {
     grid-column: 3;
     grid-row: 1 / span 2;
@@ -607,6 +630,9 @@ const IngredientsWrapper = styled.div`
   .selected {
     opacity: 1;
     pointer-events: none;
+  }
+  .selected p {
+    color: ${props => props.theme.brandColours.basePink};
   }
   ${props => props.theme.mediaQueries.tablet} {
     grid-column: 2;

@@ -24,7 +24,7 @@ const Button = styled.button`
   -webkit-tap-highlight-color: transparent;
   margin: 0;
   border-radius: 0px;
-  padding: 4px 8px;
+  padding: 8px 12px;
   &:focus{
     outline: none;
   }
