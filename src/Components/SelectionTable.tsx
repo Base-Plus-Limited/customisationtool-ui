@@ -608,6 +608,9 @@ const IngredientsWrapper = styled.div`
     opacity: 1;
     pointer-events: none;
   }
+  .selected p {
+    color: ${props => props.theme.brandColours.basePink};
+  }
   ${props => props.theme.mediaQueries.tablet} {
     grid-column: 2;
     grid-row: 2;
