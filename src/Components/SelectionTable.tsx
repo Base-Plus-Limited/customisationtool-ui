@@ -466,7 +466,7 @@ const SummaryIngredientsWrap = styled.div`
 const FragranceFreeQuestionWrap = styled.div`
   display: flex;
   justify-content: space-between;
-  margin: 0 auto 20px auto;
+  margin: 15px auto 30px auto;
   align-items: center;
   .selected {
     border: solid 1px ${props => props.theme.brandColours.basePink};
