@@ -2,7 +2,7 @@ import React, { useContext } from 'react';
 import styled from 'styled-components';
 import ICategorisedIngredient from '../Interfaces/CategorisedIngredient';
 import StyledHeading from './Shared/Heading';
-import { StyledButton, FooterButton } from './Button';
+import { StyledButton, FooterButton, FragranceButton } from './Button';
 import StyledCategory from './Category';
 import { CustomiseContext } from '../CustomiseContext';
 import StyledIngredient from './Ingredient';
@@ -15,6 +15,7 @@ import { getUniqueIngredients } from '../Helpers/Helpers';
 import ICustomProductDBModel from '../Interfaces/CustomProduct';
 import LoadingAnimation from './LoadingAnimation';
 import { track } from './Analytics';
+import { FragranceAnswer } from '../Interfaces/FragranceData';
 
 export interface SelectionTableProps {
   categorisedIngredients: ICategorisedIngredient[]
@@ -27,7 +28,7 @@ export interface IngredientsInnerWrapperProps {
 
 const SelectionTable: React.SFC<SelectionTableProps> = ({ categorisedIngredients, baseProduct }) => {
 
-  const { updateCategorisedIngredients, toggleDescriptionVisibility, isDescriptionVisible, addToMixture, currentMixture, headings, updateHeadings, setApplicationError, userName, isProductBeingAmended, updateIsCheckoutButtonSelected, isCheckoutButtonSelected, uniqueId, bearerToken, saveUserName, toggleCustomiseMessageVisibility, tempProductId } = useContext(CustomiseContext);
+  const { updateCategorisedIngredients, toggleDescriptionVisibility, isDescriptionVisible, addToMixture, currentMixture, headings, updateHeadings, setApplicationError, userName, isProductBeingAmended, updateIsCheckoutButtonSelected, isCheckoutButtonSelected, uniqueId, bearerToken, saveUserName, toggleCustomiseMessageVisibility, tempProductId, fragranceData, updateFragranceData } = useContext(CustomiseContext);
 
   const returnCurrentMixtureTotal = () => currentMixture.length;
 
@@ -182,7 +183,7 @@ const SelectionTable: React.SFC<SelectionTableProps> = ({ categorisedIngredients
   }
 
   const toggleViews = (headingId: number, fromMessage: boolean = false) => {
-    if((fromMessage === true) && (currentMixture.length !== 2))
+    if((fromMessage) && (currentMixture.length !== 2))
       return;
     updateHeadings(
       headings.map(heading => {
@@ -284,7 +285,8 @@ const SelectionTable: React.SFC<SelectionTableProps> = ({ categorisedIngredients
           id: ingredient.id
         }
       }),
-      amended: isProductBeingAmended
+      amended: isProductBeingAmended,
+      isFragranceFree: fragranceData.answers.filter(a => a.selected)[0].id === FragranceAnswer.Yes
     };
     return databaseProduct;
   }
@@ -335,13 +337,19 @@ const SelectionTable: React.SFC<SelectionTableProps> = ({ categorisedIngredients
     ]
   }
 
+  const onFragranceAnswerClick = (id: FragranceAnswer) => {
+    const fragranceDataCopy = Object.assign({}, fragranceData);
+    fragranceDataCopy.answers.forEach(f => f.selected = f.id === id);
+    updateFragranceData(fragranceDataCopy);
+  }
+
   return (
     <React.Fragment>
       {
         isCheckoutButtonSelected ?
           <LoadingWrapper>
             <LoadingAnimation />
-            <StyledText>{`Thank you${userName ? ` ${userName}` : ''}, please wait whilst we make create your bespoke product`}</StyledText>
+            <StyledText>{`Thank you${userName ? ` ${userName}` : ''}, please wait whilst we create your bespoke product`}</StyledText>
           </LoadingWrapper>
           :
           <SelectionWrapper>
@@ -378,7 +386,21 @@ const SelectionTable: React.SFC<SelectionTableProps> = ({ categorisedIngredients
                         {currentMixture.map(ingredient => <SummaryPriceRow key={ingredient.id}>{ingredient.name} <span>£{ingredient.price}</span></SummaryPriceRow>)}
                         {<SummaryPriceRow>{baseProduct.name} <span>£{baseProduct.price}</span></SummaryPriceRow>}
                         {<TotalPriceRow>Mixture <span>£{getMixturePrice()}</span></TotalPriceRow>}
-                        <StyledButton onClick={() => currentMixture.length === 2 ? saveProductToDatabase() : toggleViews(0)}>{currentMixture.length === 2 ? 'Checkout' : 'Back'}</StyledButton>
+                        <FragranceFreeQuestionWrap>
+                          <StyledText>
+                            <span className="plus">
+                              +
+                            </span>
+                            {fragranceData.question}</StyledText>
+                          <div>
+                            {
+                              fragranceData.answers.map(answer => (
+                                <FragranceButton key={answer.id} selected={answer.selected} onClick={() => onFragranceAnswerClick(answer.id)}>{answer.answer}</FragranceButton>
+                              ))
+                            }
+                          </div>
+                        </FragranceFreeQuestionWrap>
+                        <StyledButton addTransparency={fragranceData.answers.filter(x => x.selected).length !== 1} disabled={fragranceData.answers.filter(x => x.selected).length !== 1} onClick={() => currentMixture.length === 2 ? saveProductToDatabase() : toggleViews(0)}>{currentMixture.length === 2 ? 'Checkout' : 'Back'}</StyledButton>
                       </SummaryPrices>
                     </SummaryIngredientsWrap>
                     :
@@ -441,6 +463,24 @@ const SummaryIngredientsWrap = styled.div`
   }
 `
 
+const FragranceFreeQuestionWrap = styled.div`
+  display: flex;
+  width: 70%;
+  justify-content: space-between;
+  margin: 0 auto 20px auto;
+  align-items: center;
+  .selected {
+    border: solid 1px ${props => props.theme.brandColours.basePink};
+    ${props => props.theme.mediaQueries.tablet} {
+      border: solid 2px ${props => props.theme.brandColours.basePink};
+    }
+    color: ${props => props.theme.brandColours.basePink};
+  }
+  button + button {
+    margin-left: 10px;
+  }
+`
+
 const LoadingWrapper = styled.div`
   text-align: center;
 `
@@ -461,6 +501,9 @@ const SummaryPrices = styled.div`
   }
   ${props => props.theme.mediaQueries.tablet} {
     grid-row: 3;
+  }
+  .grey {
+    border-color: rgba(16,16,16,0.3);
   }
 `;
 

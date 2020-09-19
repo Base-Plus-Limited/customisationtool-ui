@@ -4,6 +4,7 @@ import ICustomiseContext from './Interfaces/CustomiseState';
 import ICategorisedIngredient from './Interfaces/CategorisedIngredient';
 import { ISelectableProduct } from './Interfaces/WordpressProduct';
 import { IHeading } from './Interfaces/Heading';
+import { FragranceAnswer, IFragranceData } from './Interfaces/FragranceData';
 
 const state: ICustomiseContext = {
   hasApplicationErrored: {} as IErrorResponse,
@@ -33,7 +34,9 @@ const state: ICustomiseContext = {
   isCustomiseMessageVisible: false,
   toggleCustomiseMessageVisibility: (previousMessageVisibility: SetStateAction<boolean>) => previousMessageVisibility,
   tempProductId: 0,
-  saveTempProductId: (previousId: SetStateAction<number>) => previousId
+  saveTempProductId: (previousId: SetStateAction<number>) => previousId,
+  fragranceData: {} as IFragranceData,
+  updateFragranceData: (previousFragranceData: SetStateAction<IFragranceData>) => previousFragranceData,
 }
 
 export const CustomiseContext = createContext(state);
@@ -69,6 +72,21 @@ export const CustomiseProvider: React.SFC<CustomiseProviderProps> = ({ children 
   const [bearerToken, saveBearerToken] = useState<string>("");
   const [isCustomiseMessageVisible, toggleCustomiseMessageVisibility] = useState<boolean>(false);
   const [tempProductId, saveTempProductId] = useState<number>(0);
+  const [fragranceData, updateFragranceData] = useState<IFragranceData>({
+    question: "Fragrance free?",
+    answers: [
+      {
+        answer: "Yes",
+        id: FragranceAnswer.Yes,
+        selected: false
+      },
+      {
+        answer: "No",
+        id: FragranceAnswer.No,
+        selected: false
+      }
+    ]
+  });
 
   return (
     <CustomiseContext.Provider value={{
@@ -99,7 +117,9 @@ export const CustomiseProvider: React.SFC<CustomiseProviderProps> = ({ children 
       isCustomiseMessageVisible,
       toggleCustomiseMessageVisibility,
       tempProductId,
-      saveTempProductId
+      saveTempProductId,
+      fragranceData,
+      updateFragranceData
     }}>
       {children}
     </CustomiseContext.Provider>
