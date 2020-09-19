@@ -352,7 +352,7 @@ const SelectionTable: React.SFC<SelectionTableProps> = ({ categorisedIngredients
             <StyledText>{`Thank you${userName ? ` ${userName}` : ''}, please wait whilst we create your bespoke product`}</StyledText>
           </LoadingWrapper>
           :
-          <SelectionWrapper>
+          <SelectionWrapper className={headings.filter(h => h.selected)[0].id === 1 ? "addScroll" : ""}>
             <Categories>
               {
                 !isSummaryHeadingSelected() &&
@@ -366,7 +366,7 @@ const SelectionTable: React.SFC<SelectionTableProps> = ({ categorisedIngredients
                 {changeHeadingTextIfDesktop()}
               </StyledHeading>
             </Ingredients>
-            <IngredientsWrapper>
+            <IngredientsWrapper className={headings.filter(h => h.selected)[0].id === 1 ? "moveUp" : ""}>
               <React.Fragment>
                 {!isSummaryHeadingSelected() && <Message onClick={() => toggleViews(headings[1].id, true)}>{getSelectionMessage()}</Message>}
                 <SelectedIngredientsWrapper>
@@ -465,9 +465,8 @@ const SummaryIngredientsWrap = styled.div`
 
 const FragranceFreeQuestionWrap = styled.div`
   display: flex;
-  width: 70%;
   justify-content: space-between;
-  margin: 0 auto 20px auto;
+  margin: 15px auto 30px auto;
   align-items: center;
   .selected {
     border: solid 1px ${props => props.theme.brandColours.basePink};
@@ -549,6 +548,15 @@ const SelectionWrapper = styled.div`
   grid-template-columns: 1fr 1fr;
   grid-template-rows: auto 59px 1fr;
   height: 100%;
+  .moveUp {
+    margin-top: -40px;
+  }
+  .moveUp .selected {
+    margin-top: -20px;
+  }
+  .moveUp .selected img {
+    width: 90px;
+  }
   .ingredientsWrapper.fullWidth {
     grid-column: 1/ span 2;
   }
@@ -563,6 +571,15 @@ const SelectionWrapper = styled.div`
     grid-template-columns: 200px 1fr 300px;
     .closed {
       transform: translateY(0vh);
+    }
+    .moveUp {
+      margin-top: 0;
+    }
+    .moveUp .selected {
+      margin-top: 0px;
+    }
+    .moveUp .selected img {
+      width: 110px;
     }
     .addBorders {
       border-top: solid 1px ${props => props.theme.brandColours.baseDarkGreen};

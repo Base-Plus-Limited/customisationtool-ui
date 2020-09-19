@@ -125,6 +125,10 @@ const StyledCustomiseScreen: React.SFC<CustomiseScreenProps> = () => {
 
 const CustomiseScreen = styled.div`
   height: 100%;
+  .addScroll {
+    overflow: scroll;
+    margin-bottom: 20px;
+  }
 `;
 
 export default StyledCustomiseScreen;

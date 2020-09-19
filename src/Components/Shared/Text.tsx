@@ -15,7 +15,7 @@ const Text = styled.p`
   font-family: ${props => props.theme.subHeadingFont};
   margin: 0;
   .plus {
-    color: ${props => props.theme.brandColours.baseDefaultGreen};
+    color: ${props => props.theme.brandColours.basePink};
     display: inline-block;
     margin-right: 10px;    
   }
