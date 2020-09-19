@@ -14,6 +14,11 @@ const Text = styled.p`
   color: ${props => props.theme.brandColours.baseDarkGreen};
   font-family: ${props => props.theme.subHeadingFont};
   margin: 0;
+  .plus {
+    color: ${props => props.theme.brandColours.baseDefaultGreen};
+    display: inline-block;
+    margin-right: 10px;    
+  }
 `
 
 const Message = styled(Text)`
@@ -47,7 +52,7 @@ const TotalPriceRow = styled(SummaryPriceRow)`
   border-top: solid 1px ${props => props.theme.brandColours.basePink};
   color: ${props => props.theme.brandColours.basePink};
   padding: 15px 0;
-  margin: 5px auto 30px;
+  margin: 5px auto 10px;
 `
 
 const LoadingMessage = styled(Text)`

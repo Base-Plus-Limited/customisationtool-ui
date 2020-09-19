@@ -3,6 +3,7 @@ import IErrorResponse from "./ErrorResponse";
 import ICategorisedIngredient from './CategorisedIngredient';
 import { ISelectableProduct } from './WordpressProduct';
 import { IHeading } from './Heading';
+import { IFragranceData } from './FragranceData';
 
 export default interface ICustomiseContext {
   hasApplicationErrored: IErrorResponse;
@@ -33,4 +34,6 @@ export default interface ICustomiseContext {
   toggleCustomiseMessageVisibility: Dispatch<SetStateAction<boolean>>;
   tempProductId: number;
   saveTempProductId: Dispatch<SetStateAction<number>>;
+  fragranceData: IFragranceData;
+  updateFragranceData: Dispatch<SetStateAction<IFragranceData>>;
 }
