@@ -368,7 +368,7 @@ const SelectionTable: React.SFC<SelectionTableProps> = ({ categorisedIngredients
             </Ingredients>
             <IngredientsWrapper className={headings.filter(h => h.selected)[0].id === 1 ? "moveUp" : ""}>
               <React.Fragment>
-                {!isSummaryHeadingSelected() && <Message onClick={() => toggleViews(headings[1].id, true)}>{getSelectionMessage()}</Message>}
+                {!isSummaryHeadingSelected() && <Message className={currentMixture.length === 2 ? "addBackground" : ""} onClick={() => toggleViews(headings[1].id, true)}>{getSelectionMessage()}</Message>}
                 <SelectedIngredientsWrapper>
                   {currentMixture.map(ingredient => <StyledSelectedIngredient key={ingredient.id} removeFromCart={() => removeFromCart(ingredient)} ingredientName={ingredient.name}></StyledSelectedIngredient>)}
                 </SelectedIngredientsWrapper>
@@ -477,8 +477,14 @@ const FragranceFreeQuestionWrap = styled.div`
     }
     color: ${props => props.theme.brandColours.basePink};
   }
+  button {
+    margin-top: 0;
+  }
   button + button {
     margin-left: 10px;
+  }
+  ${props => props.theme.mediaQueries.tablet} {
+    max-width: 70%;
   }
 `
 
@@ -542,7 +548,8 @@ const FooterWrap = styled.div`
     font-size: 9pt;
   }
   .green{
-    background: ${props => props.theme.brandColours.baseLightGreen};
+    background: ${props => props.theme.brandColours.baseDarkGreen};
+    color: #fff;
   }
   ${props => props.theme.mediaQueries.tablet} {
     display: none;
@@ -693,6 +700,10 @@ const IngredientsWrapper = styled.div`
   grid-row: 3;
   grid-template-columns: 1fr 1fr;
   grid-template-rows: 35px auto 1fr;
+  .addBackground {
+    background: ${props => props.theme.brandColours.baseDarkGreen};
+    color: #fff;
+  }
   .selected {
     opacity: 1;
     pointer-events: none;

@@ -69,9 +69,10 @@ const FooterButton = styled.button`
   font-size: 9pt;
   font-family: ${props => props.theme.subHeadingFont};
   text-transform: uppercase;
-  background: #fff;
+  background: ${props => props.theme.brandColours.baseDarkGreen};
   display: inline-block;
   outline: none;
+  color: #fff;
   -webkit-tap-highlight-color: transparent;
   margin: 0;
   border-radius: 0px;
