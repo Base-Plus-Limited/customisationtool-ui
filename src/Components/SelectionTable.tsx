@@ -400,7 +400,9 @@ const SelectionTable: React.SFC<SelectionTableProps> = ({ categorisedIngredients
                             }
                           </div>
                         </FragranceFreeQuestionWrap>
-                        <StyledButton addTransparency={fragranceData.answers.filter(x => x.selected).length !== 1} disabled={fragranceData.answers.filter(x => x.selected).length !== 1} onClick={() => currentMixture.length === 2 ? saveProductToDatabase() : toggleViews(0)}>{currentMixture.length === 2 ? 'Checkout' : 'Back'}</StyledButton>
+                        <StyledButton addTransparency={fragranceData.answers.filter(x => x.selected).length !== 1} addBackground={fragranceData.answers.filter(x => x.selected).length === 1} disabled={fragranceData.answers.filter(x => x.selected).length !== 1} onClick={() => currentMixture.length === 2 ? saveProductToDatabase() : toggleViews(0)}>
+                          {currentMixture.length === 2 ? 'Checkout' : 'Back'}
+                        </StyledButton>
                       </SummaryPrices>
                     </SummaryIngredientsWrap>
                     :
@@ -503,6 +505,10 @@ const SummaryPrices = styled.div`
   }
   .grey {
     border-color: rgba(16,16,16,0.3);
+  }
+  .greenBackground {
+    background: ${props => props.theme.brandColours.baseDarkGreen};
+    color: #fff;
   }
 `;
 

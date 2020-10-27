@@ -7,11 +7,12 @@ export interface ButtonProps {
   selected?: boolean;
   disabled?: boolean;
   addTransparency?: boolean;
+  addBackground?: boolean;
 }
 
 
-const StyledButton: React.SFC<ButtonProps> = ({ onClick, children, selected, disabled, addTransparency }) => (
-  <Button className={`${selected ? "selected" : ""} ${addTransparency ? "grey" : ""} `} disabled={disabled} onClick={onClick}>
+const StyledButton: React.SFC<ButtonProps> = ({ onClick, children, selected, disabled, addTransparency, addBackground }) => (
+  <Button className={`${selected ? "selected" : ""} ${addTransparency ? "grey" : ""} ${addBackground ? "greenBackground" : ""}`} disabled={disabled} onClick={onClick}>
     {children}
   </Button>
 )
@@ -92,4 +93,4 @@ const FooterButton = styled.button`
   }
 `
 
-export {StyledButton, FooterButton, FragranceButton};
+export { StyledButton, FooterButton, FragranceButton };
