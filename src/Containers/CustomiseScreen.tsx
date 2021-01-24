@@ -85,7 +85,7 @@ const StyledCustomiseScreen: React.SFC<CustomiseScreenProps> = () => {
       addToMixture(getUniqueIngredients(ingredients.filter(ingredient => productIds.includes(ingredient.id))));
       updateIsProductBeingAmended(true);
       toggleCustomiseMessageVisibility(true);
-      window.history.pushState({}, document.title, window.location.href.split("?")[0]);
+      //window.history.pushState({}, document.title, window.location.href.split("?")[0]);
     }
     track({
       distinct_id: uniqueId,
