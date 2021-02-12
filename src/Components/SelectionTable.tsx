@@ -388,24 +388,10 @@ const SelectionTable: React.SFC<SelectionTableProps> = ({ categorisedIngredients
                       }
                       <SummaryPrices>
                         <h2>Your product</h2>
-                        {currentMixture.map(ingredient => <SummaryPriceRow key={ingredient.id}>{ingredient.name} <span>£{Number(ingredient.price).toFixed(0)}</span></SummaryPriceRow>)}
+                        {currentMixture.map(ingredient => <SummaryPriceRow key={ingredient.id}>{ingredient.name} <span>£{Number(ingredient.price).toFixed(2)}</span></SummaryPriceRow>)}
                         {<SummaryPriceRow>{baseProduct.name + `, ${moisturiserSize}`} <span>£{getPriceBasedOnSize()}</span></SummaryPriceRow>}
                         {<TotalPriceRow>Mixture <span>£{getMixturePrice()}</span></TotalPriceRow>}
-                        <FragranceFreeQuestionWrap>
-                          <StyledText>
-                            <span className="plus">
-                              +
-                            </span>
-                            {fragranceData.question}</StyledText>
-                          <div>
-                            {
-                              fragranceData.answers.map(answer => (
-                                <FragranceButton key={answer.id} selected={answer.selected} onClick={() => onFragranceAnswerClick(answer.id)}>{answer.answer}</FragranceButton>
-                              ))
-                            }
-                          </div>
-                        </FragranceFreeQuestionWrap>
-                        <StyledButton addTransparency={fragranceData.answers.filter(x => x.selected).length !== 1} disabled={fragranceData.answers.filter(x => x.selected).length !== 1} onClick={() => currentMixture.length === 2 ? saveProductToDatabase() : toggleViews(0)}>{currentMixture.length === 2 ? 'Checkout' : 'Back'}</StyledButton>
+                        <StyledButton onClick={() => currentMixture.length === 2 ? saveProductToDatabase() : toggleViews(0)}>{currentMixture.length === 2 ? 'Checkout' : 'Back'}</StyledButton>
                       </SummaryPrices>
                     </SummaryIngredientsWrap>
                     :
