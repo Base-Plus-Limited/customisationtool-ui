@@ -388,7 +388,7 @@ const SelectionTable: React.SFC<SelectionTableProps> = ({ categorisedIngredients
                       }
                       <SummaryPrices>
                         <h2>Your product</h2>
-                        {currentMixture.map(ingredient => <SummaryPriceRow key={ingredient.id}>{ingredient.name} <span>£{ingredient.price}</span></SummaryPriceRow>)}
+                        {currentMixture.map(ingredient => <SummaryPriceRow key={ingredient.id}>{ingredient.name} <span>£{Number(ingredient.price).toFixed(0)}</span></SummaryPriceRow>)}
                         {<SummaryPriceRow>{baseProduct.name + `, ${moisturiserSize}`} <span>£{getPriceBasedOnSize()}</span></SummaryPriceRow>}
                         {<TotalPriceRow>Mixture <span>£{getMixturePrice()}</span></TotalPriceRow>}
                         <FragranceFreeQuestionWrap>
