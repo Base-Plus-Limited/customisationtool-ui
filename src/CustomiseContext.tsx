@@ -5,8 +5,11 @@ import ICategorisedIngredient from './Interfaces/CategorisedIngredient';
 import { ISelectableProduct } from './Interfaces/WordpressProduct';
 import { IHeading } from './Interfaces/Heading';
 import { FragranceAnswer, IFragranceData } from './Interfaces/FragranceData';
+import { MoisturiserSize } from './Interfaces/MoisturiserSize';
 
 const state: ICustomiseContext = {
+  moisturiserSize: "" as MoisturiserSize,
+  saveMoisturiserSize: (previousSize: SetStateAction<MoisturiserSize>) => previousSize,
   hasApplicationErrored: {} as IErrorResponse,
   setApplicationError: (previousApplicationError: SetStateAction<IErrorResponse>) => previousApplicationError,
   categorisedIngredients: [],
@@ -87,9 +90,12 @@ export const CustomiseProvider: React.SFC<CustomiseProviderProps> = ({ children 
       }
     ]
   });
+  const [moisturiserSize, saveMoisturiserSize] = useState<MoisturiserSize>("50ml");
 
   return (
     <CustomiseContext.Provider value={{
+      moisturiserSize,
+      saveMoisturiserSize,
       hasApplicationErrored,
       setApplicationError,
       categorisedIngredients,

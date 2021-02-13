@@ -10,6 +10,7 @@ import StyledErrorScreen from '../Components/ErrorScreen';
 import IErrorResponse from '../Interfaces/ErrorResponse';
 import { generateUniqueId, track } from '../Components/Analytics';
 import { LoadingMessage, InfoMessageForAmendingUsers } from '../Components/Shared/Text';
+import { MoisturiserSize } from '../Interfaces/MoisturiserSize';
 
 export interface CustomiseScreenProps {
 
@@ -17,7 +18,7 @@ export interface CustomiseScreenProps {
 
 const StyledCustomiseScreen: React.SFC<CustomiseScreenProps> = () => {
 
-  const { updateCategorisedIngredients, categorisedIngredients, setApplicationError, saveBaseProduct, baseProduct, saveUserName, updateIsProductBeingAmended, addToMixture, hasApplicationErrored, saveUniqueId, saveBearerToken, userName, currentMixture, isProductBeingAmended, isCustomiseMessageVisible, toggleCustomiseMessageVisibility, saveTempProductId } = useContext(CustomiseContext);
+  const { updateCategorisedIngredients, categorisedIngredients, setApplicationError, saveBaseProduct, baseProduct, saveUserName, updateIsProductBeingAmended, addToMixture, hasApplicationErrored, saveUniqueId, saveBearerToken, userName, currentMixture, isProductBeingAmended, isCustomiseMessageVisible, toggleCustomiseMessageVisibility, saveTempProductId, saveMoisturiserSize } = useContext(CustomiseContext);
 
   useEffect(() => {
     fetch(`${process.env.REACT_APP_SERVER_URL}/get-token`)
@@ -71,8 +72,10 @@ const StyledCustomiseScreen: React.SFC<CustomiseScreenProps> = () => {
     const productIds: number[] = [Number(params.get('productone')), Number(params.get('producttwo'))];
     const userName = params.get('username');
     const tempProductId = params.get('tempproductid');
+    const moisturiserSize = (params.get('size') as MoisturiserSize);
     const uniqueId = String(params.get('uniqueid') === null ? generateUniqueId() : params.get('uniqueid'));
     saveUniqueId(uniqueId);
+    saveMoisturiserSize(moisturiserSize ? moisturiserSize : "50ml");
 
     if(tempProductId !== null) {
       saveTempProductId(Number(tempProductId));

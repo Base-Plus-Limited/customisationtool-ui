@@ -28,7 +28,7 @@ export interface IngredientsInnerWrapperProps {
 
 const SelectionTable: React.SFC<SelectionTableProps> = ({ categorisedIngredients, baseProduct }) => {
 
-  const { updateCategorisedIngredients, toggleDescriptionVisibility, isDescriptionVisible, addToMixture, currentMixture, headings, updateHeadings, setApplicationError, userName, isProductBeingAmended, updateIsCheckoutButtonSelected, isCheckoutButtonSelected, uniqueId, bearerToken, saveUserName, toggleCustomiseMessageVisibility, tempProductId, fragranceData, updateFragranceData } = useContext(CustomiseContext);
+  const { updateCategorisedIngredients, toggleDescriptionVisibility, isDescriptionVisible, addToMixture, currentMixture, headings, updateHeadings, setApplicationError, userName, isProductBeingAmended, updateIsCheckoutButtonSelected, isCheckoutButtonSelected, uniqueId, bearerToken, saveUserName, toggleCustomiseMessageVisibility, tempProductId, fragranceData, updateFragranceData, moisturiserSize } = useContext(CustomiseContext);
 
   const returnCurrentMixtureTotal = () => currentMixture.length;
 
@@ -266,12 +266,13 @@ const SelectionTable: React.SFC<SelectionTableProps> = ({ categorisedIngredients
   const showRemoveOrAdd = () => getAlreadyAddedMixtureIngredients() ? "Remove -" : "Add +";
 
   const getMixturePrice = () => {
+    const basePrice = moisturiserSize === "50ml" ? Number(baseProduct.price) : Number(baseProduct.smallerSizePrice)
     if (currentMixture.length) {
       const addedIngredientsPrice =
         currentMixture
           .map(x => Number(x.price))
           .reduce((acc, val) => acc + val);
-      return addedIngredientsPrice + Number(baseProduct.price);
+      return addedIngredientsPrice + basePrice;
     }
     return Number(baseProduct.price);
   }
@@ -343,6 +344,10 @@ const SelectionTable: React.SFC<SelectionTableProps> = ({ categorisedIngredients
     updateFragranceData(fragranceDataCopy);
   }
 
+  const getPriceBasedOnSize = () => {
+    return moisturiserSize === "50ml" ? Number(baseProduct.price) : Number(baseProduct.smallerSizePrice);
+  }
+
   return (
     <React.Fragment>
       {
@@ -383,24 +388,10 @@ const SelectionTable: React.SFC<SelectionTableProps> = ({ categorisedIngredients
                       }
                       <SummaryPrices>
                         <h2>Your product</h2>
-                        {currentMixture.map(ingredient => <SummaryPriceRow key={ingredient.id}>{ingredient.name} <span>£{ingredient.price}</span></SummaryPriceRow>)}
-                        {<SummaryPriceRow>{baseProduct.name} <span>£{baseProduct.price}</span></SummaryPriceRow>}
+                        {currentMixture.map(ingredient => <SummaryPriceRow key={ingredient.id}>{ingredient.name} <span>£{Number(ingredient.price).toFixed(2)}</span></SummaryPriceRow>)}
+                        {<SummaryPriceRow>{baseProduct.name + `, ${moisturiserSize}`} <span>£{getPriceBasedOnSize()}</span></SummaryPriceRow>}
                         {<TotalPriceRow>Mixture <span>£{getMixturePrice()}</span></TotalPriceRow>}
-                        <FragranceFreeQuestionWrap>
-                          <StyledText>
-                            <span className="plus">
-                              +
-                            </span>
-                            {fragranceData.question}</StyledText>
-                          <div>
-                            {
-                              fragranceData.answers.map(answer => (
-                                <FragranceButton key={answer.id} selected={answer.selected} onClick={() => onFragranceAnswerClick(answer.id)}>{answer.answer}</FragranceButton>
-                              ))
-                            }
-                          </div>
-                        </FragranceFreeQuestionWrap>
-                        <StyledButton addTransparency={fragranceData.answers.filter(x => x.selected).length !== 1} disabled={fragranceData.answers.filter(x => x.selected).length !== 1} onClick={() => currentMixture.length === 2 ? saveProductToDatabase() : toggleViews(0)}>{currentMixture.length === 2 ? 'Checkout' : 'Back'}</StyledButton>
+                        <StyledButton onClick={() => currentMixture.length === 2 ? saveProductToDatabase() : toggleViews(0)}>{currentMixture.length === 2 ? 'Checkout' : 'Back'}</StyledButton>
                       </SummaryPrices>
                     </SummaryIngredientsWrap>
                     :

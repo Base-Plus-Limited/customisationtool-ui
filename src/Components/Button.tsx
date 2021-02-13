@@ -17,11 +17,11 @@ const StyledButton: React.SFC<ButtonProps> = ({ onClick, children, selected, dis
 )
 
 const Button = styled.button`
-  border: solid 1px ${props => props.theme.brandColours.baseDarkGreen};
+  background: ${props => props.theme.brandColours.baseDarkGreen};
   font-size: 9pt;
   font-family: ${props => props.theme.subHeadingFont};
   text-transform: uppercase;
-  background: #fff;
+  color: #fff;
   display: inline-block;
   outline: none;
   -webkit-tap-highlight-color: transparent;

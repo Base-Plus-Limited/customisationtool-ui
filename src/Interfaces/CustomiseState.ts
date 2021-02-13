@@ -4,8 +4,11 @@ import ICategorisedIngredient from './CategorisedIngredient';
 import { ISelectableProduct } from './WordpressProduct';
 import { IHeading } from './Heading';
 import { IFragranceData } from './FragranceData';
+import { MoisturiserSize } from './MoisturiserSize';
 
 export default interface ICustomiseContext {
+  moisturiserSize: MoisturiserSize;
+  saveMoisturiserSize: Dispatch<SetStateAction<MoisturiserSize>>;
   hasApplicationErrored: IErrorResponse;
   setApplicationError: Dispatch<SetStateAction<IErrorResponse>>;
   categorisedIngredients: ICategorisedIngredient[];
