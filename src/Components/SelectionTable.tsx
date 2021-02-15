@@ -2,20 +2,19 @@ import React, { useContext } from 'react';
 import styled from 'styled-components';
 import ICategorisedIngredient from '../Interfaces/CategorisedIngredient';
 import StyledHeading from './Shared/Heading';
-import { StyledButton, FooterButton, FragranceButton } from './Button';
+import { StyledButton, FooterButton } from './Button';
 import StyledCategory from './Category';
 import { CustomiseContext } from '../CustomiseContext';
 import StyledIngredient from './Ingredient';
 import StyledSelectedIngredient from './SelectedIngredient';
 import IWordpressProduct, { ISelectableProduct } from '../Interfaces/WordpressProduct';
 import { StyledText, Message, SummaryPriceRow, TotalPriceRow } from './Shared/Text';
-import { IHeading } from '../Interfaces/Heading';
+import { IHeading, HeadingIds } from '../Interfaces/Heading';
 import IErrorResponse from '../Interfaces/ErrorResponse';
 import { getUniqueIngredients } from '../Helpers/Helpers';
 import ICustomProductDBModel from '../Interfaces/CustomProduct';
 import LoadingAnimation from './LoadingAnimation';
 import { track } from './Analytics';
-import { FragranceAnswer } from '../Interfaces/FragranceData';
 
 export interface SelectionTableProps {
   categorisedIngredients: ICategorisedIngredient[]
@@ -28,7 +27,7 @@ export interface IngredientsInnerWrapperProps {
 
 const SelectionTable: React.SFC<SelectionTableProps> = ({ categorisedIngredients, baseProduct }) => {
 
-  const { updateCategorisedIngredients, toggleDescriptionVisibility, isDescriptionVisible, addToMixture, currentMixture, headings, updateHeadings, setApplicationError, userName, isProductBeingAmended, updateIsCheckoutButtonSelected, isCheckoutButtonSelected, uniqueId, bearerToken, saveUserName, toggleCustomiseMessageVisibility, tempProductId, fragranceData, updateFragranceData, moisturiserSize } = useContext(CustomiseContext);
+  const { updateCategorisedIngredients, toggleDescriptionVisibility, isDescriptionVisible, addToMixture, currentMixture, headings, updateHeadings, setApplicationError, userName, isProductBeingAmended, updateIsCheckoutButtonSelected, isCheckoutButtonSelected, uniqueId, bearerToken, saveUserName, toggleCustomiseMessageVisibility, tempProductId, moisturiserSize } = useContext(CustomiseContext);
 
   const returnCurrentMixtureTotal = () => currentMixture.length;
 
@@ -175,7 +174,7 @@ const SelectionTable: React.SFC<SelectionTableProps> = ({ categorisedIngredients
     updateHeadings(
       headings.map(heading => {
         heading.selected = false;
-        if (heading.id === 1) // summary heading id
+        if (heading.id === HeadingIds.Selection) 
           heading.selected = !heading.selected;
         return heading;
       })
@@ -196,7 +195,7 @@ const SelectionTable: React.SFC<SelectionTableProps> = ({ categorisedIngredients
   }
 
   const isSummaryHeadingSelected = () => {
-    return (headings.find(heading => heading.selected) as IHeading).id === 1;
+    return (headings.find(heading => heading.selected) as IHeading).id === HeadingIds.Selection;
   }
 
   const createWordpressProduct = async () => {
@@ -222,7 +221,7 @@ const SelectionTable: React.SFC<SelectionTableProps> = ({ categorisedIngredients
           if (product) {
             updateTempIds(product.id)
               .then(x => {
-                window.location.assign(`${process.env.REACT_APP_WEBSITE_URL}/cart?add-to-cart=${product.id}`)
+                window.location.assign(`${process.env.REACT_APP_WEBSITE_URL}/checkout?add-to-cart=${product.id}`)
               })
               .catch(error => {
                 setApplicationError({
@@ -266,15 +265,18 @@ const SelectionTable: React.SFC<SelectionTableProps> = ({ categorisedIngredients
   const showRemoveOrAdd = () => getAlreadyAddedMixtureIngredients() ? "Remove -" : "Add +";
 
   const getMixturePrice = () => {
-    const basePrice = moisturiserSize === "50ml" ? Number(baseProduct.price) : Number(baseProduct.smallerSizePrice)
+    const basePrice = moisturiserSize === "50ml" ? Number(baseProduct.price) : Number(baseProduct.smallerSizePrice);
+    const ingerdientsPrice = currentMixture.length > 0 ? currentMixture.map(i => Number(i.price)).reduce((a, c) => a + c) : 0;
+    const minus75Percent = ingerdientsPrice * 0.75;
     if (currentMixture.length) {
       const addedIngredientsPrice =
         currentMixture
           .map(x => Number(x.price))
           .reduce((acc, val) => acc + val);
-      return addedIngredientsPrice + basePrice;
+      const priceWithDiscount = addedIngredientsPrice - minus75Percent;
+      return moisturiserSize === "50ml" ? (addedIngredientsPrice + basePrice).toFixed(2) : (basePrice +  priceWithDiscount).toFixed(2);
     }
-    return Number(baseProduct.price);
+    return Number(baseProduct.price).toFixed(2);
   }
 
   const createFinalProductToSaveToDatabase = () => {
@@ -287,7 +289,7 @@ const SelectionTable: React.SFC<SelectionTableProps> = ({ categorisedIngredients
         }
       }),
       amended: isProductBeingAmended,
-      isFragranceFree: fragranceData.answers.filter(a => a.selected)[0].id === FragranceAnswer.Yes
+      isFragranceFree: true
     };
     return databaseProduct;
   }
@@ -321,7 +323,7 @@ const SelectionTable: React.SFC<SelectionTableProps> = ({ categorisedIngredients
   }
 
   const newProduct = {
-    name: userName ? `${userName}'s Product` : "Your bespoke product",
+    name: userName ? `${userName}'s Bespoke Moisturiser (${currentMixture.flatMap(mix => mix.name).join(", ")}), ${moisturiserSize}` : `Your Bespoke Moisturiser (${currentMixture.flatMap(mix => mix.name).join(", ")}), ${moisturiserSize}`,
     type: 'simple',
     regular_price: `${getMixturePrice()}`,
     description: '',
@@ -333,19 +335,13 @@ const SelectionTable: React.SFC<SelectionTableProps> = ({ categorisedIngredients
     ],
     images: [
       {
-        src: 'http://baseplus.co.uk/wp-content/uploads/2018/12/productImageDefault.jpg'
+        src: moisturiserSize === "50ml" ? 'https://baseplus.co.uk/wp-content/uploads/2019/11/basetubeedited-e1590996899944.png' : "https://baseplus.co.uk/wp-content/uploads/2021/02/base-moistuirser-small-scaled.jpg"
       }
     ]
   }
 
-  const onFragranceAnswerClick = (id: FragranceAnswer) => {
-    const fragranceDataCopy = Object.assign({}, fragranceData);
-    fragranceDataCopy.answers.forEach(f => f.selected = f.id === id);
-    updateFragranceData(fragranceDataCopy);
-  }
-
   const getPriceBasedOnSize = () => {
-    return moisturiserSize === "50ml" ? Number(baseProduct.price) : Number(baseProduct.smallerSizePrice);
+    return moisturiserSize === "50ml" ? Number(baseProduct.price).toFixed(2) : Number(baseProduct.smallerSizePrice).toFixed(2);
   }
 
   return (
@@ -354,10 +350,10 @@ const SelectionTable: React.SFC<SelectionTableProps> = ({ categorisedIngredients
         isCheckoutButtonSelected ?
           <LoadingWrapper>
             <LoadingAnimation />
-            <StyledText>{`Thank you${userName ? ` ${userName}` : ''}, please wait whilst we create your bespoke product`}</StyledText>
+            <StyledText>{`Thank you${userName ? ` ${userName}` : ''}, please wait whilst we create your bespoke moisturiser`}</StyledText>
           </LoadingWrapper>
           :
-          <SelectionWrapper className={headings.filter(h => h.selected)[0].id === 1 ? "addScroll" : ""}>
+          <SelectionWrapper className={headings.filter(h => h.selected)[0].id === HeadingIds.Selection ? "addScroll" : ""}>
             <Categories>
               {
                 !isSummaryHeadingSelected() &&
@@ -371,7 +367,7 @@ const SelectionTable: React.SFC<SelectionTableProps> = ({ categorisedIngredients
                 {changeHeadingTextIfDesktop()}
               </StyledHeading>
             </Ingredients>
-            <IngredientsWrapper className={headings.filter(h => h.selected)[0].id === 1 ? "moveUp" : ""}>
+            <IngredientsWrapper className={headings.filter(h => h.selected)[0].id === HeadingIds.Selection ? "moveUp" : ""}>
               <React.Fragment>
                 {!isSummaryHeadingSelected() && <Message onClick={() => toggleViews(headings[1].id, true)}>{getSelectionMessage()}</Message>}
                 <SelectedIngredientsWrapper>
@@ -453,24 +449,6 @@ const SummaryIngredientsWrap = styled.div`
     margin: 0;
   }
 `
-
-const FragranceFreeQuestionWrap = styled.div`
-  display: flex;
-  justify-content: space-between;
-  margin: 15px auto 30px auto;
-  align-items: center;
-  .selected {
-    border: solid 1px ${props => props.theme.brandColours.basePink};
-    ${props => props.theme.mediaQueries.tablet} {
-      border: solid 2px ${props => props.theme.brandColours.basePink};
-    }
-    color: ${props => props.theme.brandColours.basePink};
-  }
-  button + button {
-    margin-left: 10px;
-  }
-`
-
 const LoadingWrapper = styled.div`
   text-align: center;
 `
@@ -708,7 +686,7 @@ const IngredientsInnerWrapper = styled.div`
   width: 90%;
   grid-gap: 20px;
   max-height: 376px;
-  overflow: scroll;
+  overflow: auto;
   ${props => props.theme.mediaQueries.tablet} {
     grid-template-columns: 1fr 1fr;
     grid-template-rows: repeat(${(props: IngredientsInnerWrapperProps) => props.templateRows}, 160px);
