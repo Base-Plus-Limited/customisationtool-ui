@@ -42,28 +42,6 @@ const Button = styled.button`
   }
 `
 
-const FragranceButton = styled(StyledButton)`
-  font-size: 9pt;
-  font-family: ${props => props.theme.subHeadingFont};
-  text-transform: uppercase;
-  background: #fff;
-  display: inline-block;
-  outline: none;
-  -webkit-tap-highlight-color: transparent;
-  margin: 0;
-  border-radius: 0px;
-  border: solid 1px ${props => props.theme.brandColours.baseDarkGreen};
-  &:focus{
-    outline: none;
-  }
-  ${props => props.theme.mediaQueries.tablet} {
-    font-size: 8pt;
-    margin: 15px 0 0 0;
-    width: auto;
-    padding: 8px 14px;
-  }
-`
-
 const FooterButton = styled.button`
   font-size: 9pt;
   font-family: ${props => props.theme.subHeadingFont};
@@ -92,4 +70,4 @@ const FooterButton = styled.button`
   }
 `
 
-export {StyledButton, FooterButton, FragranceButton};
+export {StyledButton, FooterButton};

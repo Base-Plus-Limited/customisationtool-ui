@@ -2,5 +2,10 @@ export interface IHeading {
   headingText: string;
   desktopText?: string;
   selected: boolean;
-  id: number;
+  id: HeadingIds;
+}
+
+export enum HeadingIds {
+  Summary = 0,
+  Selection = 1
 }
