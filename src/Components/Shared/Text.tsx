@@ -36,7 +36,7 @@ const Message = styled(Text)`
 `
 const SummaryPriceRow = styled(Text)`
   width: 100%;
-  max-width: 70%;
+  max-width: 80%;
   padding: 10px 0;
   margin: 0 auto;
   text-align: left;
