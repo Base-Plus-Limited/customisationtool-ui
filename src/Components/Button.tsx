@@ -23,6 +23,7 @@ const Button = styled.button`
   text-transform: uppercase;
   color: #fff;
   display: inline-block;
+  border: none;
   outline: none;
   -webkit-tap-highlight-color: transparent;
   margin: 0;

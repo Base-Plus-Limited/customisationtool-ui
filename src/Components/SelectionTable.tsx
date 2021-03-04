@@ -15,6 +15,7 @@ import { getUniqueIngredients } from '../Helpers/Helpers';
 import ICustomProductDBModel from '../Interfaces/CustomProduct';
 import LoadingAnimation from './LoadingAnimation';
 import { track } from './Analytics';
+import StyledMoisturiserSizes from './MoisturiserSizes';
 
 export interface SelectionTableProps {
   categorisedIngredients: ICategorisedIngredient[]
@@ -27,7 +28,7 @@ export interface IngredientsInnerWrapperProps {
 
 const SelectionTable: React.SFC<SelectionTableProps> = ({ categorisedIngredients, baseProduct }) => {
 
-  const { updateCategorisedIngredients, toggleDescriptionVisibility, isDescriptionVisible, addToMixture, currentMixture, headings, updateHeadings, setApplicationError, userName, isProductBeingAmended, updateIsCheckoutButtonSelected, isCheckoutButtonSelected, uniqueId, bearerToken, saveUserName, toggleCustomiseMessageVisibility, tempProductId, moisturiserSize } = useContext(CustomiseContext);
+  const { updateCategorisedIngredients, toggleDescriptionVisibility, isDescriptionVisible, addToMixture, currentMixture, headings, updateHeadings, setApplicationError, userName, isProductBeingAmended, updateIsCheckoutButtonSelected, isCheckoutButtonSelected, uniqueId, bearerToken, saveUserName, toggleCustomiseMessageVisibility, tempProductId, moisturiserSize, saveMoisturiserSize } = useContext(CustomiseContext);
 
   const returnCurrentMixtureTotal = () => currentMixture.length;
 
@@ -344,6 +345,10 @@ const SelectionTable: React.SFC<SelectionTableProps> = ({ categorisedIngredients
     return moisturiserSize === "50ml" ? Number(baseProduct.price).toFixed(2) : Number(baseProduct.smallerSizePrice).toFixed(2);
   }
 
+  const toggleSelectedSize = () => {
+    moisturiserSize === "30ml" ? saveMoisturiserSize("50ml") : saveMoisturiserSize("30ml");
+  }
+
   return (
     <React.Fragment>
       {
@@ -387,6 +392,7 @@ const SelectionTable: React.SFC<SelectionTableProps> = ({ categorisedIngredients
                         {currentMixture.map(ingredient => <SummaryPriceRow key={ingredient.id}>{ingredient.name} <span>£{Number(ingredient.price).toFixed(2)}</span></SummaryPriceRow>)}
                         {<SummaryPriceRow>{baseProduct.name + `, ${moisturiserSize}`} <span>£{getPriceBasedOnSize()}</span></SummaryPriceRow>}
                         {<TotalPriceRow>Mixture <span>£{getMixturePrice()}</span></TotalPriceRow>}
+                        <StyledMoisturiserSizes onClick={toggleSelectedSize} selectedSize={moisturiserSize}></StyledMoisturiserSizes>
                         <StyledButton onClick={() => currentMixture.length === 2 ? saveProductToDatabase() : toggleViews(0)}>{currentMixture.length === 2 ? 'Checkout' : 'Back'}</StyledButton>
                       </SummaryPrices>
                     </SummaryIngredientsWrap>
