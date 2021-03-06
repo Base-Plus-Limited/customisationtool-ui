@@ -72,7 +72,7 @@ export const CustomiseProvider: React.SFC<CustomiseProviderProps> = ({ children 
   const [bearerToken, saveBearerToken] = useState<string>("");
   const [isCustomiseMessageVisible, toggleCustomiseMessageVisibility] = useState<boolean>(false);
   const [tempProductId, saveTempProductId] = useState<number>(0);
-  const [moisturiserSize, saveMoisturiserSize] = useState<MoisturiserSize>("50ml");
+  const [moisturiserSize, saveMoisturiserSize] = useState<MoisturiserSize>("30ml");
 
   return (
     <CustomiseContext.Provider value={{

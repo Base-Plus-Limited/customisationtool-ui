@@ -75,7 +75,7 @@ const StyledCustomiseScreen: React.SFC<CustomiseScreenProps> = () => {
     const moisturiserSize = (params.get('size') as MoisturiserSize);
     const uniqueId = String(params.get('uniqueid') === null ? generateUniqueId() : params.get('uniqueid'));
     saveUniqueId(uniqueId);
-    saveMoisturiserSize(moisturiserSize ? moisturiserSize : "50ml");
+    saveMoisturiserSize(moisturiserSize ? moisturiserSize : "30ml");
 
     if(tempProductId !== null) {
       saveTempProductId(Number(tempProductId));
