@@ -2,7 +2,7 @@ export interface IAnalyticsEvent {
   distinct_id: string; 
   event_type: EventType;
   category_name?: string;
-  ingredients?: string;
+  recommendedVariation?: string;
   read_description_for?: string;
   selected_ingredient?: string;
 }

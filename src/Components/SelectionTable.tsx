@@ -28,13 +28,13 @@ export interface IngredientsInnerWrapperProps {
 
 const SelectionTable: React.SFC<SelectionTableProps> = ({ categorisedIngredients, baseProduct }) => {
 
-  const { updateCategorisedIngredients, toggleDescriptionVisibility, isDescriptionVisible, addToMixture, currentMixture, headings, updateHeadings, setApplicationError, userName, isProductBeingAmended, updateIsCheckoutButtonSelected, isCheckoutButtonSelected, uniqueId, bearerToken, saveUserName, toggleCustomiseMessageVisibility, tempProductId, moisturiserSize, saveMoisturiserSize } = useContext(CustomiseContext);
+  const { updateCategorisedIngredients, toggleDescriptionVisibility, isDescriptionVisible, addToMixture, currentMixture, headings, updateHeadings, setApplicationError, userName, isProductBeingAmended, updateIsCheckoutButtonSelected, isCheckoutButtonSelected, analyticsId, bearerToken, saveUserName, toggleCustomiseMessageVisibility, longUniqueId, moisturiserSize, saveMoisturiserSize } = useContext(CustomiseContext);
 
   const returnCurrentMixtureTotal = () => currentMixture.length;
 
   const onCategorySelect = (categoryId: number) => {
     track({
-      distinct_id: uniqueId,
+      distinct_id: analyticsId,
       event_type: "Category selected",
       category_name: categorisedIngredients.filter(cat => cat.id === categoryId)[0].category
     }, bearerToken);
@@ -74,7 +74,7 @@ const SelectionTable: React.SFC<SelectionTableProps> = ({ categorisedIngredients
       if(cat.selected) {
         const selectedIngredient = cat.ingredients.filter(ingredient => ingredient.selected);
         track({
-          distinct_id: uniqueId,
+          distinct_id: analyticsId,
           event_type: "Ingredient selected",
           selected_ingredient: selectedIngredient[0].name
         }, bearerToken);
@@ -138,7 +138,7 @@ const SelectionTable: React.SFC<SelectionTableProps> = ({ categorisedIngredients
         const selectedIngredient = cat.ingredients.filter(ingredient => ingredient.selected);
         if (!isDescriptionVisible) {
           track({
-            distinct_id: uniqueId,
+            distinct_id: analyticsId,
             event_type: "Open description",
             read_description_for: selectedIngredient[0].name
           }, bearerToken);
@@ -215,23 +215,12 @@ const SelectionTable: React.SFC<SelectionTableProps> = ({ categorisedIngredients
       }))
       .then((product: IWordpressProduct) => {
         track({
-          distinct_id: uniqueId,
+          distinct_id: analyticsId,
           event_type: "Buy now selected",
-          ingredients: currentMixture.map(x => x.name).join(' & ')
+          recommendedVariation: currentMixture.map(x => x.name).join(' & ')
         }, bearerToken).then(() => {
           if (product) {
-            updateTempIds(product.id)
-              .then(x => {
-                window.location.assign(`${process.env.REACT_APP_WEBSITE_URL}/checkout?add-to-cart=${product.id}`)
-              })
-              .catch(error => {
-                setApplicationError({
-                  error: true,
-                  code: error.code,
-                  message: error.message,
-                  uiMessage: "Sorry, we weren't able to create your product. Please try again later"
-                })
-              })
+            window.location.assign(`${process.env.REACT_APP_WEBSITE_URL}/checkout?add-to-cart=${product.id}`);
           }
         });
       })
@@ -243,22 +232,6 @@ const SelectionTable: React.SFC<SelectionTableProps> = ({ categorisedIngredients
           uiMessage: "Sorry, we weren't able to create your product. Please try again later"
         })
       });
-  }
-
-  const updateTempIds = (productId: number) => {
-    return fetch(`${process.env.REACT_APP_SERVER_URL}/update`, {
-      method: 'POST',
-      body: JSON.stringify({
-        tempId: tempProductId,
-        productId: productId,
-        hasQuizBeenTaken: isProductBeingAmended
-      }),
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': 'Bearer ' + bearerToken
-      },
-      cache: 'no-cache'
-    })
   }
 
   const toggleButtonText = () => currentMixture.length !== 2 ? showRemoveOrAdd() : "view summary";
@@ -282,15 +255,10 @@ const SelectionTable: React.SFC<SelectionTableProps> = ({ categorisedIngredients
 
   const createFinalProductToSaveToDatabase = () => {
     const databaseProduct: ICustomProductDBModel = {
-      productId: tempProductId,
-      ingredients: currentMixture.map(ingredient => {
-        return {
-          name: ingredient.name,
-          id: ingredient.id
-        }
-      }),
-      amended: isProductBeingAmended,
-      isFragranceFree: true
+      productId: longUniqueId,
+      recommendedVariation: currentMixture.map(ingredient => ingredient.name).join(' & '),
+      newVariation: "",
+      amended: isProductBeingAmended
     };
     return databaseProduct;
   }

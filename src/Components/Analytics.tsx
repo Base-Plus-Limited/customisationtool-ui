@@ -12,13 +12,13 @@ export const track = async (event: IAnalyticsEvent, bearerToken: string) => {
       distinct_id: event.distinct_id,
       category_name: event.category_name,
       read_description_for: event.read_description_for,
-      ingredients: event.ingredients,
+      ingredients: event.recommendedVariation,
       selected_ingredient: event.selected_ingredient
     })
   }).then()
   .catch((error) => console.error(error))
 }
 
-export const generateUniqueId = () => {
+export const generateAnalyticsId = () => {
   return btoa(Math.random().toString()).substring(0,12)
 }
