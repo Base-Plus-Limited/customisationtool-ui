@@ -8,7 +8,7 @@ import { getUniqueIngredients } from '../Helpers/Helpers';
 import { ISelectableProduct } from '../Interfaces/WordpressProduct';
 import StyledErrorScreen from '../Components/ErrorScreen';
 import IErrorResponse from '../Interfaces/ErrorResponse';
-import { generateUniqueId, track } from '../Components/Analytics';
+import { generateAnalyticsId, track } from '../Components/Analytics';
 import { LoadingMessage, InfoMessageForAmendingUsers } from '../Components/Shared/Text';
 import { MoisturiserSize } from '../Interfaces/MoisturiserSize';
 
@@ -18,7 +18,7 @@ export interface CustomiseScreenProps {
 
 const StyledCustomiseScreen: React.SFC<CustomiseScreenProps> = () => {
 
-  const { updateCategorisedIngredients, categorisedIngredients, setApplicationError, saveBaseProduct, baseProduct, saveUserName, updateIsProductBeingAmended, addToMixture, hasApplicationErrored, saveUniqueId, saveBearerToken, userName, currentMixture, isProductBeingAmended, isCustomiseMessageVisible, toggleCustomiseMessageVisibility, saveTempProductId, saveMoisturiserSize } = useContext(CustomiseContext);
+  const { updateCategorisedIngredients, categorisedIngredients, setApplicationError, saveBaseProduct, baseProduct, saveUserName, updateIsProductBeingAmended, addToMixture, hasApplicationErrored, saveAnalyticsId, saveBearerToken, userName, currentMixture, isProductBeingAmended, isCustomiseMessageVisible, toggleCustomiseMessageVisibility, saveLongUniqueId, saveMoisturiserSize } = useContext(CustomiseContext);
 
   useEffect(() => {
     fetch(`${process.env.REACT_APP_SERVER_URL}/get-token`)
@@ -71,16 +71,16 @@ const StyledCustomiseScreen: React.SFC<CustomiseScreenProps> = () => {
     const params = new URLSearchParams(window.location.search.substring(1));
     const productIds: number[] = [Number(params.get('productone')), Number(params.get('producttwo'))];
     const userName = params.get('username');
-    const tempProductId = params.get('tempproductid');
+    const longUniqueId = params.get('longuniqueid');
     const moisturiserSize = (params.get('size') as MoisturiserSize);
-    const uniqueId = String(params.get('uniqueid') === null ? generateUniqueId() : params.get('uniqueid'));
-    saveUniqueId(uniqueId);
+    const analyticsId = String(params.get('analyticsid') === null ? generateAnalyticsId() : params.get('analyticsid'));
+    saveAnalyticsId(analyticsId);
     saveMoisturiserSize(moisturiserSize ? moisturiserSize : "30ml");
 
-    if(tempProductId !== null) {
-      saveTempProductId(Number(tempProductId));
+    if(longUniqueId !== null) {
+      saveLongUniqueId(Number(longUniqueId));
     } else {
-      saveTempProductId(generateTempProductId());
+      saveLongUniqueId(generateLongUniqueId());
     }
     if(userName !== null)
       saveUserName(userName);
@@ -91,12 +91,12 @@ const StyledCustomiseScreen: React.SFC<CustomiseScreenProps> = () => {
       window.history.pushState({}, document.title, window.location.href.split("?")[0]);
     }
     track({
-      distinct_id: uniqueId,
+      distinct_id: analyticsId,
       event_type: "Customisation started"
     }, bearer);
   }
 
-  const generateTempProductId = () => {
+  const generateLongUniqueId = () => {
     return Number(Math.random().toString().split('.')[1].slice(0,5));
   }
 

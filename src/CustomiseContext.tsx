@@ -29,14 +29,14 @@ const state: ICustomiseContext = {
   updateIsProductBeingAmended: (previousProductBeingAmended: SetStateAction<boolean>) => previousProductBeingAmended,
   isCheckoutButtonSelected: false,
   updateIsCheckoutButtonSelected: (previousIsCheckoutButtonSelected: SetStateAction<boolean>) => previousIsCheckoutButtonSelected,
-  uniqueId: "",
-  saveUniqueId: (previousUniqueId: SetStateAction<string>) => previousUniqueId,
+  analyticsId: "",
+  saveAnalyticsId: (previousAnalyticsId: SetStateAction<string>) => previousAnalyticsId,
   bearerToken: "",
   saveBearerToken: (previousBearerToken: SetStateAction<string>) => previousBearerToken,
   isCustomiseMessageVisible: false,
   toggleCustomiseMessageVisibility: (previousMessageVisibility: SetStateAction<boolean>) => previousMessageVisibility,
-  tempProductId: 0,
-  saveTempProductId: (previousId: SetStateAction<number>) => previousId
+  longUniqueId: 0,
+  saveLongUniqueId: (previousId: SetStateAction<number>) => previousId
 }
 
 export const CustomiseContext = createContext(state);
@@ -68,10 +68,10 @@ export const CustomiseProvider: React.SFC<CustomiseProviderProps> = ({ children 
   const [baseProduct, saveBaseProduct] = useState<ISelectableProduct>({} as ISelectableProduct);
   const [isProductBeingAmended, updateIsProductBeingAmended] = useState<boolean>(false);
   const [isCheckoutButtonSelected, updateIsCheckoutButtonSelected] = useState<boolean>(false);
-  const [uniqueId, saveUniqueId] = useState<string>("");
+  const [analyticsId, saveAnalyticsId] = useState<string>("");
   const [bearerToken, saveBearerToken] = useState<string>("");
   const [isCustomiseMessageVisible, toggleCustomiseMessageVisibility] = useState<boolean>(false);
-  const [tempProductId, saveTempProductId] = useState<number>(0);
+  const [longUniqueId, saveLongUniqueId] = useState<number>(0);
   const [moisturiserSize, saveMoisturiserSize] = useState<MoisturiserSize>("30ml");
 
   return (
@@ -98,14 +98,14 @@ export const CustomiseProvider: React.SFC<CustomiseProviderProps> = ({ children 
       updateIsProductBeingAmended,
       isCheckoutButtonSelected,
       updateIsCheckoutButtonSelected,
-      uniqueId,
-      saveUniqueId,
+      analyticsId,
+      saveAnalyticsId,
       bearerToken,
       saveBearerToken,
       isCustomiseMessageVisible,
       toggleCustomiseMessageVisibility,
-      tempProductId,
-      saveTempProductId
+      longUniqueId,
+      saveLongUniqueId
     }}>
       {children}
     </CustomiseContext.Provider>

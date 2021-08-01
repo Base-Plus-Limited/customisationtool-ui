@@ -28,12 +28,12 @@ export default interface ICustomiseContext {
   updateIsProductBeingAmended: Dispatch<SetStateAction<boolean>>;
   isCheckoutButtonSelected: boolean;
   updateIsCheckoutButtonSelected: Dispatch<SetStateAction<boolean>>;
-  uniqueId: string;
-  saveUniqueId: Dispatch<SetStateAction<string>>;
+  analyticsId: string;
+  saveAnalyticsId: Dispatch<SetStateAction<string>>;
   bearerToken: string;
   saveBearerToken: Dispatch<SetStateAction<string>>;
   isCustomiseMessageVisible: boolean;
   toggleCustomiseMessageVisibility: Dispatch<SetStateAction<boolean>>;
-  tempProductId: number;
-  saveTempProductId: Dispatch<SetStateAction<number>>;
+  longUniqueId: number;
+  saveLongUniqueId: Dispatch<SetStateAction<number>>;
 }

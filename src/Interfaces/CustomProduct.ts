@@ -1,12 +1,11 @@
 export default interface ICustomProductDBModel {
-  ingredients: IIngredient[];
+  newVariation: IIngredient[] | string;
+  recommendedVariation: IIngredient[] | string;
   amended: boolean;
   productId: number;
-  isFragranceFree: boolean;
 }
 
-interface IIngredient {
+export interface IIngredient {
   id: number;
   name: string;
 }
-
